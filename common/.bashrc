@@ -75,7 +75,8 @@ alias la='ls -A'
 alias l='ls -CF'
 
 # locale
-export LC_ALL=en_US.UTF-8
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
 
 # slurm shortcuts and settings
 alias sb='sbatch'
