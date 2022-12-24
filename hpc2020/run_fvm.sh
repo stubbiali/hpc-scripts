@@ -18,7 +18,7 @@ else
   NUM_TASKS_PER_NODE=1
 fi
 
-BRANCH="$BRANCH" ENV="$ENV" MPI="$MPI" . prepare_fvm.sh
+. prepare_fvm.sh
 pushd "$FVM" || return
 . "$VENV"/bin/activate
 pushd drivers || return
