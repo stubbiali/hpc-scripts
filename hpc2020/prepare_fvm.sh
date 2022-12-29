@@ -2,7 +2,7 @@
 
 BRANCH=${BRANCH:-main}
 ENV=${ENV:-gnu}
-MPI=${MPI:-openmpi}
+MPI=${MPI:-none}
 
 # unload all modules
 module purge
@@ -38,7 +38,7 @@ elif [ "$MPI" = "intel" ]; then
     module load intel-mpi
 elif [ "$MPI" = "hpcx" ]; then
     module load hpcx-openmpi/2.10.0
-else
+elif [ "$MPI" != "none" ]; then
     echo "Unknown MPI installation '$MPI'."
     return
 fi

@@ -2,6 +2,7 @@
 
 set -a
 
+BRANCH=${BRANCH:-distributed}
 ENV_L=( gnu )
 GT_BACKEND_L=( gt:cpu_kfirst )
 MPI_L=( openmpi )
