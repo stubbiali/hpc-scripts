@@ -10,7 +10,7 @@ module load env/release/2022.1
 
 # load compilers and libraries
 module load GCC
-module load NVHPC/22.7-CUDA-11.7.0
+module load CUDA/11.7.0
 
 # load tools
 module load Boost
@@ -28,7 +28,7 @@ module load Python
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH/${NVHPC_CUDA_LIB_PATH}:/}"
 
 # set path to FVM code
-export FVM=$SCRATCH/fvm-gt4py/$BRANCH
+export FVM="$SCRATCH"/fvm-gt4py/"$BRANCH"
 export GT_CACHE_ROOT=$FVM/gt_cache
 export GT_CACHE_DIR_NAME=.gt_cache
-export DACE_CONFIG=$GT_CACHE_ROOT/.dace.conf
+export DACE_CONFIG="$GT_CACHE_ROOT"/.dace.conf
