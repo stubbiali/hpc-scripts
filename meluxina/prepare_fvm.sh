@@ -16,7 +16,7 @@ module load CUDA/11.7.0
 module load Boost
 module load CMake
 module load netCDF
-module load OpenMPI/4.1.4-GCC-11.3.0
+module load OpenMPI/4.1.4-NVHPC-22.7-CUDA-11.7.0
 module load Python
 
 # set/fix CUDA-related variables
@@ -28,7 +28,7 @@ module load Python
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH/${NVHPC_CUDA_LIB_PATH}:/}"
 
 # set path to FVM code
-export FVM="$SCRATCH"/fvm-gt4py/"$BRANCH"
+export FVM=/project/scratch/p200061/nasu/fvm-gt4py/"$BRANCH"
 export GT_CACHE_ROOT=$FVM/gt_cache
 export GT_CACHE_DIR_NAME=.gt_cache
 export DACE_CONFIG="$GT_CACHE_ROOT"/.dace.conf
