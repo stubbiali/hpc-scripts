@@ -6,8 +6,8 @@ GT_BACKEND=${GT_BACKEND:-gt:cpu_kfirst}
 MPI=${MPI:-none}
 NUM_NODES=${NUM_NODES:-1}
 NUM_RUNS=${NUM_RUNS:-5}
-NUM_TASKS=${NUM_TASKS:-1}
-NUM_THREADS=${NUM_THREADS:-12}
+NUM_TASKS_PER_NODE=${NUM_TASKS_PER_NODE:-1}
+NUM_THREADS=${NUM_THREADS:-}
 OVERCOMPUTING=${OVERCOMPUTING:-0}
 USE_CASE=${USE_CASE:-thermal}
 
@@ -17,10 +17,10 @@ else
   VENV=venv/"$ENV"-"$MPI"
 fi
 
-if [ "$NUM_TASKS" -gt "$NUM_NODES" ]; then
-  NUM_TASKS_PER_NODE=2
-else
-  NUM_TASKS_PER_NODE=1
+NUM_TASKS=$(( NUM_TASKS_PER_NODE * NUM_NODES ))
+CPUS_PER_TASK=$(( 256 / NUM_TASKS_PER_NODE ))
+if [ -z "$NUM_THREADS" ]; then
+  NUM_THREADS=$(( 128 / NUM_TASKS_PER_NODE ))
 fi
 
 . prepare_fvm.sh
@@ -37,9 +37,9 @@ for i in $(eval echo "{1..$NUM_RUNS}"); do
     GHEX_MAX_NUM_FIELDS_PER_COMM=13 \
     OMP_NUM_THREADS="$NUM_THREADS" \
     OMP_PLACES=cores \
-    OMP_PROC_BIND=spread \
+    OMP_PROC_BIND=close \
     srun \
-      --cpus-per-task=256 \
+      --cpus-per-task="$CPUS_PER_TASK" \
       --nodes="$NUM_NODES" \
       --ntasks="$NUM_TASKS" \
       --ntasks-per-node="$NUM_TASKS_PER_NODE" \

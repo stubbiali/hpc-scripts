@@ -2,7 +2,7 @@
 
 BRANCH=distributed
 ENV_L=( gnu )
-MPI_L=( openmpi )
+MPI_L=( openmpi hpcx )
 
 mkdir -p fvm-gt4py/"$BRANCH"/venv
 
@@ -12,6 +12,7 @@ for ENV in "${ENV_L[@]}"; do
     pushd "$FVM" || return
     ENABLE_DISTRIBUTED=1 \
       ENABLE_GPU=0 \
+      GHEX_PREFIX="$MPI" \
       INSTALL_PRE_COMMIT=0 \
       MPICC=mpicc \
       MPICXX=mpicxx \
