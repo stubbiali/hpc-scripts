@@ -19,6 +19,9 @@ pushd "$FVM" || return
 . venv/bin/activate
 pushd drivers || return
 
+export OMPI_MCA_btl_openib_want_cuda_gdr=1
+export UCX_MAX_RNDV_RAILS=1
+
 for i in $(eval echo "{1..$NUM_RUNS}"); do
   echo "NUM_NODES=$NUM_NODES: start"
   GT_BACKEND="$GT_BACKEND" \

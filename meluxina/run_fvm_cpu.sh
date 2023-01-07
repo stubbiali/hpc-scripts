@@ -5,7 +5,7 @@ GT_BACKEND=${GT_BACKEND:-dace:gpu}
 NUM_NODES=${NUM_NODES:-1}
 NUM_RUNS=${NUM_RUNS:-5}
 NUM_TASKS=${NUM_TASKS:-1}
-NUM_THREADS=${NUM_THREADS:-16}
+NUM_THREADS=${NUM_THREADS:-64}
 OVERCOMPUTING=${OVERCOMPUTING:-0}
 USE_CASE=${USE_CASE:-thermal}
 
@@ -20,8 +20,6 @@ pushd "$FVM" || return
 . venv/bin/activate
 pushd drivers || return
 
-export UCX_MAX_RNDV_RAILS=1
-
 for i in $(eval echo "{1..$NUM_RUNS}"); do
   echo "NUM_NODES=$NUM_NODES: start"
   GT_BACKEND="$GT_BACKEND" \
@@ -30,11 +28,12 @@ for i in $(eval echo "{1..$NUM_RUNS}"); do
     OMP_NUM_THREADS="$NUM_THREADS" \
     OMP_PLACES=cores \
     OMP_PROC_BIND=close \
+    OMP_DISPLAY_AFFINITY=true \
     srun \
       --nodes="$NUM_NODES" \
       --ntasks="$NUM_TASKS" \
       --ntasks-per-node="$NUM_TASKS_PER_NODE" \
-      --cpus-per-task=32 \
+      --cpus-per-task=256 \
       python run_model.py \
         ../config/weak-scaling/"$USE_CASE"/"$NUM_TASKS".yml \
         --csv-file=../data/meluxina/weak-scaling/"$USE_CASE"/"$NUM_TASKS".csv
