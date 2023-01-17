@@ -1,30 +1,31 @@
 #!/bin/bash -l
 
 BRANCH=${BRANCH:-distributed}
-GT_BACKEND=${GT_BACKEND:-dace:gpu}
+GT_BACKEND=${GT_BACKEND:-gt:cpu_kfirst}
+MPI=${MPI:-openmpi}
 NUM_NODES=${NUM_NODES:-1}
 NUM_RUNS=${NUM_RUNS:-5}
-NUM_TASKS=${NUM_TASKS:-1}
+NUM_TASKS_PER_NODE=${NUM_TASKS_PER_NODE:-1}
 NUM_THREADS=${NUM_THREADS:-64}
-OVERCOMPUTING=${OVERCOMPUTING:-0}
+NUMPY_DTYPE=${NUMPY_DTYPE:-float64}
 USE_CASE=${USE_CASE:-thermal}
 
-#if [ "$NUM_TASKS" -gt "$NUM_NODES" ]; then
-#  NUM_TASKS_PER_NODE=2
-#else
-#  NUM_TASKS_PER_NODE=1
-#fi
+CPUS_PER_TASK=$(( 128 / NUM_TASKS_PER_NODE ))
+NUM_TASKS=$(( NUM_NODES * NUM_TASKS_PER_NODE ))
 
 . prepare_fvm.sh
 pushd "$FVM" || return
-. venv/bin/activate
+. venv/gnu-"$MPI"/bin/activate
 pushd drivers || return
 
 for i in $(eval echo "{1..$NUM_RUNS}"); do
-  echo "NUM_NODES=$NUM_NODES: start"
-  GT_BACKEND="$GT_BACKEND" \
-    FVM_ENABLE_BENCHMARKING=1 \
-    FVM_ENABLE_OVERCOMPUTING="$OVERCOMPUTING" \
+  echo "i=$i: start"
+  FVM_ENABLE_BENCHMARKING=1 \
+    FVM_NUMPY_DTYPE="$NUMPY_DTYPE" \
+    GHEX_NUM_COMMS=1 \
+    GHEX_MAX_NUM_FIELDS_PER_COMM=13 \
+    GHEX_PREFIX="$MPI" \
+    GT_BACKEND="$GT_BACKEND" \
     OMP_NUM_THREADS="$NUM_THREADS" \
     OMP_PLACES=cores \
     OMP_PROC_BIND=close \
@@ -33,11 +34,11 @@ for i in $(eval echo "{1..$NUM_RUNS}"); do
       --nodes="$NUM_NODES" \
       --ntasks="$NUM_TASKS" \
       --ntasks-per-node="$NUM_TASKS_PER_NODE" \
-      --cpus-per-task=256 \
+      --cpus-per-task="$CPUS_PER_TASK" \
       python run_model.py \
         ../config/weak-scaling/"$USE_CASE"/"$NUM_TASKS".yml \
-        --csv-file=../data/meluxina/weak-scaling/"$USE_CASE"/"$NUM_TASKS".csv
-  echo "NUM_NODES=$NUM_NODES, i=$i.1: end"
+        --performance-data-file=../data/meluxina/weak-scaling/"$USE_CASE"/"$NUM_TASKS".csv
+  echo "i=$i: end"
   echo ""
 done
 

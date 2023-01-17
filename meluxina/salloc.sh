@@ -1,5 +1,6 @@
 #!/bin/bash -l
 
+ACCOUNT=${ACCOUNT:-p200061}
 NUM_NODES=${NUM_NODES:-1}
 TIME=${TIME:-01:00:00}
 
