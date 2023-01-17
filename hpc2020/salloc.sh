@@ -1,5 +1,6 @@
 #!/bin/bash -l
 
+ACCOUNT=${ACCOUNT:-ecrdmonm}
 NUM_NODES=${NUM_NODES:-1}
 NUM_TASKS=${NUM_TASKS:-}
 TIME=${TIME:-01:00:00}
@@ -9,7 +10,7 @@ if [ -z "$NUM_TASKS" ]; then
 fi
 
 salloc \
-    --account=ecrdmonm \
+    --account="$ACCOUNT" \
     --cpus-per-task=256 \
     --partition=par \
     --qos=np \
