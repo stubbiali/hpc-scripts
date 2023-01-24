@@ -9,6 +9,7 @@ NUM_RUNS=${NUM_RUNS:-5}
 NUM_TASKS_PER_NODE=${NUM_TASKS_PER_NODE:-1}
 NUM_THREADS=${NUM_THREADS:-}
 NUMPY_DTYPE=${NUMPY_DTYPE:-float64}
+OVERCOMPUTING=${OVERCOMPUTING:-0}
 USE_CASE=${USE_CASE:-thermal}
 
 if [ "$MPI" = "none" ]; then
@@ -28,12 +29,16 @@ pushd "$FVM" || return
 . "$VENV"/bin/activate
 pushd drivers || return
 
+mkdir -p ../data/hpc2020/weak-scaling/"$USE_CASE"/"$ENV"/"$MPI"
+
 for i in $(eval echo "{1..$NUM_RUNS}"); do
   echo "NUM_NODES=$NUM_NODES: start"
   FVM_ENABLE_BENCHMARKING=1 \
+    FVM_ENABLE_OVERCOMPUTING="$OVERCOMPUTING" \
     FVM_NUMPY_DTYPE="$NUMPY_DTYPE" \
     GHEX_NUM_COMMS=1 \
     GHEX_MAX_NUM_FIELDS_PER_COMM=13 \
+    GHEX_BUILD_PREFIX="$MPI"\
     GT_BACKEND="$GT_BACKEND" \
     OMP_NUM_THREADS="$NUM_THREADS" \
     OMP_PLACES=cores \

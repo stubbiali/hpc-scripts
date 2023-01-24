@@ -51,6 +51,7 @@ export NVHPC_CUDA_HOME="$CUDA_PATH"
 
 # set path to FVM code
 export FVM="$SCRATCH"/fvm-gt4py/"$BRANCH"
-export GT_CACHE_ROOT="$FVM"/gt_cache/"$ENV"
+export GT_CACHE_ROOT="$SCRATCH"/fvm-gt4py/gt_cache/"$ENV"
 export GT_CACHE_DIR_NAME=.gt_cache
 export DACE_CONFIG="$GT_CACHE_ROOT"/.dace.conf
+export GHEX_BUILD_PREFIX="$MPI"

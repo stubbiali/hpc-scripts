@@ -1,11 +1,11 @@
 #!/bin/bash -l
 
 BRANCH=${BRANCH:-distributed}
-GHEX_PREFIX=${GHEX_PREFIX:-}
 GT_BACKEND=${GT_BACKEND:-gt:cpu_kfirst}
 NUM_NODES=${NUM_NODES:-1}
 NUM_RUNS=${NUM_RUNS:-1}
 NUM_THREADS=${NUM_THREADS:-12}
+NUMPY_DTYPE=${NUMPY_DTYPE:-float64}
 OVERCOMPUTING=${OVERCOMPUTING:-0}
 USE_CASE=${USE_CASE:-thermal}
 VENV=venv
@@ -15,11 +15,14 @@ VENV=venv
 pushd "$FVM" || return
 . "$VENV"/bin/activate
 pushd drivers || return
+
+mkdir -p ../data/daint/weak-scaling/"$USE_CASE"
+
 for i in $(eval echo "{1..$NUM_RUNS}"); do
   echo "NUM_NODES=$NUM_NODES, i=$i: start"
   FVM_ENABLE_BENCHMARKING=1 \
-    FVM_ENABLE_OVERCOMPUTING="$OVERCOMPUTING" \
-    GHEX_PREFIX="$GHEX_PREFIX" \
+    FVM_ENABLE_OVERCOMPUTING=1 \
+    FVM_NUMPY_DTYPE="$NUMPY_DTYPE" \
     GHEX_NUM_COMMS=1 \
     GHEX_MAX_NUM_FIELDS_PER_COMM=13 \
     GT_BACKEND="$GT_BACKEND" \
@@ -27,7 +30,7 @@ for i in $(eval echo "{1..$NUM_RUNS}"); do
     srun -N "$NUM_NODES" -n "$NUM_NODES" \
     python run_model.py \
       ../config/weak-scaling/"$USE_CASE"/"$NUM_NODES".yml \
-      --csv-file=../data/daint/weak-scaling/"$USE_CASE"/"$NUM_NODES".csv
+      --performance-data-file=../data/daint/weak-scaling/"$USE_CASE"/"$NUM_NODES".csv
   echo "NUM_NODES=$NUM_NODES, i=$i: end"
   echo ""
 done
