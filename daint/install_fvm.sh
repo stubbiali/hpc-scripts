@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-BRANCH=distributed-dev
+BRANCH=${BRANCH:-distributed}
 
 . prepare_fvm.sh
 . prepare_mpi.sh
@@ -12,5 +12,8 @@ ENABLE_DISTRIBUTED=1 \
   MPICC=cc \
   MPICXX=CC \
   VENV=venv \
+  FRESH_INSTALL=1 \
+  INSTALL_PARALLEL_HDF5=1 \
+  INSTALL_PARALLEL_NETCDF=1 \
   . bootstrap_venv.sh
 popd || return

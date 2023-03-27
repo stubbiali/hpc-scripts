@@ -7,13 +7,10 @@ module purge
 module load daint-gpu
 module load PrgEnv-gnu
 module load Boost
-module load cray-hdf5-parallel
 module load cray-mpich
-module load cray-netcdf-hdf5parallel
 module load cray-python
 module load CMake
 module load cudatoolkit/11.2.0_3.39-2.1__gf93aa1c
-#module load cudatoolkit/21.9_11.0
 
 NVCC_PATH=$(which nvcc)
 CUDA_PATH=$(echo $NVCC_PATH | sed -e "s/\/bin\/nvcc//g")
