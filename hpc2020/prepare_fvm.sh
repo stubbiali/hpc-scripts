@@ -3,6 +3,7 @@
 BRANCH=${BRANCH:-main}
 ENV=${ENV:-gnu}
 MPI=${MPI:-none}
+PYTHON3_MINOR_VERSION=${PYTHON3_MINOR_VERSION:-8}
 
 # unload all modules
 module purge
@@ -23,13 +24,22 @@ else
     return
 fi
 
+# load python interpreter
+if [ "$PYTHON3_MINOR_VERSION" = "8" ]; then
+    module load python3/3.8.8-01
+elif [ "$PYTHON3_MINOR_VERSION" = "10" ]; then
+    module load python3/3.10.10-01
+else
+    echo "Python 3.$PYTHON3_MINOR_VERSION not available."
+    return
+fi
+
 # load tools and libraries
 module load boost
 module load cmake
 module load hdf5
 module load netcdf4
 module load nvidia/22.11
-module load python3
 
 # load MPI
 if [ "$MPI" = "openmpi" ]; then
@@ -50,8 +60,9 @@ export CUDA_HOME="$CUDA_PATH"
 export NVHPC_CUDA_HOME="$CUDA_PATH"
 
 # set path to FVM code
-export FVM="$SCRATCH"/fvm-gt4py/"$BRANCH"
-export GT_CACHE_ROOT="$SCRATCH"/fvm-gt4py/gt_cache/"$ENV"
+ROOT="$PWD"
+export FVM="$ROOT"/fvm-gt4py/"$BRANCH"
+export GT_CACHE_ROOT="$ROOT"/fvm-gt4py/gt_cache/"$ENV"
 export GT_CACHE_DIR_NAME=.gt_cache
 export DACE_CONFIG="$GT_CACHE_ROOT"/.dace.conf
-export GHEX_BUILD_PREFIX="$MPI"
+export GHEX_BUILD_PREFIX=py3"$PYTHON3_MINOR_VERSION"/"$ENV"/"$MPI"

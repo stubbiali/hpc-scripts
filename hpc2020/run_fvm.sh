@@ -8,14 +8,15 @@ NUM_NODES=${NUM_NODES:-1}
 NUM_RUNS=${NUM_RUNS:-5}
 NUM_TASKS_PER_NODE=${NUM_TASKS_PER_NODE:-1}
 NUM_THREADS=${NUM_THREADS:-}
-NUMPY_DTYPE=${NUMPY_DTYPE:-float64}
 OVERCOMPUTING=${OVERCOMPUTING:-0}
+PRECISION=${PRECISION:-double}
+PYTHON3_MINOR_VERSION=${PYTHON3_MINOR_VERSION:-10}
 USE_CASE=${USE_CASE:-thermal}
 
 if [ "$MPI" = "none" ]; then
-  VENV=venv/"$ENV"
+  PREFIX=py3"$PYTHON3_MINOR_VERSION"/"$ENV"
 else
-  VENV=venv/"$ENV"-"$MPI"
+  PREFIX=py3"$PYTHON3_MINOR_VERSION"/"$ENV"/"$MPI"
 fi
 
 NUM_TASKS=$(( NUM_TASKS_PER_NODE * NUM_NODES ))
@@ -26,10 +27,10 @@ fi
 
 . prepare_fvm.sh
 pushd "$FVM" || return
-. "$VENV"/bin/activate
+. venv/"$PREFIX"/bin/activate
 pushd drivers || return
 
-mkdir -p ../data/hpc2020/weak-scaling/"$USE_CASE"/"$ENV"/"$MPI"
+mkdir -p ../data/hpc2020/"$PREFIX"/weak-scaling/"$USE_CASE"
 
 for i in $(eval echo "{1..$NUM_RUNS}"); do
   echo "NUM_NODES=$NUM_NODES: start"
@@ -37,8 +38,7 @@ for i in $(eval echo "{1..$NUM_RUNS}"); do
     FVM_ENABLE_OVERCOMPUTING="$OVERCOMPUTING" \
     FVM_NUMPY_DTYPE="$NUMPY_DTYPE" \
     GHEX_NUM_COMMS=1 \
-    GHEX_MAX_NUM_FIELDS_PER_COMM=13 \
-    GHEX_BUILD_PREFIX="$MPI"\
+    GHEX_AGGREGATE_FIELDS=1 \
     GT_BACKEND="$GT_BACKEND" \
     OMP_NUM_THREADS="$NUM_THREADS" \
     OMP_PLACES=cores \
@@ -50,7 +50,7 @@ for i in $(eval echo "{1..$NUM_RUNS}"); do
       --ntasks-per-node="$NUM_TASKS_PER_NODE" \
       python run_model.py \
         ../config/weak-scaling/"$USE_CASE"/"$NUM_TASKS".yml \
-        --performance-data-file=../data/hpc2020/weak-scaling/"$USE_CASE"/"$ENV"/"$MPI"/"$NUM_TASKS".csv
+        --performance-data-file=../data/hpc2020/"$PREFIX"/weak-scaling/"$USE_CASE"/"$NUM_TASKS".csv
   echo "NUM_NODES=$NUM_NODES, i=$i.1: end"
   echo ""
 done
