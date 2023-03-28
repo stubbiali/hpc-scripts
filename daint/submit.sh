@@ -1,12 +1,13 @@
 #!/bin/bash -l
 
+ACCOUNT=${ACCOUNT:-s299}
 JOB_NAME=${JOB_NAME:-test_job}
 JOB_SCRIPT=${JOB_SCRIPT:-run_fvm.sh}
 NUM_NODES=${NUM_NODES:-1}
 TIME=${TIME:-01:00:00}
 
 sbatch \
-	--account=s299 \
+	--account="$ACCOUNT" \
 	--constraint=gpu \
 	--distribution=block \
 	--error=error/"${JOB_NAME}".err \

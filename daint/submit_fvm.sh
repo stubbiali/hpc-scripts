@@ -2,6 +2,7 @@
 
 set -a
 
+ACCOUNT=s299
 BRANCH=distributed
 GT_BACKEND_L=( gt:cpu_kfirst dace:gpu )
 NUM_NODES_L=( 1 2 4 8 16 32 64 128 256 512 1024 2048 )
