@@ -9,7 +9,7 @@ import utils
 
 
 # >>> config: start
-BRANCH: str = "main"
+BRANCH: str = "distributed-overcomputing"
 ENV: defs.ProgrammingEnvironment = "cray"
 PARTITION_TYPE: defs.PartitionType = "gpu"
 STACK: defs.SoftwareStack = "lumi"
@@ -44,7 +44,7 @@ def core(
         utils.export_variable("FVM", gt4py_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        gt_cache_root = os.path.join(pwd, "fvm-gt4py", "gt_cache", f"{env}{suffix}")
+        gt_cache_root = os.path.join(pwd, "fvm-gt4py", branch, "gt_cache", f"{env}{suffix}")
         utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))

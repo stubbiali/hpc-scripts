@@ -139,6 +139,7 @@ def setup_hip():
     export_variable("CUDA_HOME", "/opt/rocm")
     export_variable("CUPY_INSTALL_USE_HIP", 1)
     export_variable("GT4PY_USE_HIP", 1)
+    export_variable("HCC_AMDGPU_TARGET", "gfx90a")
     export_variable("ROCM_HOME", "/opt/rocm")
 
 
@@ -163,7 +164,7 @@ def get_srun_options(
         "--distribution=block:block",
     ]
     if partition_type == "gpu":
-        # srun_options.append("--cpu-bind=map_cpu:48,56,16,24,1,8,32,40")
+        # srun_options.append("--cpu-bind=map_cpu:49,57,17,25,1,9,33,41")
         srun_options.append(
             "--cpu-bind=mask_cpu:fe000000000000,fe00000000000000,"
             "fe0000,fe000000,fe,fe00,fe00000000,fe0000000000"

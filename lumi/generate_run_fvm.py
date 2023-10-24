@@ -14,7 +14,10 @@ import utils
 BRANCH: str = "main"
 ENV: defs.ProgrammingEnvironment = "cray"
 FVM_ENABLE_BENCHMARKING: bool = False
+FVM_ENABLE_OVERCOMPUTING: bool = False
 FVM_PRECISION: defs.FloatingPointPrecision = "double"
+GHEX_AGGREGATE_FIELDS: bool = False
+GHEX_COLLECT_STATISTICS: bool = False
 GT_BACKEND: str = "dace:gpu"
 NUM_NODES: int = 1
 NUM_RUNS: int = 1
@@ -30,7 +33,10 @@ def core(
     branch: str,
     env: defs.ProgrammingEnvironment,
     fvm_enable_benchmarking: bool,
+    fvm_enable_overcomputing: bool,
     fvm_precision: defs.FloatingPointPrecision,
+    ghex_aggregate_fields: bool,
+    ghex_collect_statistics: bool,
     gt_backend: str,
     num_nodes: int,
     num_runs: int,
@@ -51,7 +57,10 @@ def core(
             utils.run(f". venv/{env}/bin/activate")
             with utils.chdir("drivers"):
                 utils.export_variable("FVM_ENABLE_BENCHMARKING", int(fvm_enable_benchmarking))
+                utils.export_variable("FVM_ENABLE_OVERCOMPUTING", int(fvm_enable_overcomputing))
                 utils.export_variable("FVM_PRECISION", fvm_precision)
+                utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
+                utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
                 utils.export_variable("GT_BACKEND", gt_backend)
                 utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
                 utils.export_variable("OMP_PLACES", "cores")
@@ -61,10 +70,11 @@ def core(
                     num_nodes, num_tasks_per_node, num_threads_per_task, partition_type
                 )
                 output_directory = os.path.join(
-                    "$PWD", "data", gt_backend.replace(":", ""), fvm_precision, use_case
+                    "$PWD", "data", "pasc-report", gt_backend.replace(":", ""), fvm_precision, use_case
                 )
                 utils.run(f"mkdir -p {output_directory}")
                 command = (
+                    f"CC=cc CXX=CC "
                     f"srun {' '.join(srun_options)} ./../../../select_gpu.sh python run_model.py "
                     f"{os.path.join('../config', use_case + '.yml')} "
                     f"--output-directory={output_directory}"
@@ -83,7 +93,10 @@ if __name__ == "__main__":
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=ENV)
     parser.add_argument("--fvm-enable-benchmarking", type=bool, default=FVM_ENABLE_BENCHMARKING)
+    parser.add_argument("--fvm-enable-overcomputing", type=bool, default=FVM_ENABLE_OVERCOMPUTING)
     parser.add_argument("--fvm-precision", type=str, default=FVM_PRECISION)
+    parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
+    parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)
     parser.add_argument("--gt-backend", type=str, default=GT_BACKEND)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
     parser.add_argument("--num-runs", type=int, default=NUM_RUNS)
