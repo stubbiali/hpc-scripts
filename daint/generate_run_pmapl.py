@@ -5,16 +5,13 @@ import argparse
 import os
 
 import defs
-import generate_prepare_fvm
+import generate_prepare_pmapl
 import utils
 
 
 # >>> config: start
 BRANCH: str = "main"
 ENV: defs.ProgrammingEnvironment = "gnu"
-FVM_ENABLE_BENCHMARKING: bool = False
-FVM_ENABLE_OVERCOMPUTING: bool = False
-FVM_PRECISION: defs.FloatingPointPrecision = "double"
 GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
 GT_BACKEND: str = "dace:gpu"
@@ -23,6 +20,9 @@ NUM_RUNS: int = 1
 NUM_TASKS_PER_NODE: int = 1
 NUM_THREADS_PER_TASK: int = 1
 PARTITION: defs.Partition = "gpu"
+PMAP_ENABLE_BENCHMARKING: bool = False
+PMAP_ENABLE_OVERCOMPUTING: bool = False
+PMAP_PRECISION: defs.FloatingPointPrecision = "double"
 USE_CASE: str = "thermal"
 # >>> config: end
 
@@ -30,9 +30,6 @@ USE_CASE: str = "thermal"
 def core(
     branch: str,
     env: defs.ProgrammingEnvironment,
-    fvm_enable_benchmarking: bool,
-    fvm_enable_overcomputing: bool,
-    fvm_precision: defs.FloatingPointPrecision,
     ghex_aggregate_fields: bool,
     ghex_collect_statistics: bool,
     gt_backend: str,
@@ -41,42 +38,43 @@ def core(
     num_tasks_per_node: int,
     num_threads_per_task: int,
     partition: defs.Partition,
+    pmap_enable_benchmarking: bool,
+    pmap_enable_overcomputing: bool,
+    pmap_precision: defs.FloatingPointPrecision,
     use_case: str,
 ) -> str:
-    prepare_fvm_fname = generate_prepare_fvm.core(branch, env, partition)
+    prepare_pmap_fname = generate_prepare_pmap.core(branch, env, partition)
 
-    with utils.batch_file(prefix="run_fvm") as (f, fname):
-        utils.run(f". {prepare_fvm_fname}")
+    with utils.batch_file(prefix="run_pmap") as (f, fname):
+        utils.run(f". {prepare_pmap_fname}")
 
-        with utils.chdir("$FVM"):
-            utils.run(f". venv/{env}/bin/activate")
+        with utils.chdir("$PMAP"):
+            utils.run(f". venv/bin/activate")
             with utils.chdir("drivers"):
-                utils.export_variable("FVM_ENABLE_BENCHMARKING", int(fvm_enable_benchmarking))
-                utils.export_variable("FVM_ENABLE_OVERCOMPUTING", int(fvm_enable_overcomputing))
-                utils.export_variable("FVM_PRECISION", fvm_precision)
                 utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
                 utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
                 utils.export_variable("GT_BACKEND", gt_backend)
                 utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
                 utils.export_variable("OMP_PLACES", "cores")
                 utils.export_variable("OMP_PROC_BIND", "close")
+                utils.export_variable("PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
+                utils.export_variable("PMAP_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing))
+                utils.export_variable("PMAP_PRECISION", pmap_precision)
 
                 output_directory = os.path.join(
                     "$PWD",
-                    "data",
-                    "pasc-report",
-                    gt_backend.replace(":", ""),
-                    fvm_precision,
                     use_case,
+                    pmap_precision,
+                    gt_backend.replace(":", ""),
                 )
                 utils.run(f"mkdir -p {output_directory}")
                 command = (
                     f"CC=cc CXX=CC CUDA_HOST_CXX=CC "
-                    f"srun -N {num_nodes} -n {num_tasks_per_node} python run_model.py "
+                    f"srun --nodes={num_nodes} --ntasks-per-node={num_tasks_per_node} python run_model.py "
                     f"{os.path.join('../config', use_case + '.yml')} "
                     f"--output-directory={output_directory}"
                 )
-                if fvm_enable_benchmarking:
+                if pmap_enable_benchmarking:
                     command += f" --performance-data-file={output_directory}/performance.csv"
 
                 for _ in range(num_runs):
@@ -89,9 +87,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=ENV)
-    parser.add_argument("--fvm-enable-benchmarking", type=bool, default=FVM_ENABLE_BENCHMARKING)
-    parser.add_argument("--fvm-enable-overcomputing", type=bool, default=FVM_ENABLE_OVERCOMPUTING)
-    parser.add_argument("--fvm-precision", type=str, default=FVM_PRECISION)
+    parser.add_argument("--pmap-enable-benchmarking", type=bool, default=PMAP_ENABLE_BENCHMARKING)
+    parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
+    parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
     parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
     parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)
     parser.add_argument("--gt-backend", type=str, default=GT_BACKEND)

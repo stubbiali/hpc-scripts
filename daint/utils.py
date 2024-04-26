@@ -112,12 +112,13 @@ def setup_cuda():
 
 
 @contextlib.contextmanager
-def chdir(dirname: str) -> None:
+def chdir(dirname: str, restore: bool = True) -> None:
     try:
         run(f"pushd {dirname}")
         yield None
     finally:
-        run("popd")
+        if restore:
+            run("popd")
 
 
 @dataclasses.dataclass

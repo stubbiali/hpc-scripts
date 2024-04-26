@@ -8,7 +8,7 @@ import utils
 
 
 # >>> config: start
-PARTITION_TYPE: defs.Partition = "gpu"
+PARTITION: defs.Partition = "gpu"
 # >>> config: end
 
 
@@ -32,6 +32,6 @@ def core(partition: defs.Partition) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Configure MPICH.")
-    parser.add_argument("--partition-type", type=str, default=PARTITION_TYPE)
+    parser.add_argument("--partition", type=str, default=PARTITION)
     args = parser.parse_args()
     core(**args.__dict__)
