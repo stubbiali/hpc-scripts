@@ -11,18 +11,18 @@ import utils
 
 # >>> config: start
 account: str = "s299"
-branch_l: list[str] = ["fix-cloudsc"]
+branch_l: list[str] = ["cloudsc-cy49r1"]
 partition: defs.Partition = "gpu"
 env_l: list[defs.ProgrammingEnvironment] = ["gnu"]
 ghex_aggregate_fields: bool = False
 ghex_collect_statistics: bool = False
 gt_backend_l: list[str] = [
-    # "gt:cpu_kfirst",
-    "gt:cpu_ifirst",
+    "gt:cpu_kfirst",
+    # "gt:cpu_ifirst",
     # "dace:cpu",
     # "cuda",
     # "gt:gpu",
-    # "dace:gpu",
+    "dace:gpu",
 ]
 num_runs: int = 1
 pmap_enable_benchmarking: bool = True
@@ -30,10 +30,10 @@ pmap_enable_overcomputing_l: list[bool] = [True]
 pmap_precision_l: list[defs.FloatingPointPrecision] = ["single", "double"]
 time: str = "01:00:00"
 use_case_l: dict[str, list[utils.ThreadsLayout]] = {
-    "baroclinic_wave_sphere_moist": [utils.ThreadsLayout(1, 1, 12)],
+    # "baroclinic_wave_sphere_moist": [utils.ThreadsLayout(1, 1, 12)],
     # "weak-scaling/baroclinic-wave-sphere-moist/1": [utils.ThreadsLayout(1, 1, 12)],
     # "weak-scaling/baroclinic-wave-sphere-moist/2": [utils.ThreadsLayout(2, 1, 12)],
-    # "weak-scaling/baroclinic-wave-sphere-moist/4": [utils.ThreadsLayout(4, 1, 12)],
+    "weak-scaling/baroclinic-wave-sphere-moist/4": [utils.ThreadsLayout(4, 1, 12)],
     # "weak-scaling/baroclinic-wave-sphere-moist/8": [utils.ThreadsLayout(8, 1, 12)],
     # "weak-scaling/baroclinic-wave-sphere-moist/16": [utils.ThreadsLayout(16, 1, 12)],
     # "weak-scaling/baroclinic-wave-sphere-moist/32": [utils.ThreadsLayout(32, 1, 12)],
@@ -76,7 +76,7 @@ def core():
                 #     f"{threads_layout.num_tasks_per_node}"
                 # )
                 job_name = f"{gt_backend}-{pmap_precision}-{threads_layout.num_nodes}"
-                job_script = generate_run_pmap.core(
+                job_script = generate_run_pmapl.core(
                     branch=branch,
                     env=env,
                     ghex_aggregate_fields=ghex_aggregate_fields,

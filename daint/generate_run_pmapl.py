@@ -43,13 +43,12 @@ def core(
     pmap_precision: defs.FloatingPointPrecision,
     use_case: str,
 ) -> str:
-    prepare_pmap_fname = generate_prepare_pmap.core(branch, env, partition)
+    prepare_pmapl_fname = generate_prepare_pmapl.core(branch, env, partition)
 
-    with utils.batch_file(prefix="run_pmap") as (f, fname):
-        utils.run(f". {prepare_pmap_fname}")
+    with utils.batch_file(prefix="run_pmapl") as (f, fname):
+        utils.run(f". {prepare_pmapl_fname}")
 
-        with utils.chdir("$PMAP"):
-            utils.run(f". venv/bin/activate")
+        with utils.chdir("$PMAPL"):
             with utils.chdir("drivers"):
                 utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
                 utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
@@ -57,9 +56,9 @@ def core(
                 utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
                 utils.export_variable("OMP_PLACES", "cores")
                 utils.export_variable("OMP_PROC_BIND", "close")
-                utils.export_variable("PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
-                utils.export_variable("PMAP_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing))
-                utils.export_variable("PMAP_PRECISION", pmap_precision)
+                utils.export_variable("FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
+                utils.export_variable("FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing))
+                utils.export_variable("FVM_PRECISION", pmap_precision)
 
                 output_directory = os.path.join(
                     "$PWD",
@@ -75,7 +74,7 @@ def core(
                     f"--output-directory={output_directory}"
                 )
                 if pmap_enable_benchmarking:
-                    command += f" --performance-data-file={output_directory}/performance.csv"
+                    command += " --write-profiling-data"
 
                 for _ in range(num_runs):
                     utils.run(command)
