@@ -52,7 +52,7 @@ def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partitio
             utils.setup_cuda()
 
         # path to custom build of HDF5 and NetCDF-C
-        home_dir = os.environ.get("HOME", "/users/subbiali")
+        home_dir = os.environ.get("HOME", f"/users/{os.getlogin()}")
         utils.export_variable("HDF5_ROOT", os.path.join(home_dir, f"hdf5/1.14.2/build/{env}"))
         utils.export_variable("HDF5_DIR", os.path.join(home_dir, f"hdf5/1.14.2/build/{env}"))
         utils.export_variable("NETCDF_ROOT", os.path.join(home_dir, f"netcdf-c/4.9.2/build/{env}"))
