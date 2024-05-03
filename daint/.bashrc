@@ -121,7 +121,8 @@ export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
 # project
-export PROJECT=/project/s299/"$USER"
+project_id=$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')
+export PROJECT=/project/"$project_id"/"$USER"
 
 # scratch
 case $HOSTNAME in
