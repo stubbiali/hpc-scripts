@@ -1,4 +1,4 @@
-#!/opt/python/3.9.4.1/bin/python
+#!/usr/local/apps/python3/3.11.8-01/bin/python3
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 import argparse
@@ -11,7 +11,7 @@ import utils
 # >>> config: start
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
-ROOT_DIR: str = f"/users/{os.getlogin()}"
+ROOT_DIR: str = f"/home/{os.getlogin()}"
 VERSION: str = "2.72"
 # >>> config: end
 
@@ -19,7 +19,6 @@ VERSION: str = "2.72"
 def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
     with utils.batch_file(prefix="build_autoconf"):
         utils.module_purge(force=True)
-        utils.load_partition(partition)
         utils.load_env(env)
         root_dir = os.path.abspath(root_dir)
         with utils.chdir(root_dir):

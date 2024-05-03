@@ -90,26 +90,25 @@ def check_argument(parameter, token, options):
         pass
 
 
-def load_partition(partition: str) -> None:
-    with check_argument("partition", partition, defs.valid_partitions):
-        module_load(f"daint-{partition}")
-
 
 def load_env(env: str) -> None:
     with check_argument("env", env, defs.valid_programming_environments):
-        module_load("PrgEnv-gnu")
+        module_load("prgenv/gnu")
 
 
 def export_variable(name: str, value: typing.Any) -> None:
     run(f"export {name}={str(value)}")
 
+
 def append_to_path( name: str, value: typing.Any) -> None:
     run(f"{name}={str(value)}:${name}")
+
 
 def setup_cuda():
     run("NVCC_PATH=$(which nvcc)")
     run("CUDA_PATH=$(echo $NVCC_PATH | sed -e 's/\/bin\/nvcc//g')")
     export_variable("CUDA_HOME", "$CUDA_PATH")
+    export_variable("NVHPC_CUDA_HOME", "$CUDA_PATH")
     export_variable("LD_LIBRARY_PATH", "$CUDA_PATH/lib64:$LD_LIBRARY_PATH")
 
 
@@ -128,3 +127,5 @@ class ThreadsLayout:
     num_nodes: int
     num_tasks_per_node: int
     num_threads_per_task: int
+
+

@@ -101,3 +101,6 @@ alias sc='scancel'
 alias sq='squeue -u $USER'
 alias sr='srun'
 export SQUEUE_FORMAT="%.9i %.50j %.15u %.15q %.15T %.10M %.10l %.5D %.13f %R"
+
+PATH=~/help2man/1.49.3/build/gnu/bin/:$PATH
+PATH=~/autoconf/2.72/build/gnu/bin/:$PATH
