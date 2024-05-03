@@ -10,7 +10,7 @@ import utils
 
 
 # >>> config: start
-ACCOUNT: str = "s299"
+ACCOUNT: str = "c28"
 JOB_NAME: str = "test_job"
 JOB_SCRIPT: str = "test_job"
 NUM_NODES: int = 1

@@ -10,8 +10,8 @@ import utils
 
 
 # >>> config: start
-account: str = "s299"
-branch_l: list[str] = ["cloudsc-cy49r1"]
+account: str = "c28"
+branch_l: list[str] = ["main"]
 partition: defs.Partition = "gpu"
 env_l: list[defs.ProgrammingEnvironment] = ["gnu"]
 ghex_aggregate_fields: bool = False

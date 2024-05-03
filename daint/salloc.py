@@ -7,7 +7,7 @@ import utils
 
 
 # >>> config: start
-ACCOUNT: str = "s299"
+ACCOUNT: str = "c28"
 NUM_NODES: int = 1
 PARTITION: defs.Partition = "gpu"
 TIME: str = "01:00:00"

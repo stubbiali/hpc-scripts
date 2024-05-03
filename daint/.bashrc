@@ -121,7 +121,7 @@ export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
 # project
-export PROJECT=/project/s299/"$USER"
+export PROJECT=/project/c28/"$USER"
 
 # scratch
 case $HOSTNAME in
