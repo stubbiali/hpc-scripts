@@ -10,7 +10,8 @@ import utils
 
 
 # >>> config: start
-ACCOUNT: str = "s299"
+project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
+ACCOUNT: str = project_id
 JOB_NAME: str = "test_job"
 JOB_SCRIPT: str = "test_job"
 NUM_NODES: int = 1
