@@ -11,7 +11,7 @@ import utils
 # >>> config: start
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
-ROOT_DIR: str = "/users/subbiali"
+ROOT_DIR: str = f"/users/{os.getlogin()}"
 VERSION: str = "1.14.2"
 # >>> config: end
 

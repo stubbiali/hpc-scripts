@@ -12,7 +12,7 @@ import utils
 ENV: defs.ProgrammingEnvironment = "gnu"
 HDF5_VERSION: str = "1.14.2"
 PARTITION: defs.Partition = "gpu"
-ROOT_DIR: str = "/users/subbiali"
+ROOT_DIR: str = f"/users/{os.getlogin()}"
 VERSION: str = "4.9.2"
 # >>> config: end
 

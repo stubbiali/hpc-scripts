@@ -109,36 +109,36 @@ if ! shopt -oq posix; then
 fi
 
 # nvim
-alias vim='/users/subbiali/neovim_build/bin/nvim'
-export VIM=/users/subbiali/neovim_build/bin/nvim
-export VIMRUNTIME=/users/subbiali/neovim_build/share/nvim/runtime
+alias vim='/users/"$USER"/neovim_build/bin/nvim'
+export VIM=/users/"$USER"/neovim_build/bin/nvim
+export VIMRUNTIME=/users/"$USER"/neovim_build/share/nvim/runtime
 
 # path
-export PATH="/users/subbiali/go1.19.2/bin:/users/subbiali/gitlfs_build/bin:$PATH"
+export PATH="/users/"$USER"/go1.19.2/bin:/users/"$USER"/gitlfs_build/bin:$PATH"
 
 # locale
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
 # project
-export PROJECT=/project/s299/subbiali
+export PROJECT=/project/s299/"$USER"
 
 # scratch
 case $HOSTNAME in
-	(*daint*) export SCRATCH=/scratch/snx3000/subbiali ;;
-  	(*dom*) export SCRATCH=/scratch/snx3000tds/subbiali ;;
+	(*daint*) export SCRATCH=/scratch/snx3000/"$USER" ;;
+  	(*dom*) export SCRATCH=/scratch/snx3000tds/"$USER" ;;
 esac
 
 # slurm shortcuts and settings
 alias sb='sbatch'
 alias sc='scancel'
-alias sq='squeue -u subbiali'
+alias sq='squeue -u "$USER"'
 alias sr='srun'
 export SQUEUE_FORMAT="%.9i %.50j %.15u %.5q %.15T %.10M %.10l %.5D %.13f %R"
 
 # hdf5 and netcdf
-export HDF5_ROOT=/users/subbiali/hdf5/1.14.2/build/gnu
-export NETCDF_ROOT=/users/subbiali/netcdf-c/4.9.2/build/gnu
+export HDF5_ROOT=/users/"$USER"/hdf5/1.14.2/build/gnu
+export NETCDF_ROOT=/users/"$USER"/netcdf-c/4.9.2/build/gnu
 
 # get node id of a salloc
 function get_node_id() {

@@ -4,7 +4,7 @@ module purge -f
 module load PrgEnv-gnu
 module load daint-gpu
 
-. /users/subbiali/spack/share/spack/setup-env.sh
+. /users/"$USER"/spack/share/spack/setup-env.sh
 spack env activate ghex-dev
 
 spack load boost
