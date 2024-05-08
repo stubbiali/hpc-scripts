@@ -7,12 +7,13 @@ import utils
 
 
 # >>> config: start
-ACCOUNT: str = "c28"
+
+project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
+ACCOUNT: str = project_id
 NUM_NODES: int = 1
 PARTITION: defs.Partition = "gpu"
 TIME: str = "01:00:00"
 # >>> config: end
-
 
 def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> None:
     command = [
