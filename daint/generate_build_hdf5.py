@@ -12,7 +12,7 @@ import utils
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
 ROOT_DIR: str = "/users/subbiali"
-VERSION: str = "1.14.2"
+VERSION: str = "1.14.4.2"
 # >>> config: end
 
 
@@ -27,7 +27,8 @@ def core(
         root_dir = os.path.abspath(root_dir)
         with utils.chdir(root_dir):
             utils.run("mkdir -p hdf5")
-            branch = f"hdf5-{version.replace('.', '_')}"
+            # branch = f"hdf5-{version.replace('.', '_')}"
+            branch = f"hdf5_{version}"
             utils.run(
                 f"git clone --branch={branch} --depth=1 "
                 f"https://github.com/HDFGroup/hdf5.git hdf5/{version}"
