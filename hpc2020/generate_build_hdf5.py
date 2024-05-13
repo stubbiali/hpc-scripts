@@ -1,4 +1,4 @@
-#!/opt/python/3.9.4.1/bin/python
+#!/usr/local/apps/python3/3.11.8-01/bin/python3
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 import argparse
@@ -11,8 +11,8 @@ import utils
 # >>> config: start
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
-ROOT_DIR: str = f"/users/{os.getlogin()}"
-VERSION: str = "1.14.4.2"
+ROOT_DIR: str = f"/home/{os.getlogin()}"
+VERSION: str = "1.14.2"
 # >>> config: end
 
 
@@ -21,14 +21,14 @@ def core(
 ):
     with utils.batch_file(prefix="build_hdf5"):
         utils.module_purge(force=True)
-        utils.load_partition(partition)
         utils.load_env(env)
-        utils.module_load("cray-mpich")
+        utils.module_load("gcc/11.2.0")
+        utils.append_to_path("LD_LIBRARY_PATH", f"/usr/local/apps/gcc/11.2.0/lib64")
+        utils.module_load("openmpi")
         root_dir = os.path.abspath(root_dir)
         with utils.chdir(root_dir):
             utils.run("mkdir -p hdf5")
-            # branch = f"hdf5-{version.replace('.', '_')}"
-            branch = f"hdf5_{version}"
+            branch = f"hdf5-{version.replace('.', '_')}"
             utils.run(
                 f"git clone --branch={branch} --depth=1 "
                 f"https://github.com/HDFGroup/hdf5.git hdf5/{version}"
@@ -38,7 +38,8 @@ def core(
                 utils.run("./autogen.sh")
                 build_dir = os.path.join(root_dir, f"hdf5/{version}/build/{env}")
                 utils.run(
-                    "CC=cc",
+                    "CC=mpicc",
+                    "CXX=mpicxx",
                     "CFLAGS='-fPIC'",
                     "./configure",
                     f"--prefix={build_dir}",

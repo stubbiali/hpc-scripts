@@ -10,8 +10,9 @@ import utils
 
 
 # >>> config: start
-account: str = "s299"
-branch_l: list[str] = ["cloudsc-cy49r1"]
+project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
+account: str = project_id
+branch_l: list[str] = ["main"]
 partition: defs.Partition = "gpu"
 env_l: list[defs.ProgrammingEnvironment] = ["gnu"]
 ghex_aggregate_fields: bool = False

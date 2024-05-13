@@ -1,4 +1,4 @@
-#!/opt/python/3.9.4.1/bin/python
+#!/usr/local/apps/python3/3.11.8-01/bin/python3
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 import argparse
@@ -22,11 +22,11 @@ def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partitio
         utils.module_purge(force=True)
 
         # load relevant modules
-        utils.load_partition(partition)
         utils.load_env(env)
-        utils.module_load("Boost", "cray-mpich", "cray-python", "CMake")
+        utils.module_load("gcc/11.2.0",  "boost", "openmpi", "cmake", "python3/3.10.10-01", "cmake")
+        utils.append_to_path("LD_LIBRARY_PATH", f"/usr/local/apps/gcc/11.2.0/lib64")
         if partition == "gpu":
-            utils.module_load("cudatoolkit/11.2.0_3.39-2.1__gf93aa1c")
+            utils.module_load("nvidia/22.11")
 
         # set path to PMAP code
         pwd = os.environ.get("SCRATCH", os.path.curdir)
@@ -52,7 +52,7 @@ def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partitio
             utils.setup_cuda()
 
         # path to custom build of HDF5 and NetCDF-C
-        home_dir = os.environ.get("HOME", f"/users/{os.getlogin()}")
+        home_dir = os.environ.get("HOME", f"/home/{os.getlogin()}")
         utils.export_variable("HDF5_ROOT", os.path.join(home_dir, f"hdf5/1.14.2/build/{env}"))
         utils.export_variable("HDF5_DIR", os.path.join(home_dir, f"hdf5/1.14.2/build/{env}"))
         utils.export_variable("NETCDF_ROOT", os.path.join(home_dir, f"netcdf-c/4.9.2/build/{env}"))
