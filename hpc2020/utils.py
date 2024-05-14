@@ -90,26 +90,49 @@ def check_argument(parameter, token, options):
         pass
 
 
-
 def load_env(env: str) -> None:
     with check_argument("env", env, defs.valid_programming_environments):
-        module_load("prgenv/gnu")
+        if env == "gnu":
+            module_load("prgenv/gnu", "gcc/11.2.0")
+            cc, cxx, fc = "gcc", "g++", "gfortran"
+            export_variable(
+                "LD_LIBRARY_PATH", "/usr/local/apps/gcc/11.2.0/lib64", prepend_value=True
+            )
+        else:
+            module_load("prgenv/intel")
+            cc, cxx, fc = "icc", "icpc", "ifort"
+        export_variable("CC", cc)
+        export_variable("CXX", cxx)
+        export_variable("FC", fc)
 
 
-def export_variable(name: str, value: typing.Any) -> None:
-    run(f"export {name}={str(value)}")
+def load_mpi(env: str, mpi: str) -> None:
+    with check_argument("env", env, defs.valid_programming_environments):
+        with check_argument("mpi", mpi, defs.valid_mpi_libraries):
+            cc, cxx, fc = "mpicc", "mpicxx", "mpifort"
+            if mpi == "hpcx":
+                module_load("hpcx-openmpi/2.10.0")
+            elif mpi == "intel-mpi":
+                module_load("intel-mpi/2023.2.0")
+                if env == "intel":
+                    cc, cxx, fc = "mpiicc", "mpiicpc", "mpiifort"
+                else:
+                    cc, cxx, fc = "mpigcc", "mpigxx", "mpif90"
+            else:
+                module_load("openmpi/4.1.1.1")
+            export_variable("CC", cc)
+            export_variable("MPICC", cc)
+            export_variable("CXX", cxx)
+            export_variable("MPICXX", cxx)
+            export_variable("FC", fc)
+            export_variable("MPIFC", fc)
 
 
-def append_to_path( name: str, value: typing.Any) -> None:
-    run(f"{name}={str(value)}:${name}")
-
-
-def setup_cuda():
-    run("NVCC_PATH=$(which nvcc)")
-    run("CUDA_PATH=$(echo $NVCC_PATH | sed -e 's/\/bin\/nvcc//g')")
-    export_variable("CUDA_HOME", "$CUDA_PATH")
-    export_variable("NVHPC_CUDA_HOME", "$CUDA_PATH")
-    export_variable("LD_LIBRARY_PATH", "$CUDA_PATH/lib64:$LD_LIBRARY_PATH")
+def export_variable(name: str, value: typing.Any, prepend_value: bool = False) -> None:
+    cmd = f"export {name}={str(value)}"
+    if prepend_value:
+        cmd += f":${name}"
+    run(cmd)
 
 
 @contextlib.contextmanager
@@ -127,5 +150,3 @@ class ThreadsLayout:
     num_nodes: int
     num_tasks_per_node: int
     num_threads_per_task: int
-
-
