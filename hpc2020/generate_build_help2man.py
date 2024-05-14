@@ -9,35 +9,30 @@ import utils
 
 # >>> config: start
 ENV: defs.ProgrammingEnvironment = "gnu"
-PARTITION: defs.Partition = "gpu"
-ROOT_DIR: str = f"/home/{os.getlogin()}"
-VERSION: str = "1.49.3"
-# >>> config: endi
+ROOT_DIR: str = defs.root_dir
+# >>> config: end
 
 
-def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
+def core(env: defs.ProgrammingEnvironment, root_dir: str):
     with utils.batch_file(prefix="build_help2man"):
         utils.module_purge(force=True)
         utils.load_env(env)
         root_dir = os.path.abspath(root_dir)
         with utils.chdir(root_dir):
             utils.run("mkdir -p help2man")
-            branch = f"master"
             utils.run(
-                f"git clone --branch={branch} "
-                f"https://github.com/Distrotech/help2man.git help2man/{version}"
+                f"git clone --branch=master " f"https://github.com/Distrotech/help2man.git help2man"
             )
-            with utils.chdir(f"help2man/{version}"):
-                build_dir = os.path.join(root_dir, f"help2man/{version}/build/{env}")
-                utils.run("CC=cc", "CXX=CC", "./configure", f"--prefix={build_dir}")
+            with utils.chdir(f"help2man"):
+                build_dir = os.path.join(root_dir, f"help2man/build/{env}")
+                utils.run("./configure", f"--prefix={build_dir}")
                 utils.run("make -j 8 install")
-                utils.append_to_path("PATH", f"{build_dir}/bin")
+                utils.export_variable("PATH", f"{build_dir}/bin", prepend_value=True)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", type=str, default=ENV)
-    parser.add_argument("--partition", type=str, default=PARTITION)
     parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
-    parser.add_argument("--version", type=str, default=VERSION)
     args = parser.parse_args()
     core(**args.__dict__)
