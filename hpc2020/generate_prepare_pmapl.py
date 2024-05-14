@@ -14,7 +14,7 @@ ENV: defs.ProgrammingEnvironment = "gnu"
 HDF5_VERSION: str = "1.14.4.2"
 MPI: defs.MPI = "openmpi"
 NETCDF_VERSION: str = "4.9.2"
-PARTITION: defs.Partition = "par"
+PARTITION: defs.Partition = "gpu"
 # >>> config: end
 
 
@@ -32,7 +32,7 @@ def core(
 
         # load relevant modules
         utils.load_env(env)
-        utils.load_mpi(env, mpi)
+        utils.load_mpi(env, mpi, partition)
         utils.module_load("boost", "cmake", "python3/3.11.8-01")
         if partition == "gpu":
             utils.module_load("nvidia/22.11", "cuda/11.6")

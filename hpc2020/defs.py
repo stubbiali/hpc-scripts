@@ -8,6 +8,7 @@ Partition = typing.Literal["gpu", "par"]
 ProgrammingEnvironment = typing.Literal["gnu", "intel"]
 
 valid_mpi_libraries = typing.get_args(MPI)
+valid_partitions = typing.get_args(Partition)
 valid_programming_environments = typing.get_args(ProgrammingEnvironment)
 
 root_dir = os.environ.get("HPCPERM", f"/home/{os.getlogin()}")

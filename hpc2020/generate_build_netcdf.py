@@ -12,18 +12,24 @@ import utils
 ENV: defs.ProgrammingEnvironment = "gnu"
 HDF5_VERSION: str = "1.14.4.2"
 MPI: defs.MPI = "openmpi"
+PARTITION: defs.Partition = "gpu"
 ROOT_DIR: str = defs.root_dir
 VERSION: str = "4.9.2"
 # >>> config: end
 
 
 def core(
-    env: defs.ProgrammingEnvironment, hdf5_version: str, mpi: defs.MPI, root_dir: str, version: str
+    env: defs.ProgrammingEnvironment,
+    hdf5_version: str,
+    mpi: defs.MPI,
+    partition: defs.Partition,
+    root_dir: str,
+    version: str,
 ):
     with utils.batch_file(prefix="build_netcdf"):
         utils.module_purge(force=True)
         utils.load_env(env)
-        utils.load_mpi(env, mpi)
+        utils.load_mpi(env, mpi, partition)
         root_dir = os.path.abspath(root_dir)
         hdf5_root = os.path.join(root_dir, "hdf5", hdf5_version, "build", env, mpi)
         utils.export_variable("HDF5_ROOT", hdf5_root)
@@ -59,6 +65,7 @@ if __name__ == "__main__":
     parser.add_argument("--env", type=str, default=ENV)
     parser.add_argument("--hdf5-version", type=str, default=HDF5_VERSION)
     parser.add_argument("--mpi", type=str, default=MPI)
+    parser.add_argument("--partition", type=str, default=PARTITION)
     parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
     parser.add_argument("--version", type=str, default=VERSION)
     args = parser.parse_args()

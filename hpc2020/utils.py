@@ -106,26 +106,30 @@ def load_env(env: str) -> None:
         export_variable("FC", fc)
 
 
-def load_mpi(env: str, mpi: str) -> None:
+def load_mpi(env: str, mpi: str, partition: str) -> None:
     with check_argument("env", env, defs.valid_programming_environments):
         with check_argument("mpi", mpi, defs.valid_mpi_libraries):
-            cc, cxx, fc = "mpicc", "mpicxx", "mpifort"
-            if mpi == "hpcx":
-                module_load("hpcx-openmpi/2.10.0")
-            elif mpi == "intel-mpi":
-                module_load("intel-mpi/2023.2.0")
-                if env == "intel":
-                    cc, cxx, fc = "mpiicc", "mpiicpc", "mpiifort"
+            with check_argument("partition", partition, defs.valid_partitions):
+                cc, cxx, fc = "mpicc", "mpicxx", "mpifort"
+                if mpi == "hpcx":
+                    module_load("hpcx-openmpi/2.10.0")
+                elif mpi == "intel-mpi":
+                    module_load("intel-mpi/2023.2.0")
+                    if env == "intel":
+                        cc, cxx, fc = "mpiicc", "mpiicpc", "mpiifort"
+                    else:
+                        cc, cxx, fc = "mpigcc", "mpigxx", "mpif90"
                 else:
-                    cc, cxx, fc = "mpigcc", "mpigxx", "mpif90"
-            else:
-                module_load("openmpi/4.1.1.1")
-            export_variable("CC", cc)
-            export_variable("MPICC", cc)
-            export_variable("CXX", cxx)
-            export_variable("MPICXX", cxx)
-            export_variable("FC", fc)
-            export_variable("MPIFC", fc)
+                    if partition == "gpu":
+                        module_load("openmpi/4.1.5.4")
+                    else:
+                        module_load("openmpi/4.1.1.1")
+                export_variable("CC", cc)
+                export_variable("MPICC", cc)
+                export_variable("CXX", cxx)
+                export_variable("MPICXX", cxx)
+                export_variable("FC", fc)
+                export_variable("MPIFC", fc)
 
 
 def export_variable(name: str, value: typing.Any, prepend_value: bool = False) -> None:

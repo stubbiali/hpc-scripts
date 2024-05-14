@@ -11,16 +11,23 @@ import utils
 # >>> config: start
 ENV: defs.ProgrammingEnvironment = "gnu"
 MPI: defs.MPI = "openmpi"
+PARTITION: defs.Partition = "gpu"
 ROOT_DIR: str = defs.root_dir
 VERSION: str = "1.14.4.2"
 # >>> config: end
 
 
-def core(env: defs.ProgrammingEnvironment, mpi: defs.MPI, root_dir: str, version: str):
+def core(
+    env: defs.ProgrammingEnvironment,
+    mpi: defs.MPI,
+    partition: defs.Partition,
+    root_dir: str,
+    version: str,
+):
     with utils.batch_file(prefix="build_hdf5"):
         utils.module_purge(force=True)
         utils.load_env(env)
-        utils.load_mpi(env, mpi)
+        utils.load_mpi(env, mpi, partition)
         root_dir = os.path.abspath(root_dir)
         with utils.chdir(root_dir):
             utils.run("mkdir -p hdf5")
@@ -53,6 +60,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", type=str, default=ENV)
     parser.add_argument("--mpi", type=str, default=MPI)
+    parser.add_argument("--partition", type=str, default=PARTITION)
     parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
     parser.add_argument("--version", type=str, default=VERSION)
     args = parser.parse_args()
