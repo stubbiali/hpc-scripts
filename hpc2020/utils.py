@@ -144,6 +144,14 @@ def load_mpi(mpi: str, env: str, compiler_version: str, partition: str) -> str:
     return module_name.replace("/", "-")
 
 
+def load_gpu_libraries(env: str, compiler_version: str) -> None:
+    with check_argument("env", env, defs.valid_programming_environments):
+        if env == "gnu" and compiler_version == "13.2.0":
+            module_load("nvidia/24.1", "cuda/11.6")
+        else:
+            module_load("nvidia/22.11", "cuda/11.6")
+
+
 def export_variable(name: str, value: typing.Any, prepend_value: bool = False) -> None:
     cmd = f"export {name}={str(value)}"
     if prepend_value:

@@ -46,7 +46,7 @@ def core(
         mpi_id = utils.load_mpi(mpi, env, compiler_version, partition)
         utils.module_load("boost", "cmake", "python3/3.11.8-01")
         if partition == "gpu":
-            utils.module_load("nvidia/22.11", "cuda/11.6")
+            utils.load_gpu_libraries(env, compiler_version)
 
         # set path to custom build of external dependencies
         generate_build_help2man.setup(env, compiler_version, root_dir)
