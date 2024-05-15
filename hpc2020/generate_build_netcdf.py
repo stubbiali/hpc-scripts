@@ -24,7 +24,7 @@ VERSION: str = "4.9.2"
 
 
 def _setup(build_dir: str) -> None:
-    utils.export_variable("NETCDF_DIR", build_dir)
+    utils.export_variable("NETCDF4_DIR", build_dir)
     utils.export_variable("NETCDF_ROOT", build_dir)
 
 
