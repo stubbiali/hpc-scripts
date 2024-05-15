@@ -9,7 +9,7 @@ import utils
 
 # >>> config: start
 ENV: defs.ProgrammingEnvironment = "gnu"
-COMPILER_VERSION: str = "13.2.0"
+COMPILER_VERSION: str = "11.2.0"
 ROOT_DIR: str = defs.root_dir
 # >>> config: end
 

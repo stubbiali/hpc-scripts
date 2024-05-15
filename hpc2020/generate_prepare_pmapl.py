@@ -16,7 +16,7 @@ import utils
 AUTOCONF_VERSION: str = "2.72"
 BRANCH: str = "main"
 ENV: defs.ProgrammingEnvironment = "gnu"
-COMPILER_VERSION: str = "13.2.0"
+COMPILER_VERSION: str = "11.2.0"
 HDF5_VERSION: str = "1.14.4.2"
 MPI: defs.MPI = "hpcx"
 NETCDF_VERSION: str = "4.9.2"

@@ -13,7 +13,7 @@ import utils
 # >>> config: start
 AUTOCONF_VERSION: str = "2.72"
 ENV: defs.ProgrammingEnvironment = "gnu"
-COMPILER_VERSION: str = "13.2.0"
+COMPILER_VERSION: str = "11.2.0"
 MPI: defs.MPI = "hpcx"
 PARTITION: defs.Partition = "gpu"
 ROOT_DIR: str = defs.root_dir
