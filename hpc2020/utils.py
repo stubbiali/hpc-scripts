@@ -139,6 +139,10 @@ def export_variable(name: str, value: typing.Any, prepend_value: bool = False) -
     run(cmd)
 
 
+def update_path(value: str):
+    export_variable("PATH", value, prepend_value=True)
+
+
 @contextlib.contextmanager
 def chdir(dirname: str, restore: bool = True) -> None:
     try:
