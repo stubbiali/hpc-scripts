@@ -20,6 +20,7 @@ def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> 
     command = [
         f"salloc",
         f"--account={account}",
+        "--cpus-per-task=256",
         f"--nodes={num_nodes}",
         f"--partition={partition}",
         f"--time={time}",
