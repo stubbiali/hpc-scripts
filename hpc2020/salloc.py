@@ -25,7 +25,7 @@ def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> 
         f"--partition={partition}",
         f"--time={time}",
     ]
-    command += ["--qos=ng", "--gpus=1"] if partition == "gpu" else ["--qos=np"]
+    command += ["--qos=ng", "--gpus=4"] if partition == "gpu" else ["--qos=np"]
     utils.run(*command)
 
 
