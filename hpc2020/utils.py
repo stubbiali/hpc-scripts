@@ -150,6 +150,9 @@ def load_gpu_libraries(env: str, compiler_version: str) -> None:
             module_load("nvidia/24.1", "cuda/11.6")
         else:
             module_load("nvidia/22.11", "cuda/11.6")
+    export_variable("GHEX_USE_GPU", 1)
+    export_variable("GHEX_GPU_TYPE", "NVIDIA")
+    export_variable("GHEX_GPU_ARCH", 80)
 
 
 def export_variable(name: str, value: typing.Any, prepend_value: bool = False) -> None:
