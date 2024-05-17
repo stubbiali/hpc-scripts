@@ -1,6 +1,7 @@
-#!/opt/python/3.9.4.1/bin/python
+#!/usr/local/apps/python3/3.11.8-01/bin/python3
 # -*- coding: utf-8 -*-
 import argparse
+import os
 
 import defs
 import utils
@@ -8,22 +9,23 @@ import utils
 
 # >>> config: start
 
-project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
-ACCOUNT: str = project_id
+ACCOUNT: str = os.environ.get("ECACCOUNT", "")
 NUM_NODES: int = 1
 PARTITION: defs.Partition = "gpu"
 TIME: str = "01:00:00"
 # >>> config: end
 
+
 def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> None:
     command = [
         f"salloc",
-        f"--account={account}{'m' if partition == 'mc' else ''}",
-        f"--constraint={partition}",
+        f"--account={account}",
+        "--cpus-per-task=256",
         f"--nodes={num_nodes}",
-        f"--partition=normal",
+        f"--partition={partition}",
         f"--time={time}",
     ]
+    command += ["--qos=ng", "--gpus=4"] if partition == "gpu" else ["--qos=np"]
     utils.run(*command)
 
 

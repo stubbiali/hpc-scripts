@@ -10,7 +10,7 @@ import utils
 
 
 # >>> config: start
-BRANCH: str = "cloudsc-cy49r1"
+BRANCH: str = "main"
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
 # >>> config: end
