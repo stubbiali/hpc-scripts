@@ -52,9 +52,11 @@ def batch_file(prefix: typing.Optional[str] = None):
         BATCH_FILE_REGISTRY.pop()
 
 
-def run(*args: str) -> None:
+def run(*args: str, verbose: bool = False) -> None:
     split_args = [item for arg in args for item in arg.split(" ")]
     command = " ".join(split_args)
+    if verbose:
+        print(f"Run: {command}")
     if len(BATCH_FILE_REGISTRY) > 0:
         BATCH_FILE_REGISTRY[-1].write(command + "\n")
     else:
@@ -65,9 +67,14 @@ def module_purge(force: bool = False) -> None:
     run(f"module{' --force ' if force else ' '}purge")
 
 
+def module_reset() -> None:
+    run("module reset")
+
+
 def module_load(*module_names: str) -> None:
     for module_name in module_names:
-        run(f"module load {module_name}")
+        if module_name:
+            run(f"module load {module_name}")
 
 
 class InvalidArgumentError(Exception):
@@ -82,7 +89,7 @@ class InvalidArgumentError(Exception):
 
 @contextlib.contextmanager
 def check_argument(parameter, token, options):
-    if token not in options:
+    if token is not None and token not in options:
         raise InvalidArgumentError(parameter, token, options)
     try:
         yield token
@@ -98,37 +105,74 @@ def get_partition(partition_type: typing.Literal["gpu", "host"]) -> str:
             return "standard"
 
 
-def load_stack(stack: str) -> None:
+def load_stack(stack: str, stack_version: typing.Optional[str]) -> None:
     with check_argument("stack", stack, defs.valid_software_stacks):
-        if stack == "cray":
-            module_load("CrayEnv")
-        else:
-            module_load("LUMI/22.08")
+        module = "CrayEnv" if stack == "cray" else stack.upper()
+        if stack_version is not None:
+            module += f"/{stack_version}"
+        module_load(module)
 
 
-def load_partition(partition_type: str) -> str:
+def load_partition(partition_type: str) -> None:
     with check_argument("partition_type", partition_type, defs.valid_partition_types):
         if partition_type == "gpu":
             module_load("partition/G")
-            suffix = ""
         else:
             module_load("partition/C")
-            suffix = "-host"
-        return suffix
 
 
-def load_env(env: str) -> str:
+def load_env(
+    env: str,
+    env_version: typing.Optional[str],
+    partition_type: str,
+    stack_version: typing.Optional[str],
+) -> tuple[str, str]:
     with check_argument("env", env, defs.valid_programming_environments):
-        if env == "amd":
-            module_load("PrgEnv-amd")
-            cpe = "cpeAMD"
-        elif env == "cray":
-            module_load("PrgEnv-cray")
-            cpe = "cpeCray"
-        else:
-            module_load("PrgEnv-gnu")
-            cpe = "cpeGNU"
-        return cpe
+        with check_argument("partition_type", partition_type, defs.valid_partition_types):
+            if env == "amd":
+                module = "PrgEnv-amd"
+                cpe = "cpeAMD"
+            elif env == "aocc":
+                module = "PrgEnv-aocc"
+                cpe = "cpuAOCC"
+            elif env == "cray":
+                module = "PrgEnv-cray"
+                if partition_type == "host":
+                    env += "-amd"
+                    module += "-amd"
+                cpe = "cpeCray"
+            else:
+                module = "PrgEnv-gnu"
+                if partition_type == "host":
+                    env += "-amd"
+                    module += "-amd"
+                cpe = "cpeGNU"
+
+            if env_version is not None:
+                module += f"/{env_version}"
+            if stack_version is not None:
+                cpe += f"-{stack_version}"
+
+            module_load(module)
+
+    return env, cpe
+
+
+def load_compiler(env: str, compiler_version: typing.Optional[str] = None) -> str:
+    if compiler_version is not None:
+        with check_argument("env", env, defs.valid_programming_environments):
+            if env == "cray":
+                module = "cce/" + compiler_version
+            elif env == "gnu":
+                module = "gcc/" + compiler_version
+            else:
+                module = ""
+    else:
+        module = ""
+
+    module_load(module)
+
+    return module
 
 
 def export_variable(name: str, value: typing.Any) -> None:
@@ -137,19 +181,24 @@ def export_variable(name: str, value: typing.Any) -> None:
 
 def setup_hip():
     export_variable("CUDA_HOME", "/opt/rocm")
+    export_variable("CUPY_ACCELERATORS", "cub")
     export_variable("CUPY_INSTALL_USE_HIP", 1)
+    export_variable("GHEX_USE_GPU", 1)
+    export_variable("GHEX_GPU_TYPE", "AMD")
+    export_variable("GHEX_GPU_ARCH", "gfx90a")
     export_variable("GT4PY_USE_HIP", 1)
     export_variable("HCC_AMDGPU_TARGET", "gfx90a")
     export_variable("ROCM_HOME", "/opt/rocm")
 
 
 @contextlib.contextmanager
-def chdir(dirname: str) -> None:
+def chdir(dirname: str, restore: bool = True) -> None:
     try:
         run(f"pushd {dirname}")
         yield None
     finally:
-        run("popd")
+        if restore:
+            run("popd")
 
 
 def get_srun_options(
@@ -157,20 +206,21 @@ def get_srun_options(
     num_tasks_per_node: int,
     num_threads_per_task: int,
     partition_type: defs.PartitionType,
+    gt_backend: typing.Optional[str] = None,
 ) -> list[str]:
     srun_options = [
         f"--nodes={num_nodes}",
         f"--ntasks-per-node={num_tasks_per_node}",
         "--distribution=block:block",
     ]
-    if partition_type == "gpu":
+    if partition_type == "gpu" and gt_backend in ["cuda", "dace:gpu", "gt:cpu"]:
         # srun_options.append("--cpu-bind=map_cpu:49,57,17,25,1,9,33,41")
         srun_options.append(
             "--cpu-bind=mask_cpu:fe000000000000,fe00000000000000,"
             "fe0000,fe000000,fe,fe00,fe00000000,fe0000000000"
         )
     else:
-        srun_options.append(f"--cpus-per-task={num_threads_per_task}")
+        srun_options += [f"--cpus-per-task={num_threads_per_task}", "--cpu-bind=cores"]
     return srun_options
 
 

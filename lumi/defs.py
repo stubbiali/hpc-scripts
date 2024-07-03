@@ -3,7 +3,7 @@ import typing
 
 FloatingPointPrecision = typing.Literal["double", "single"]
 PartitionType = typing.Literal["gpu", "host"]
-ProgrammingEnvironment = typing.Literal["amd", "cray", "gnu"]
+ProgrammingEnvironment = typing.Literal["amd", "aocc", "cray", "gnu"]
 SoftwareStack = typing.Literal["cray", "lumi"]
 
 valid_programming_environments = typing.get_args(ProgrammingEnvironment)
