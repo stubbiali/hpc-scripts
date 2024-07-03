@@ -33,7 +33,7 @@ def core(
     ]
     if partition_type == "gpu":
         command.append("--gpus-per-node=8")
-    utils.run(*command)
+    utils.run(*command, verbose=True)
 
 
 if __name__ == "__main__":
