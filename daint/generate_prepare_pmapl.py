@@ -10,7 +10,7 @@ import utils
 
 
 # >>> config: start
-BRANCH: str = "main"
+BRANCH: str = "benchmarking"
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
 # >>> config: end
@@ -53,8 +53,8 @@ def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partitio
 
         # path to custom build of HDF5 and NetCDF-C
         home_dir = os.environ.get("HOME", f"/users/{os.getlogin()}")
-        utils.export_variable("HDF5_ROOT", os.path.join(home_dir, f"hdf5/1.14.2/build/{env}"))
-        utils.export_variable("HDF5_DIR", os.path.join(home_dir, f"hdf5/1.14.2/build/{env}"))
+        utils.export_variable("HDF5_ROOT", os.path.join(home_dir, f"hdf5/1.14.4.2/build/{env}"))
+        utils.export_variable("HDF5_DIR", os.path.join(home_dir, f"hdf5/1.14.4.2/build/{env}"))
         utils.export_variable("NETCDF_ROOT", os.path.join(home_dir, f"netcdf-c/4.9.2/build/{env}"))
         utils.export_variable("NETCDF4_DIR", os.path.join(home_dir, f"netcdf-c/4.9.2/build/{env}"))
 

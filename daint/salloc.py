@@ -8,8 +8,9 @@ import utils
 
 # >>> config: start
 
-project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
-ACCOUNT: str = project_id
+# project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
+# ACCOUNT: str = project_id
+ACCOUNT: str = "s299"
 NUM_NODES: int = 1
 PARTITION: defs.Partition = "gpu"
 TIME: str = "01:00:00"

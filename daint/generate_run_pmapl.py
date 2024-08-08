@@ -20,6 +20,7 @@ NUM_RUNS: int = 1
 NUM_TASKS_PER_NODE: int = 1
 NUM_THREADS_PER_TASK: int = 1
 PARTITION: defs.Partition = "gpu"
+PMAP_DISABLE_LOG: bool = False
 PMAP_ENABLE_BENCHMARKING: bool = False
 PMAP_ENABLE_OVERCOMPUTING: bool = False
 PMAP_PRECISION: defs.FloatingPointPrecision = "double"
@@ -38,6 +39,7 @@ def core(
     num_tasks_per_node: int,
     num_threads_per_task: int,
     partition: defs.Partition,
+    pmap_disable_log: bool,
     pmap_enable_benchmarking: bool,
     pmap_enable_overcomputing: bool,
     pmap_precision: defs.FloatingPointPrecision,
@@ -56,6 +58,7 @@ def core(
                 utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
                 utils.export_variable("OMP_PLACES", "cores")
                 utils.export_variable("OMP_PROC_BIND", "close")
+                utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
                 utils.export_variable("FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
                 utils.export_variable("FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing))
                 utils.export_variable("FVM_PRECISION", pmap_precision)
@@ -68,12 +71,13 @@ def core(
                 )
                 utils.run(f"mkdir -p {output_directory}")
                 command = (
-                    f"CC=cc CXX=CC CUDA_HOST_CXX=CC "
-                    f"srun --nodes={num_nodes} --ntasks-per-node={num_tasks_per_node} python run_model.py "
-                    f"{os.path.join('../config', use_case + '.yml')} "
+                    f"CC=cc CXX=CC "
+                    f"{'CUDA_HOST_CXX=CC' if gt_backend in ('dace:gpu', 'gt:gpu') else ''} "
+                    f"srun --nodes={num_nodes} --ntasks-per-node={num_tasks_per_node} "
+                    f"python run_model.py {os.path.join('../config', use_case + '.yml')} "
                     f"--output-directory={output_directory}"
                 )
-                if pmap_enable_benchmarking:
+                if pmap_disable_log or pmap_enable_benchmarking:
                     command += " --write-profiling-data"
 
                 for _ in range(num_runs):
@@ -86,9 +90,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=ENV)
-    parser.add_argument("--pmap-enable-benchmarking", type=bool, default=PMAP_ENABLE_BENCHMARKING)
-    parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
-    parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
     parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
     parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)
     parser.add_argument("--gt-backend", type=str, default=GT_BACKEND)
@@ -97,6 +98,10 @@ if __name__ == "__main__":
     parser.add_argument("--num-tasks-per-node", type=int, default=NUM_TASKS_PER_NODE)
     parser.add_argument("--num-threads-per-task", type=int, default=NUM_THREADS_PER_TASK)
     parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--pmap-disable-log", type=bool, default=PMAP_DISABLE_LOG)
+    parser.add_argument("--pmap-enable-benchmarking", type=bool, default=PMAP_ENABLE_BENCHMARKING)
+    parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
+    parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()
     with utils.batch_directory():
