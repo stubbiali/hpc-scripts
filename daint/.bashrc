@@ -141,8 +141,7 @@ export SQUEUE_FORMAT="%.9i %.50j %.15u %.5q %.15T %.10M %.10l %.5D %.13f %R"
 # hdf5 and netcdf
 export HDF5_ROOT=/users/"$USER"/hdf5/1.14.2/build/gnu
 export NETCDF_ROOT=/users/"$USER"/netcdf-c/4.9.2/build/gnu
-PATH=~/help2man/1.49.3/build/gnu/bin/:$PATH
-PATH=~/autoconf/2.72/build/gnu/bin/:$PATH
+export PATH="$HOME"/autoconf/2.72/build/gnu/bin/:"$HOME"/help2man/1.49.3/build/gnu/bin/:$PATH
 
 # get node id of a salloc
 function get_node_id() {

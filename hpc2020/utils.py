@@ -90,26 +90,80 @@ def check_argument(parameter, token, options):
         pass
 
 
-
 def load_env(env: str) -> None:
     with check_argument("env", env, defs.valid_programming_environments):
-        module_load("prgenv/gnu")
+        module_load(f"prgenv/{env}")
 
 
-def export_variable(name: str, value: typing.Any) -> None:
-    run(f"export {name}={str(value)}")
+def load_compiler(env: str, compiler_version: str) -> str:
+    with check_argument("env", env, defs.valid_programming_environments):
+        if env == "gnu":
+            module_load(f"gcc/{compiler_version}")
+            cc, cxx, fc = "gcc", "g++", "gfortran"
+            env_id = f"gnu-{compiler_version}"
+            export_variable(
+                "LD_LIBRARY_PATH",
+                f"/usr/local/apps/gcc/{compiler_version}/lib64",
+                prepend_value=True,
+            )
+        else:
+            module_load(f"intel/{compiler_version}")
+            cc, cxx, fc = "icc", "icpc", "ifort"
+            env_id = f"intel-{compiler_version}"
+    export_variable("CC", cc)
+    export_variable("CXX", cxx)
+    export_variable("FC", fc)
+    return env_id
 
 
-def append_to_path( name: str, value: typing.Any) -> None:
-    run(f"{name}={str(value)}:${name}")
+def load_mpi(mpi: str, env: str, compiler_version: str, partition: str) -> str:
+    with check_argument("mpi", mpi, defs.valid_mpi_libraries):
+        with check_argument("env", env, defs.valid_programming_environments):
+            with check_argument("partition", partition, defs.valid_partitions):
+                cc, cxx, fc = "mpicc", "mpicxx", "mpifort"
+                if mpi == "hpcx":
+                    if env == "gnu" and compiler_version == "13.2.0":
+                        module_name = "hpcx-openmpi/2.17.1"
+                    else:
+                        module_name = "hpcx-openmpi/2.10.0"
+                elif mpi == "intel-mpi":
+                    module_name = "intel-mpi/2023.2.0"
+                    if env == "intel":
+                        cc, cxx, fc = "mpiicc", "mpiicpc", "mpiifort"
+                    else:
+                        cc, cxx, fc = "mpigcc", "mpigxx", "mpif90"
+                else:
+                    module_name = "openmpi/4.1.5.4" if partition == "gpu" else "openmpi/4.1.1.1"
+    module_load(module_name)
+    export_variable("CC", cc)
+    export_variable("MPICC", cc)
+    export_variable("CXX", cxx)
+    export_variable("MPICXX", cxx)
+    export_variable("FC", fc)
+    export_variable("MPIFC", fc)
+    return module_name.replace("/", "-")
 
 
-def setup_cuda():
-    run("NVCC_PATH=$(which nvcc)")
-    run("CUDA_PATH=$(echo $NVCC_PATH | sed -e 's/\/bin\/nvcc//g')")
-    export_variable("CUDA_HOME", "$CUDA_PATH")
-    export_variable("NVHPC_CUDA_HOME", "$CUDA_PATH")
-    export_variable("LD_LIBRARY_PATH", "$CUDA_PATH/lib64:$LD_LIBRARY_PATH")
+def load_gpu_libraries(env: str, compiler_version: str) -> None:
+    with check_argument("env", env, defs.valid_programming_environments):
+        if env == "gnu" and compiler_version == "13.2.0":
+            module_load("nvidia/24.1", "cuda/11.6")
+        else:
+            module_load("nvidia/22.11", "cuda/11.6")
+    export_variable("GHEX_USE_GPU", 1)
+    export_variable("GHEX_GPU_TYPE", "NVIDIA")
+    export_variable("GHEX_GPU_ARCH", 80)
+
+
+def export_variable(name: str, value: typing.Any, prepend_value: bool = False) -> None:
+    cmd = f"export {name}={str(value)}"
+    if prepend_value:
+        cmd += f":${name}"
+    run(cmd)
+
+
+def update_path(value: str):
+    export_variable("PATH", value, prepend_value=True)
 
 
 @contextlib.contextmanager
@@ -127,5 +181,3 @@ class ThreadsLayout:
     num_nodes: int
     num_tasks_per_node: int
     num_threads_per_task: int
-
-
