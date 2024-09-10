@@ -16,7 +16,7 @@ PARTITION: defs.Partition = "gpu"
 
 
 def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partition) -> str:
-    with utils.batch_file(prefix="prepare_cloudsc_versions") as (f, fname):
+    with utils.batch_file(filename="prepare_cloudsc_versions") as (f, fname):
         # clear environment
         utils.module_purge(force=True)
 

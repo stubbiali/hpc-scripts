@@ -21,7 +21,7 @@ def core(
     partition: defs.Partition,
     project: str = "cloudsc",
 ) -> str:
-    with utils.batch_file(prefix="prepare_" + project) as (f, fname):
+    with utils.batch_file(filename="prepare_" + project) as (f, fname):
         # clear environment
         utils.module_purge(force=True)
 

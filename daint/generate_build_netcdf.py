@@ -24,7 +24,7 @@ def core(
     root_dir: str,
     version: str,
 ):
-    with utils.batch_file(prefix="build_netcdf"):
+    with utils.batch_file(filename="build_netcdf"):
         utils.module_purge(force=True)
         utils.load_partition(partition)
         utils.load_env(env)

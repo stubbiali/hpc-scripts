@@ -17,7 +17,7 @@ VERSION: str = "2.72"
 
 
 def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
-    with utils.batch_file(prefix="build_autoconf"):
+    with utils.batch_file(filename="build_autoconf"):
         utils.module_purge(force=True)
         utils.load_partition(partition)
         utils.load_env(env)

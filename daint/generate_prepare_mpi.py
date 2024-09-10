@@ -13,7 +13,7 @@ PARTITION: defs.Partition = "gpu"
 
 
 def core(partition: defs.Partition) -> str:
-    with utils.batch_file(prefix="prepare_mpi") as (f, fname):
+    with utils.batch_file(filename="prepare_mpi") as (f, fname):
         # configure MPICH
         utils.export_variable("MPICH_CRAY_OPT_THREAD_SYNC", 1)
         utils.export_variable("MPICH_GNI_USE_UNASSIGNED_CPUS", "enabled")

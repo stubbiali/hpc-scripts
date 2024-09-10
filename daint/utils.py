@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import dataclasses
 import os
+import shutil
 import subprocess
 import tempfile
 import typing
@@ -15,46 +16,64 @@ BATCH_FILE_REGISTRY = []
 
 
 @contextlib.contextmanager
-def batch_directory():
-    os.makedirs("_tmp", exist_ok=True)
+def batch_directory(path: typing.Optional[str] = None):
+    assert len(BATCH_DIRECTORY_REGISTRY) <= 1
     try:
         if len(BATCH_DIRECTORY_REGISTRY) > 0:
             final_cleanup = False
             yield BATCH_DIRECTORY_REGISTRY[-1]
         else:
             final_cleanup = True
-            dirname = os.path.abspath(tempfile.mkdtemp(dir="_tmp"))
-            BATCH_DIRECTORY_REGISTRY.append(dirname)
-            os.makedirs(dirname, exist_ok=True)
-            print(f"py-hpc-scripts: create {dirname}")
-            yield dirname
+            if path is not None:
+                path = os.path.abspath(path)
+                if os.path.exists(path):
+                    shutil.rmtree(path)
+                    print(f"py-hpc-scripts: overwrite {path}")
+                else:
+                    print(f"py-hpc-scripts: create {path}")
+                os.makedirs(path)
+            else:
+                os.makedirs("_tmp", exist_ok=True)
+                path = os.path.abspath(tempfile.mkdtemp(dir="_tmp"))
+                os.makedirs(path, exist_ok=True)
+                print(f"py-hpc-scripts: create {path}")
+            BATCH_DIRECTORY_REGISTRY.append(path)
+            yield path
     finally:
         if final_cleanup:
             BATCH_DIRECTORY_REGISTRY.pop()
 
 
 @contextlib.contextmanager
-def batch_file(prefix: typing.Optional[str] = None):
-    if len(BATCH_DIRECTORY_REGISTRY) > 0:
-        fname = os.path.abspath(os.path.join(BATCH_DIRECTORY_REGISTRY[-1], prefix + ".sh"))
-    else:
-        # os.makedirs("_tmp", exist_ok=True)
-        # fname = os.path.abspath(tempfile.mktemp(prefix=prefix + "_", suffix=".sh", dir="_tmp"))
-        fname = os.path.abspath(prefix + ".sh")
+def batch_file(filename: typing.Optional[str] = None):
+    if filename is not None:
+        if len(BATCH_DIRECTORY_REGISTRY) > 0:
+            fname = os.path.abspath(os.path.join(BATCH_DIRECTORY_REGISTRY[-1], filename + ".sh"))
+        else:
+            # os.makedirs("_tmp", exist_ok=True)
+            # fname = os.path.abspath(tempfile.mktemp(prefix=prefix + "_", suffix=".sh", dir="_tmp"))
+            fname = os.path.abspath(filename + ".sh")
 
-    try:
-        with open(fname, "w") as f:
-            BATCH_FILE_REGISTRY.append(f)
-            f.write("#!/bin/bash -l\n\n")
-            yield f, fname
-    finally:
-        print(f"py-hpc-scripts: write {fname}")
-        BATCH_FILE_REGISTRY.pop()
+        try:
+            with open(fname, "w") as f:
+                BATCH_FILE_REGISTRY.append(f)
+                f.write("#!/bin/bash -l\n\n")
+                yield f, fname
+        finally:
+            print(f"py-hpc-scripts: write {fname}")
+            BATCH_FILE_REGISTRY.pop()
 
 
-def run(*args: str) -> None:
+def run(*args: str, split: bool = False, verbose: bool = False) -> None:
     split_args = [item for arg in args for item in arg.split(" ")]
-    command = " ".join(split_args)
+    if split:
+        command = split_args[0]
+        for arg in split_args[1:]:
+            command += " \\\n    " + arg
+    else:
+        command = " ".join(split_args)
+    if verbose:
+        print(command)
     if len(BATCH_FILE_REGISTRY) > 0:
         BATCH_FILE_REGISTRY[-1].write(command + "\n")
     else:
@@ -103,8 +122,10 @@ def load_env(env: str) -> None:
 def export_variable(name: str, value: typing.Any) -> None:
     run(f"export {name}={str(value)}")
 
-def append_to_path( name: str, value: typing.Any) -> None:
+
+def append_to_path(name: str, value: typing.Any) -> None:
     run(f"{name}={str(value)}:${name}")
+
 
 def setup_cuda():
     run("NVCC_PATH=$(which nvcc)")

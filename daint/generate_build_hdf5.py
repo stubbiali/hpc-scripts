@@ -19,7 +19,7 @@ VERSION: str = "1.14.4.2"
 def core(
     env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str
 ):
-    with utils.batch_file(prefix="build_hdf5"):
+    with utils.batch_file(filename="build_hdf5"):
         utils.module_purge(force=True)
         utils.load_partition(partition)
         utils.load_env(env)

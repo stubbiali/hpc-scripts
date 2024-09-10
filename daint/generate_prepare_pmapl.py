@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 import os
+import typing
 
 import defs
 import generate_prepare_mpi
@@ -10,14 +11,20 @@ import utils
 
 
 # >>> config: start
-BRANCH: str = "benchmarking"
+BRANCH: str = "benchmarking-baroclinic"
 ENV: defs.ProgrammingEnvironment = "gnu"
 PARTITION: defs.Partition = "gpu"
+ROOT_DIR: typing.Optional[str] = None
 # >>> config: end
 
 
-def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partition) -> str:
-    with utils.batch_file(prefix="prepare_pmapl") as (f, fname):
+def core(
+    branch: str,
+    env: defs.ProgrammingEnvironment,
+    partition: defs.Partition,
+    root_dir: typing.Optional[str],
+) -> str:
+    with utils.batch_file(filename="prepare_pmapl") as (f, fname):
         # clear environment
         utils.module_purge(force=True)
 
@@ -29,16 +36,15 @@ def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partitio
             utils.module_load("cudatoolkit/11.2.0_3.39-2.1__gf93aa1c")
 
         # set path to PMAP code
-        pwd = os.environ.get("SCRATCH", os.path.curdir)
-        pmapl_dir = os.path.join(pwd, "pmapl", branch)
+        root_dir = os.path.abspath(root_dir or os.path.curdir)
+        pmapl_dir = os.path.join(root_dir, "pmapl", branch)
         assert os.path.exists(pmapl_dir)
         utils.export_variable("PMAPL", pmapl_dir)
-        pmapl_venv_dir = os.path.join(pmapl_dir, "venv", env)
+        pmapl_venv_dir = os.path.join(pmapl_dir, "_venv", env)
         utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        # gt_cache_root = os.path.join(pmapl_dir, "gt_cache", env)
-        gt_cache_root = os.path.join(pwd, "pmapl", "gt_cache", env)
+        gt_cache_root = os.path.join(root_dir, "pmapl", "_gtcache", env)
         utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
@@ -71,5 +77,6 @@ if __name__ == "__main__":
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=ENV)
     parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
     args = parser.parse_args()
     core(**args.__dict__)
