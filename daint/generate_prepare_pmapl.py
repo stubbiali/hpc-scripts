@@ -13,6 +13,7 @@ import utils
 # >>> config: start
 BRANCH: str = "benchmarking-baroclinic"
 ENV: defs.ProgrammingEnvironment = "gnu"
+GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 PARTITION: defs.Partition = "gpu"
 ROOT_DIR: typing.Optional[str] = None
 # >>> config: end
@@ -21,6 +22,7 @@ ROOT_DIR: typing.Optional[str] = None
 def core(
     branch: str,
     env: defs.ProgrammingEnvironment,
+    ghex_transport_backend: defs.GHEXTransportBackend,
     partition: defs.Partition,
     root_dir: typing.Optional[str],
 ) -> str:
@@ -40,7 +42,16 @@ def core(
         pmapl_dir = os.path.join(root_dir, "pmapl", branch)
         assert os.path.exists(pmapl_dir)
         utils.export_variable("PMAPL", pmapl_dir)
-        pmapl_venv_dir = os.path.join(pmapl_dir, "_venv", env)
+        pmapl_venv_dir = os.path.join(
+            pmapl_dir,
+            "_venv"
+            + (
+                f"_{ghex_transport_backend}"
+                if ghex_transport_backend in ("libfabric", "ucx")
+                else ""
+            ),
+            env,
+        )
         utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
@@ -76,6 +87,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=ENV)
+    parser.add_argument("--ghex-transport-backend", type=str, default=GHEX_TRANSPORT_BACKEND)
     parser.add_argument("--partition", type=str, default=PARTITION)
     parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
     args = parser.parse_args()

@@ -62,7 +62,7 @@ def core(
                 f"--nodes={num_nodes}",
                 f"--ntasks-per-node={num_tasks_per_node}",
                 f"--output={output}",
-                f"--partition=normal",
+                f"--partition={'large' if num_nodes > 2400 else 'normal'}",
                 f"--time={time}",
             ]
             if contiguous_nodes:

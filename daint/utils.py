@@ -132,6 +132,7 @@ def setup_cuda():
     run("CUDA_PATH=$(echo $NVCC_PATH | sed -e 's/\/bin\/nvcc//g')")
     export_variable("CUDA_HOME", "$CUDA_PATH")
     export_variable("LD_LIBRARY_PATH", "$CUDA_PATH/lib64:$LD_LIBRARY_PATH")
+    export_variable("CRAY_CUDA_MPS", "1")
 
 
 @contextlib.contextmanager

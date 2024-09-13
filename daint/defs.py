@@ -2,6 +2,7 @@
 import typing
 
 FloatingPointPrecision = typing.Literal["double", "single"]
+GHEXTransportBackend = typing.Literal["libfabric", "mpi", "ucx"]
 Partition = typing.Literal["gpu", "mc"]
 ProgrammingEnvironment = typing.Literal["gnu"]
 
