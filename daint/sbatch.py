@@ -65,10 +65,13 @@ def core(
                 f"--partition={'large' if num_nodes > 2400 else 'normal'}",
                 f"--time={time}",
             ]
-            if contiguous_nodes:
-                command.append(f"--contiguous")
             if reservation:
                 command.append(f"--reservation={reservation}")
+            if contiguous_nodes and num_nodes <= 256:
+                # we ask for contiguous nodes only when the number of nodes does not exceed 256
+                # the request of a larger number of contiguous nodes might not be satisfied by the
+                # scheduler, due to the presence of faulty nodes
+                command.append(f"--contiguous")
             if set_switches:
                 command.append(f"--switches={1 + (num_nodes - 1) // 384}")
                 # command.append(f"--switches={num_switches}@12:00:00")
