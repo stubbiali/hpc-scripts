@@ -12,38 +12,90 @@ import utils
 
 
 # >>> config: start
-account: str = "s299"
-branch_l: list[str] = ["benchmarking"]
-contiguous_nodes: bool = False
-copy_gt_cache_to_dev_shm: bool = True
-copy_gt_cache_to_tmp: bool = False
-dry_run: bool = True
-enable_cprofile: bool = False
-partition: defs.Partition = "gpu"
-env_l: list[defs.ProgrammingEnvironment] = ["gnu"]
-ghex_aggregate_fields: bool = False
-ghex_collect_statistics: bool = False
-ghex_transport_backend: defs.GHEXTransportBackend = "mpi"
-gt_backend_l: list[str] = [
+# account to be used to submit the jobs
+ACCOUNT: str = "s299"
+
+# branch of the PMAP-L repository
+BRANCH: str = "benchmarking"
+
+# True to ask for contiguous nodes
+CONTIGUOUS_NODES: bool = False
+
+# True to copy the GT4Py cache directory to /dev/shm before running the model
+# this is still experimental, but might help job startup time at high node counts
+COPY_GT_CACHE_TO_DEV_SHM: bool = False
+
+# True to copy the GT4Py cache directory to /tmp before running the model
+# this is still experimental, but might help job startup time at high node counts
+COPY_GT_CACHE_TO_TMP: bool = False
+
+# True to generate the scripts only, without submitting any job
+DRY_RUN: bool = True
+
+# True to profile the code using cProfile
+ENABLE_CPROFILE: bool = False
+
+# partition of Piz Daint
+PARTITION: defs.Partition = "gpu"
+
+# programming environment
+ENV: defs.ProgrammingEnvironment = "gnu"
+
+# value of the env variable GHEX_AGGREGATE_FIELDS
+GHEX_AGGREGATE_FIELDS: bool = False
+
+# value of the env variable GHEX_COLLECT_STATISTICS
+GHEX_COLLECT_STATISTICS: bool = False
+
+# transport backend for GHEX
+GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
+
+# list of GT4Py backends to be used
+GT_BACKEND: list[str] = [
     # "gt:cpu_kfirst",
     # "gt:cpu_ifirst",
     # "dace:cpu",
     # "cuda",
     # "gt:gpu",
-    "dace:gpu",
+    "dace:gpu"
 ]
-job_root_dir: str = "test-scripts"
-num_runs: int = 3
-pmap_disable_log: bool = False
-pmap_enable_benchmarking: bool = True
-pmap_enable_overcomputing_l: list[bool] = [True]
-pmap_extended_timers: bool = False
-pmap_precision_l: list[defs.FloatingPointPrecision] = ["double"]
-pmap_root_dir: typing.Optional[str] = None
-reservation: typing.Optional[str] = None
-set_switches: bool = False
-time: str = "00:10:00"
-use_case_l: dict[str, list[utils.ThreadsLayout]] = {
+
+# folder (relative to the current directory) where scripts will be placed
+JOB_ROOT_DIR: str = "test-scripts"
+
+# number of model runs to perform
+NUM_RUNS: int = 3
+
+# value of the env variable FVM_DISABLE_LOG
+PMAP_DISABLE_LOG: bool = False
+
+# value of the env variable FVM_ENABLE_BENCHMARKING
+PMAP_ENABLE_BENCHMARKING: bool = True
+
+# value of the env variable FVM_ENABLE_OVERCOMPUTING
+PMAP_ENABLE_OVERCOMPUTING: bool = True
+
+# value of the env variable FVM_EXTENDED_TIMERS
+PMAP_EXTENDED_TIMERS: bool = False
+
+# values of the env variable FVM_PRECISION
+PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["double"]
+
+# the model source code is assumed to be found under PMAP_ROOT_DIR/pmapl/BRANCH
+# if not otherwise specified, PMAP_ROOT_DIR is the current directory
+PMAP_ROOT_DIR: typing.Optional[str] = None
+
+# jobs reservation (if any)
+RESERVATION: typing.Optional[str] = None
+
+# True to ask the scheduler to minimize the number of electrical groups spanned by the allocated nodes
+SET_SWITCHES: bool = False
+
+# job time limit
+TIME: str = "01:00:00"
+
+# list of use cases
+USE_CASE: dict[str, list[utils.ThreadsLayout]] = {
     **{
         f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/128x128/{num_nodes}": [
             utils.ThreadsLayout(num_nodes, 1, 12)
@@ -62,7 +114,6 @@ use_case_l: dict[str, list[utils.ThreadsLayout]] = {
         ]
         for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
     },
-
     **{
         f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/128x128/{num_nodes}": [
             utils.ThreadsLayout(num_nodes, 1, 12)
@@ -81,88 +132,86 @@ use_case_l: dict[str, list[utils.ThreadsLayout]] = {
         ]
         for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
     },
-
     **{
-        f"weak-scaling/bomex-prescribed-boundary/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
+        f"weak-scaling/bomex-prescribed-boundary/{num_nodes}": [
+            utils.ThreadsLayout(num_nodes, 1, 12)
+        ]
         for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
     },
-
     **{
         f"weak-scaling/bomex/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
-        for num_nodes in (1, 4, 16, 64)  #, 256, 1024, 4096)
+        for num_nodes in (1, 4, 16, 64)  # , 256, 1024, 4096)
     },
+    # "weak-scaling/bomex-prescribed-boundary/1": [utils.ThreadsLayout(1, 1, 12)],
+    # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/1": [
+    #     utils.ThreadsLayout(1, 1, 12)
+    # ],
+    # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/1": [
+    #     utils.ThreadsLayout(1, 1, 12)
+    # ],
+    # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/4": [
+    #     utils.ThreadsLayout(4, 1, 12)
+    # ],
+    # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/8": [
+    #     utils.ThreadsLayout(8, 1, 12)
+    # ],
+    # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/256": [
+    #     utils.ThreadsLayout(256, 1, 12)
+    # ],
+    # "weak-scaling/baroclinic-wave-sphere-moist-mpdata-vector/1": [utils.ThreadsLayout(1, 1, 12)],
 }
 # >>> config: end
 
 
 def core():
-    for (
-        branch,
-        env,
-        gt_backend,
-        pmap_enable_overcomputing,
-        pmap_precision,
-        use_case,
-    ) in itertools.product(
-        branch_l,
-        env_l,
-        gt_backend_l,
-        pmap_enable_overcomputing_l,
-        pmap_precision_l,
-        use_case_l.keys(),
+    for gt_backend, pmap_precision, use_case in itertools.product(
+        GT_BACKEND, PMAP_PRECISION, USE_CASE
     ):
-        for threads_layout in use_case_l[use_case]:
+        for threads_layout in USE_CASE[use_case]:
             job_dir = os.path.join(
-                job_root_dir, branch, use_case, pmap_precision, gt_backend.replace(":", "")
+                JOB_ROOT_DIR, BRANCH, use_case, pmap_precision, gt_backend.replace(":", "")
             )
             with utils.batch_directory(path=job_dir) as output_dir:
-                # job_name = (
-                #     f"{use_case.replace('/', '_')}-{env}-{gt_backend}-{pmap_precision}-"
-                #     f"{pmap_enable_overcomputing}-{threads_layout.num_nodes}-"
-                #     f"{threads_layout.num_tasks_per_node}"
-                # )
-                # job_name = (
-                #     f"{gt_backend}-{pmap_precision}-"
-                #     f"{pmap_enable_overcomputing}-{threads_layout.num_nodes}-"
-                #     f"{threads_layout.num_tasks_per_node}"
-                # )
-                job_name = f"{use_case.replace('/', '-')}-{pmap_precision[0]}"
+                job_name = (
+                    f"{use_case.replace('/', '_')}-{gt_backend}-{pmap_precision[0]}-"
+                    f"{threads_layout.num_nodes}-"
+                )
                 job_script = generate_run_pmapl.core(
-                    branch=branch,
-                    copy_gt_cache_to_dev_shm=copy_gt_cache_to_dev_shm,
-                    copy_gt_cache_to_tmp=copy_gt_cache_to_tmp,
-                    enable_cprofile=enable_cprofile,
-                    env=env,
-                    ghex_aggregate_fields=ghex_aggregate_fields,
-                    ghex_collect_statistics=ghex_collect_statistics,
-                    ghex_transport_backend=ghex_transport_backend,
+                    branch=BRANCH,
+                    copy_gt_cache_to_dev_shm=COPY_GT_CACHE_TO_DEV_SHM,
+                    copy_gt_cache_to_tmp=COPY_GT_CACHE_TO_TMP,
+                    enable_cprofile=ENABLE_CPROFILE,
+                    env=ENV,
+                    ghex_aggregate_fields=GHEX_AGGREGATE_FIELDS,
+                    ghex_collect_statistics=GHEX_COLLECT_STATISTICS,
+                    ghex_transport_backend=GHEX_TRANSPORT_BACKEND,
                     gt_backend=gt_backend,
                     num_nodes=threads_layout.num_nodes,
-                    num_runs=num_runs,
+                    num_runs=NUM_RUNS,
                     num_tasks_per_node=threads_layout.num_tasks_per_node,
                     num_threads_per_task=threads_layout.num_threads_per_task,
                     output_dir=output_dir,
-                    partition=partition,
-                    pmap_disable_log=pmap_disable_log,
-                    pmap_enable_benchmarking=pmap_enable_benchmarking,
-                    pmap_enable_overcomputing=pmap_enable_overcomputing,
-                    pmap_extended_timers=pmap_extended_timers,
+                    partition=PARTITION,
+                    pmap_disable_log=PMAP_DISABLE_LOG,
+                    pmap_enable_benchmarking=PMAP_ENABLE_BENCHMARKING,
+                    pmap_enable_overcomputing=PMAP_ENABLE_OVERCOMPUTING,
+                    pmap_extended_timers=PMAP_EXTENDED_TIMERS,
                     pmap_precision=pmap_precision,
-                    root_dir=pmap_root_dir,
+                    root_dir=PMAP_ROOT_DIR,
                     use_case=use_case,
                 )
                 sbatch.core(
-                    account=account,
-                    contiguous_nodes=contiguous_nodes,
-                    dry_run=dry_run,
+                    account=ACCOUNT,
+                    contiguous_nodes=CONTIGUOUS_NODES,
+                    dry_run=DRY_RUN,
                     job_name=job_name,
                     job_script=job_script,
                     num_nodes=threads_layout.num_nodes,
                     num_tasks_per_node=threads_layout.num_tasks_per_node,
-                    partition=partition,
-                    reservation=reservation,
-                    set_switches=set_switches,
-                    time=time,
+                    partition=PARTITION,
+                    reservation=RESERVATION,
+                    set_switches=SET_SWITCHES,
+                    time=TIME,
                 )
 
 
