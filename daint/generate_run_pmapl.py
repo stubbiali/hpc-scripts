@@ -105,7 +105,6 @@ def core(
                         utils.run(f"tar cf {gt_cache_backend_tar} {gt_cache_backend_dir}")
 
                     new_gt_cache_root = dest + gt_cache_root
-                    print(f"{dest=} {new_gt_cache_root=}")
                     utils.run(f"srun rm -rf {new_gt_cache_root}")
                     utils.run(f"srun mkdir -p {new_gt_cache_root}/.gt_cache/py39_1013")
                     utils.run(
