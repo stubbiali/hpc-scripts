@@ -25,7 +25,7 @@ def core(
     ghex_transport_backend: defs.GHEXTransportBackend,
     partition: defs.Partition,
     root_dir: typing.Optional[str],
-) -> str:
+) -> tuple[str, str]:
     with utils.batch_file(filename="prepare_pmapl") as (f, fname):
         # clear environment
         utils.module_purge(force=True)
@@ -80,7 +80,7 @@ def core(
             if os.path.exists(pmapl_venv_dir):
                 utils.run(f"source {pmapl_venv_dir}/bin/activate")
 
-    return fname
+    return fname, gt_cache_root
 
 
 if __name__ == "__main__":

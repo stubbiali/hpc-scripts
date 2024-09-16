@@ -12,6 +12,9 @@ import utils
 
 # >>> config: start
 BRANCH: str = "main"
+COPY_GT_CACHE_TO_DEV_SHM: bool = False
+COPY_GT_CACHE_TO_TMP: bool = False
+ENABLE_CPROFILE: bool = False
 ENV: defs.ProgrammingEnvironment = "gnu"
 GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
@@ -35,6 +38,9 @@ USE_CASE: str = "thermal"
 
 def core(
     branch: str,
+    copy_gt_cache_to_dev_shm: bool,
+    copy_gt_cache_to_tmp: bool,
+    enable_cprofile: bool,
     env: defs.ProgrammingEnvironment,
     ghex_aggregate_fields: bool,
     ghex_collect_statistics: bool,
@@ -54,7 +60,7 @@ def core(
     root_dir: typing.Optional[str],
     use_case: str,
 ) -> str:
-    prepare_pmapl_fname = generate_prepare_pmapl.core(
+    prepare_pmapl_fname, gt_cache_root = generate_prepare_pmapl.core(
         branch, env, ghex_transport_backend, partition, root_dir
     )
 
@@ -78,21 +84,35 @@ def core(
                 # utils.export_variable("CUDA_LAUNCH_BLOCKING", 1)
 
                 gt_backend_str = gt_backend.replace(":", "")
-                if num_nodes > 256:
+
+                if copy_gt_cache_to_dev_shm and copy_gt_cache_to_tmp:
+                    raise RuntimeError("gtcache can be copied either to /dev/shm or to /tmp.")
+                if copy_gt_cache_to_dev_shm:
+                    dest = "/dev/shm"
+                elif copy_gt_cache_to_tmp:
+                    dest = "/tmp"
+                else:
+                    dest = None
+
+                if dest is not None:
+                    gt_cache_backend_dir = os.path.join(
+                        gt_cache_root, f".gt_cache/py39_1013/{gt_backend_str}"
+                    )
+                    gt_cache_backend_tar = os.path.join(
+                        gt_cache_root, f".gt_cache/py39_1013/{gt_backend_str}.tar"
+                    )
+                    if not os.path.exists(gt_cache_backend_tar):
+                        utils.run(f"tar cf {gt_cache_backend_tar} {gt_cache_backend_dir}")
+
+                    new_gt_cache_root = dest + gt_cache_root
+                    print(f"{dest=} {new_gt_cache_root=}")
+                    utils.run(f"srun rm -rf {new_gt_cache_root}")
+                    utils.run(f"srun mkdir -p {new_gt_cache_root}/.gt_cache/py39_1013")
                     utils.run(
-                        f"srun rm -rf /tmp/subbiali/c28/pmapl/_gtcache/{env}/"
-                        f".gt_cache/py39_1013/{gt_backend_str}"
+                        f"srun tar xf {gt_cache_backend_tar} "
+                        f"-C {new_gt_cache_root}/.gt_cache/py39_1013"
                     )
-                    utils.run(
-                        f"srun mkdir -p /tmp/subbiali/c28/pmapl/_gtcache/{env}/.gt_cache/py39_1013"
-                    )
-                    utils.run(
-                        f"srun cp -r ../../_gtcache/{env}/.gt_cache/py39_1013/{gt_backend_str} "
-                        f"/tmp/subbiali/c28/pmapl/_gtcache/{env}/.gt_cache/py39_1013"
-                    )
-                    utils.export_variable(
-                        "GT_CACHE_ROOT", f"/tmp/subbiali/c28/pmapl/_gtcache/{env}"
-                    )
+                    utils.export_variable("GT_CACHE_ROOT", new_gt_cache_root)
 
                 if output_dir is not None:
                     output_dir = os.path.abspath(output_dir)
@@ -105,7 +125,10 @@ def core(
                     f"{'CUDA_HOST_CXX=CC' if gt_backend in ('dace:gpu', 'gt:gpu') else ''} "
                     f"srun --nodes={num_nodes} --ntasks-per-node={num_tasks_per_node} --unbuffered "
                     "python "
-                    # f"-m cProfile -o {output_dir}/profile_data_$(hostname).prof "
+                )
+                if enable_cprofile:
+                    command += f"-m cProfile -o {output_dir}/profile_data_$(hostname).prof "
+                command += (
                     f"run_model.py {os.path.join('../config', use_case + '.yml')} "
                     f"--output-directory={output_dir}"
                 )
@@ -115,11 +138,8 @@ def core(
                 for _ in range(num_runs):
                     utils.run(command)
 
-                if num_nodes > 256:
-                    utils.run(
-                        f"srun rm -rf /tmp/subbiali/c28/pmapl/_gtcache/{env}/"
-                        f".gt_cache/py39_1013/{gt_backend_str}"
-                    )
+                if dest is not None:
+                    utils.run(f"srun rm -rf {new_gt_cache_root}")
 
     return fname
 
@@ -127,6 +147,9 @@ def core(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
+    parser.add_argument("--copy-gt-cache-to-dev-shm", type=bool, default=COPY_GT_CACHE_TO_DEV_SHM)
+    parser.add_argument("--copy-gt-cache-to-tmp", type=bool, default=COPY_GT_CACHE_TO_TMP)
+    parser.add_argument("--enable-cprofile", type=bool, default=ENABLE_CPROFILE)
     parser.add_argument("--env", type=str, default=ENV)
     parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
     parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)

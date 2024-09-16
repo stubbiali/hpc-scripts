@@ -13,9 +13,12 @@ import utils
 
 # >>> config: start
 account: str = "s299"
-branch_l: list[str] = ["benchmarking-baroclinic"]
-contiguous_nodes: bool = True
+branch_l: list[str] = ["benchmarking"]
+contiguous_nodes: bool = False
+copy_gt_cache_to_dev_shm: bool = True
+copy_gt_cache_to_tmp: bool = False
 dry_run: bool = True
+enable_cprofile: bool = False
 partition: defs.Partition = "gpu"
 env_l: list[defs.ProgrammingEnvironment] = ["gnu"]
 ghex_aggregate_fields: bool = False
@@ -29,7 +32,7 @@ gt_backend_l: list[str] = [
     # "gt:gpu",
     "dace:gpu",
 ]
-job_root_dir: str = "largerun"
+job_root_dir: str = "test-scripts"
 num_runs: int = 3
 pmap_disable_log: bool = False
 pmap_enable_benchmarking: bool = True
@@ -37,9 +40,9 @@ pmap_enable_overcomputing_l: list[bool] = [True]
 pmap_extended_timers: bool = False
 pmap_precision_l: list[defs.FloatingPointPrecision] = ["double"]
 pmap_root_dir: typing.Optional[str] = None
-reservation: typing.Optional[str] = "largerun"
-set_switches: bool = True
-time: str = "01:00:00"
+reservation: typing.Optional[str] = None
+set_switches: bool = False
+time: str = "00:10:00"
 use_case_l: dict[str, list[utils.ThreadsLayout]] = {
     **{
         f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/128x128/{num_nodes}": [
@@ -60,14 +63,34 @@ use_case_l: dict[str, list[utils.ThreadsLayout]] = {
         for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
     },
 
-    # **{
-    #     f"weak-scaling/bomex-prescribed-boundary/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
-    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    # },
-    # **{
-    #     f"weak-scaling/bomex/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
-    #     for num_nodes in (1, 4, 16, 64)  #, 256, 1024, 4096)
-    # },
+    **{
+        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/128x128/{num_nodes}": [
+            utils.ThreadsLayout(num_nodes, 1, 12)
+        ]
+        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    },
+    **{
+        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/160x160/{num_nodes}": [
+            utils.ThreadsLayout(num_nodes, 1, 12)
+        ]
+        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    },
+    **{
+        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/256x256/{num_nodes}": [
+            utils.ThreadsLayout(num_nodes, 1, 12)
+        ]
+        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    },
+
+    **{
+        f"weak-scaling/bomex-prescribed-boundary/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
+        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    },
+
+    **{
+        f"weak-scaling/bomex/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
+        for num_nodes in (1, 4, 16, 64)  #, 256, 1024, 4096)
+    },
 }
 # >>> config: end
 
@@ -103,10 +126,12 @@ def core():
                 #     f"{pmap_enable_overcomputing}-{threads_layout.num_nodes}-"
                 #     f"{threads_layout.num_tasks_per_node}"
                 # )
-                # job_name = f"{use_case[45:52]}-{gt_backend}-{pmap_precision}-{threads_layout.num_nodes}"
                 job_name = f"{use_case.replace('/', '-')}-{pmap_precision[0]}"
                 job_script = generate_run_pmapl.core(
                     branch=branch,
+                    copy_gt_cache_to_dev_shm=copy_gt_cache_to_dev_shm,
+                    copy_gt_cache_to_tmp=copy_gt_cache_to_tmp,
+                    enable_cprofile=enable_cprofile,
                     env=env,
                     ghex_aggregate_fields=ghex_aggregate_fields,
                     ghex_collect_statistics=ghex_collect_statistics,
