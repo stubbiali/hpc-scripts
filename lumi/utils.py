@@ -100,7 +100,7 @@ def check_argument(parameter, token, options):
 def get_partition(partition_type: typing.Literal["gpu", "host"]) -> str:
     with check_argument("partition_type", partition_type, defs.valid_partition_types):
         if partition_type == "gpu":
-            return "standard-g"
+            return "dev-g"
         else:
             return "standard"
 
@@ -184,7 +184,7 @@ def setup_hip():
     export_variable("CUPY_ACCELERATORS", "cub")
     export_variable("CUPY_INSTALL_USE_HIP", 1)
     export_variable("GHEX_USE_GPU", 1)
-    export_variable("GHEX_GPU_TYPE", "AMD")
+    export_variable("GHEX_GPU_TYPE", "AMD_LEGACY")
     export_variable("GHEX_GPU_ARCH", "gfx90a")
     export_variable("GT4PY_USE_HIP", 1)
     export_variable("HCC_AMDGPU_TARGET", "gfx90a")
@@ -229,3 +229,7 @@ class ThreadsLayout:
     num_nodes: int
     num_tasks_per_node: int
     num_threads_per_task: int
+
+    @property
+    def num_tasks(self) -> int:
+        return self.num_nodes * self.num_tasks_per_node

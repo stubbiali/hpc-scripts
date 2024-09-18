@@ -11,7 +11,7 @@ import utils
 
 
 # >>> config: start
-BRANCH: str = "coupling-refactoring"
+BRANCH: str = "benchmarking"
 COMPILER_VERSION: str = "16.0.1"
 ENV: defs.ProgrammingEnvironment = "cray"
 ENV_VERSION: str = "8.4.0"
@@ -43,12 +43,9 @@ def core(
         utils.load_partition(partition_type)
         env, cpe = utils.load_env(env, env_version, partition_type, stack_version)
         compiler = utils.load_compiler(env, compiler_version)
-        utils.module_load("Boost", "buildtools", "cray-python")
+        utils.module_load(f"Boost/1.82.0-{cpe}", "buildtools", "cray-python")
         if partition_type == "gpu":
             utils.module_load("rocm")
-
-        # patch PYTHONPATH
-        utils.export_variable("PYTHONPATH", "/opt/cray/pe/python/3.9.13.1")
 
         # set path to PMAP code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
@@ -62,7 +59,7 @@ def core(
         utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        gt_cache_root = os.path.join(pmapl_dir, "gt_cache", subtree)
+        gt_cache_root = os.path.join(pwd, "pmapl", "_gtcache", subtree)
         utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
