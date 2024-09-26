@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import os
 
-import update_path
+import update_path  # noqa: F401
 
 import common_utils
 import defaults

@@ -5,7 +5,7 @@ import argparse
 import os
 from typing import Optional
 
-import update_path
+import update_path  # noqa: F401
 
 import common_utils
 import defaults

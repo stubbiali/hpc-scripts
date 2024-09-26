@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-import update_path
+import update_path  # noqa: F401
 
 import common_utils
 import defs

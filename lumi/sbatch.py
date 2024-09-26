@@ -5,7 +5,7 @@ import importlib
 import os
 import typing
 
-import update_path
+import update_path  # noqa: F401
 
 import common_utils
 import defaults
