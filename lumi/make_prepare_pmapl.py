@@ -7,7 +7,7 @@ from typing import Optional
 
 import defaults
 import defs
-import generate_prepare_mpi
+import make_prepare_mpi
 import utils
 
 
@@ -62,7 +62,7 @@ def core(
             utils.setup_hip(rocm_version)
 
         # configure MPICH
-        prepare_mpi_fname = generate_prepare_mpi.core(ghex_transport_backend, partition)
+        prepare_mpi_fname = make_prepare_mpi.core(ghex_transport_backend, partition)
         utils.run(f". {prepare_mpi_fname}")
 
         # path to custom build of HDF5 and NetCDF-C

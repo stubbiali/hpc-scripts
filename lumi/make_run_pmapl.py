@@ -6,7 +6,7 @@ import os
 
 import defaults
 import defs
-import generate_prepare_pmapl
+import make_prepare_pmapl
 import utils
 
 
@@ -55,7 +55,7 @@ def core(
     stack_version: str,
     use_case: str,
 ) -> str:
-    prepare_pmapl_fname = generate_prepare_pmapl.core(
+    prepare_pmapl_fname = make_prepare_pmapl.core(
         branch,
         env,
         ghex_transport_backend,

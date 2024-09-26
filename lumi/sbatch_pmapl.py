@@ -6,7 +6,7 @@ import os
 
 import defaults
 import defs
-import generate_run_pmapl
+import make_run_pmapl
 import sbatch
 import utils
 
@@ -70,7 +70,7 @@ def core():
                 job_name = (
                     f"{use_case.replace('/', '-')}-{threads_layout.num_tasks}-{pmap_precision[0]}"
                 )
-                job_script = generate_run_pmapl.core(
+                job_script = make_run_pmapl.core(
                     branch=BRANCH,
                     default_block_size=DEFAULT_BLOCK_SIZE,
                     env=ENV,

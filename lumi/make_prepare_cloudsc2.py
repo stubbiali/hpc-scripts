@@ -5,7 +5,7 @@ import argparse
 from typing import Optional
 
 import defs
-import generate_prepare_cloudsc
+import make_prepare_cloudsc
 
 
 # >>> config: start
@@ -29,4 +29,4 @@ if __name__ == "__main__":
     parser.add_argument("--stack", type=str, default=STACK)
     parser.add_argument("--stack-version", type=str, default=STACK_VERSION)
     args = parser.parse_args()
-    generate_prepare_cloudsc.core(**args.__dict__, project="cloudsc2")
+    make_prepare_cloudsc.core(**args.__dict__, project="cloudsc2")
