@@ -55,7 +55,7 @@ def core(
         with common_utils.batch_file(filename="batch") as (_, batch_file):
             command = [
                 "sbatch",
-                f"--account={account}{'m' if partition == 'mc' else ''}",
+                f"--account={account}",
                 f"--constraint={partition}",
                 f"--distribution=block",
                 f"--error={error}",

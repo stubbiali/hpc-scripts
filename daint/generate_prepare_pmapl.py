@@ -43,10 +43,15 @@ def core(
         common_utils.export_variable("PMAPL", pmapl_dir)
         pmapl_venv_dir = os.path.join(
             pmapl_dir,
-            "_venv"
-            + (
-                f"_{ghex_transport_backend}"
-                if ghex_transport_backend in ("libfabric", "ucx")
+            (
+                "_venv"
+                + (
+                    f"_{ghex_transport_backend}"
+                    if ghex_transport_backend in ("libfabric", "ucx")
+                    else ""
+                )
+                + "_cpu"
+                if partition == "mc"
                 else ""
             ),
             env,
@@ -54,7 +59,9 @@ def core(
         common_utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        gt_cache_root = os.path.join(root_dir, "pmapl", "_gtcache", env)
+        gt_cache_root = os.path.join(
+            root_dir, "pmapl", "_gtcache" + "_cpu" if partition == "mc" else "", env
+        )
         common_utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         common_utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         common_utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))

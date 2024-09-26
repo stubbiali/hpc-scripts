@@ -21,7 +21,7 @@ TIME: str = "01:00:00"
 def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> None:
     command = [
         f"salloc",
-        f"--account={account}{'m' if partition == 'mc' else ''}",
+        f"--account={account}",
         f"--constraint={partition}",
         f"--nodes={num_nodes}",
         f"--partition=normal",
