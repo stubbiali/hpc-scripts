@@ -5,60 +5,53 @@ import argparse
 import os
 from typing import Optional
 
+import defaults
 import defs
 import generate_prepare_mpi
 import utils
 
 
 # >>> config: start
-BRANCH: str = "benchmarking"
-COMPILER_VERSION: str = "16.0.1"
-ENV: defs.ProgrammingEnvironment = "cray"
-ENV_VERSION: str = "8.4.0"
-HDF5_VERSION: str = "1.14.4.3"
-NETCDF_VERSION: str = "4.9.2"
-PARTITION_TYPE: defs.PartitionType = "gpu"
-STACK: defs.SoftwareStack = "lumi"
-STACK_VERSION: Optional[str] = "23.09"
+BRANCH: str = "benchmarking-lumi"
 # >>> config: end
 
 
 def core(
     branch: str,
-    compiler_version: str,
     env: defs.ProgrammingEnvironment,
-    env_version: str,
+    ghex_transport_backend: defs.GHEXTransportBackend,
     hdf5_version: str,
     netcdf_version: str,
-    partition_type: defs.PartitionType,
+    partition: defs.Partition,
+    rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
 ) -> tuple[str, str]:
-    with utils.batch_file(prefix="prepare_pmapl") as (f, fname):
-        # clear environment
-        utils.module_reset()
-
-        # load relevant modules
-        utils.load_stack(stack, stack_version)
-        utils.load_partition(partition_type)
-        env, cpe = utils.load_env(env, env_version, partition_type, stack_version)
-        compiler = utils.load_compiler(env, compiler_version)
-        utils.module_load(f"Boost/1.82.0-{cpe}", "buildtools", "cray-python")
+    with utils.batch_file(filename="prepare_pmapl") as (f, fname):
+        # clear environment and load relevant modules
+        cpe = utils.setup_env(env, partition, stack, stack_version)
+        utils.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
+        partition_type = utils.get_partition_type(partition)
         if partition_type == "gpu":
-            utils.module_load("rocm")
+            utils.module_load(f"rocm/{rocm_version}")
 
         # set path to PMAP code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
         pmapl_dir = os.path.join(pwd, "pmapl", branch)
         assert os.path.exists(pmapl_dir)
         utils.export_variable("PMAPL", pmapl_dir)
-        subtree = os.path.join(
-            stack + "-" + stack_version or "", env + "-" + env_version, compiler.replace("/", "-")
+        pmapl_subtree = utils.get_subtree(
+            env,
+            stack,
+            stack_version,
+            ghex_transport_backend=ghex_transport_backend,
+            rocm_version=rocm_version if partition_type == "gpu" else None,
         )
-        pmapl_venv_dir = os.path.join(pmapl_dir, "venv", subtree)
+        pmapl_venv_dir = os.path.join(pmapl_dir, "_venv", pmapl_subtree)
         utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
+        subtree = utils.get_subtree(env, stack, stack_version)
         gt_cache_root = os.path.join(pwd, "pmapl", "_gtcache", subtree)
         utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
@@ -66,10 +59,10 @@ def core(
 
         # set/fix HIP-related variables
         if partition_type == "gpu":
-            utils.setup_hip()
+            utils.setup_hip(rocm_version)
 
         # configure MPICH
-        prepare_mpi_fname = generate_prepare_mpi.core(partition_type)
+        prepare_mpi_fname = generate_prepare_mpi.core(ghex_transport_backend, partition)
         utils.run(f". {prepare_mpi_fname}")
 
         # path to custom build of HDF5 and NetCDF-C
@@ -84,24 +77,35 @@ def core(
             "NETCDF4_DIR", os.path.join(pwd, "netcdf-c", netcdf_version, "build", subtree)
         )
 
-        # jump into project source directory and activate virtual environment (if it already exists)
+        # jump into project source directory
         with utils.chdir(pmapl_dir, restore=False):
-            if os.path.exists(pmapl_venv_dir):
+            if not os.path.exists(pmapl_venv_dir):
+                # create virtual environment if it does not exist yet
+                utils.run(f"python -m venv --prompt={pmapl_subtree} {pmapl_venv_dir}")
+                utils.run(f"source {pmapl_venv_dir}/bin/activate")
+                utils.run(f"pip install --upgrade pip setuptools wheel")
+                utils.run(
+                    f"CC=cc CXX=CC MPICC=cc MPICXX=CC pip install -e .[mpi,gpu-rocm] --no-cache-dir"
+                )
+            else:
+                # activate virtual environment
                 utils.run(f"source {pmapl_venv_dir}/bin/activate")
 
-    return fname, compiler
+    return fname
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--compiler-version", type=str, default=COMPILER_VERSION)
-    parser.add_argument("--env", type=str, default=ENV)
-    parser.add_argument("--env-version", type=str, default=ENV_VERSION)
-    parser.add_argument("--hdf5-version", type=str, default=HDF5_VERSION)
-    parser.add_argument("--netcdf-version", type=str, default=NETCDF_VERSION)
-    parser.add_argument("--partition-type", type=str, default=PARTITION_TYPE)
-    parser.add_argument("--stack", type=str, default=STACK)
-    parser.add_argument("--stack-version", type=str, default=STACK_VERSION)
+    parser.add_argument("--env", type=str, default=defaults.ENV)
+    parser.add_argument(
+        "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
+    )
+    parser.add_argument("--hdf5-version", type=str, default=defaults.HDF5_VERSION)
+    parser.add_argument("--netcdf-version", type=str, default=defaults.NETCDF_VERSION)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
+    parser.add_argument("--rocm-version", type=str, default=defaults.ROCM_VERSION)
+    parser.add_argument("--stack", type=str, default=defaults.STACK)
+    parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
     args = parser.parse_args()
     core(**args.__dict__)

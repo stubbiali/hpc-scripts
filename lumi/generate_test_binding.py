@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 import argparse
-import typing
 
 import defs
 import generate_prepare_fvm
