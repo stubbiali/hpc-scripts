@@ -15,7 +15,7 @@ import utils
 
 # >>> config: start
 BRANCH: str = "coupling-refactoring"
-DEFAULT_BLOCK_SIZE: str = ""
+DACE_DEFAULT_BLOCK_SIZE: str = ""
 GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
 GT_BACKEND: str = "gt:gpu"
@@ -34,7 +34,7 @@ USE_CASE: str = "thermal"
 
 def core(
     branch: str,
-    default_block_size: str,
+    dace_default_block_size: str,
     env: defs.ProgrammingEnvironment,
     ghex_aggregate_fields: bool,
     ghex_collect_statistics: bool,
@@ -96,7 +96,7 @@ def core(
                 common_utils.export_variable("FVM_PRECISION", pmap_precision)
                 common_utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
                 if utils.get_partition_type(partition) == "gpu":
-                    common_utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", default_block_size)
+                    common_utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
 
                 srun_options = utils.get_srun_options(
                     num_nodes,
@@ -130,7 +130,7 @@ def core(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--default-block-size", type=str, default=DEFAULT_BLOCK_SIZE)
+    parser.add_argument("--dace-default-block-size", type=str, default=DACE_DEFAULT_BLOCK_SIZE)
     parser.add_argument("--env", type=str, default=defaults.ENV)
     parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
     parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)

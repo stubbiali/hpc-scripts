@@ -16,7 +16,7 @@ import sbatch
 # >>> config: start
 ACCOUNT: int = defaults.ACCOUNT
 BRANCH: str = "benchmarking-lumi"
-DEFAULT_BLOCK_SIZE: str = "'256,1,1'"
+DACE_DEFAULT_BLOCK_SIZE: str = "'256,1,1'"
 DRY_RUN: bool = True
 ENV: defs.ProgrammingEnvironment = "cray"
 GHEX_AGGREGATE_FIELDS: bool = False
@@ -74,7 +74,7 @@ def core():
                 )
                 job_script = make_run_pmapl.core(
                     branch=BRANCH,
-                    default_block_size=DEFAULT_BLOCK_SIZE,
+                    dace_default_block_size=DACE_DEFAULT_BLOCK_SIZE,
                     env=ENV,
                     ghex_aggregate_fields=GHEX_AGGREGATE_FIELDS,
                     ghex_collect_statistics=GHEX_COLLECT_STATISTICS,
