@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse
 import os
 
+import update_path
+
+import common_utils
 import defaults
 import defs
 import make_prepare_pmapl
@@ -61,33 +64,39 @@ def core(
         ghex_transport_backend,
         hdf5_version,
         netcdf_version,
-        partition_type,
+        partition,
         rocm_version,
         stack,
         stack_version,
     )
 
-    with utils.batch_file(filename="run_pmapl") as (f, fname):
-        utils.run(f". {prepare_pmapl_fname}")
+    with common_utils.batch_file(filename="run_pmapl") as (f, fname):
+        common_utils.run(f". {prepare_pmapl_fname}")
 
-        with utils.chdir("$PMAPL"):
-            utils.run(f". $PMAPL_VENV/bin/activate")
-            with utils.chdir("drivers"):
-                utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
-                utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
-                utils.export_variable("GT_BACKEND", gt_backend)
-                utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
-                utils.export_variable("OMP_PLACES", "cores")
-                utils.export_variable("OMP_PROC_BIND", "close")
-                # utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
-                utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
-                utils.export_variable("FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
-                utils.export_variable("FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing))
-                utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
-                utils.export_variable("FVM_PRECISION", pmap_precision)
-                utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
+        with common_utils.chdir("$PMAPL"):
+            common_utils.run(f". $PMAPL_VENV/bin/activate")
+            with common_utils.chdir("drivers"):
+                common_utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
+                common_utils.export_variable(
+                    "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
+                )
+                common_utils.export_variable("GT_BACKEND", gt_backend)
+                common_utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
+                common_utils.export_variable("OMP_PLACES", "cores")
+                common_utils.export_variable("OMP_PROC_BIND", "close")
+                # common_utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
+                common_utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
+                common_utils.export_variable(
+                    "FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
+                )
+                common_utils.export_variable(
+                    "FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
+                )
+                common_utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
+                common_utils.export_variable("FVM_PRECISION", pmap_precision)
+                common_utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
                 if utils.get_partition_type(partition) == "gpu":
-                    utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", default_block_size)
+                    common_utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", default_block_size)
 
                 srun_options = utils.get_srun_options(
                     num_nodes,
@@ -102,7 +111,7 @@ def core(
                     output_dir = os.path.join(
                         "$PWD", use_case, pmap_precision, gt_backend.replace(":", "")
                     )
-                utils.run(f"mkdir -p {output_dir}")
+                common_utils.run(f"mkdir -p {output_dir}")
                 command = (
                     f"CC=cc CXX=CC "
                     f"srun {' '.join(srun_options)} ./../../../select_gpu.sh python run_model.py "
@@ -113,7 +122,7 @@ def core(
                     command += f" --write-profiling-data"
 
                 for _ in range(num_runs):
-                    utils.run(command)
+                    common_utils.run(command)
 
     return fname
 
@@ -146,5 +155,5 @@ if __name__ == "__main__":
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()
-    with utils.batch_directory():
+    with common_utils.batch_directory():
         core(**args.__dict__)

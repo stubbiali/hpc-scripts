@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 import argparse
 
+import update_path
+
+import common_utils
 import defaults
 import defs
 import utils
@@ -28,7 +31,7 @@ def core(
     ]
     if utils.get_partition_type(partition) == "gpu":
         command.append("--gpus-per-node=8")
-    utils.run(*command, verbose=True)
+    common_utils.run(*command, verbose=True)
 
 
 if __name__ == "__main__":

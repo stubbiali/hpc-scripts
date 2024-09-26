@@ -5,6 +5,9 @@ import importlib
 import os
 import typing
 
+import update_path
+
+import common_utils
 import defaults
 import defs
 import utils
@@ -37,10 +40,10 @@ def core(
         assert cb is not None, f"Module `{callback_module}` must define `callback()`."
         job_script = cb()
 
-    with utils.batch_directory() as job_dir:
+    with common_utils.batch_directory() as job_dir:
         error = os.path.join(job_dir, "error.txt")
         output = os.path.join(job_dir, "output.txt")
-        with utils.batch_file(filename="batch") as (_, batch_file):
+        with common_utils.batch_file(filename="batch") as (_, batch_file):
             command = [
                 "sbatch",
                 f"--account=project_{account}",
@@ -58,10 +61,10 @@ def core(
             if utils.get_partition_type(partition) == "gpu":
                 command.append(f"--gpus-per-node=8")
             command.append(job_script)
-            utils.run(*command, split=True)
+            common_utils.run(*command, split=True)
 
     if not dry_run:
-        utils.run(f". {batch_file}")
+        common_utils.run(f". {batch_file}")
 
 
 if __name__ == "__main__":
