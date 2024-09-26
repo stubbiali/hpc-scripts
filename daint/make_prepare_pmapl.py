@@ -9,15 +9,15 @@ import update_path  # noqa: F401
 
 import common_utils
 import defs
-import generate_prepare_mpi
+import make_prepare_mpi
 import utils
 
 
 # >>> config: start
-BRANCH: str = "benchmarking-baroclinic"
+BRANCH: str = "benchmarking"
 ENV: defs.ProgrammingEnvironment = "gnu"
 GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
-PARTITION: defs.Partition = "gpu"
+PARTITION: defs.Partition = "mc"
 ROOT_DIR: typing.Optional[str] = None
 # >>> config: end
 
@@ -67,7 +67,7 @@ def core(
         common_utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
 
         # configure MPICH
-        prepare_mpi_fname = generate_prepare_mpi.core(partition)
+        prepare_mpi_fname = make_prepare_mpi.core(partition)
         common_utils.run(f". {prepare_mpi_fname}")
 
         # set/fix CUDA-related variables

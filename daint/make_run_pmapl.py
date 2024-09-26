@@ -9,7 +9,7 @@ import update_path  # noqa: F401
 
 import common_utils
 import defs
-import generate_prepare_pmapl
+import make_prepare_pmapl
 
 
 # >>> config: start
@@ -62,7 +62,7 @@ def core(
     root_dir: typing.Optional[str],
     use_case: str,
 ) -> str:
-    prepare_pmapl_fname, gt_cache_root = generate_prepare_pmapl.core(
+    prepare_pmapl_fname, gt_cache_root = make_prepare_pmapl.core(
         branch, env, ghex_transport_backend, partition, root_dir
     )
 

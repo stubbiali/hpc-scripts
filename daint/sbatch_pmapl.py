@@ -9,7 +9,7 @@ import update_path  # noqa: F401
 
 import common_utils
 import defs
-import generate_run_pmapl
+import make_run_pmapl
 import sbatch
 
 
@@ -178,7 +178,7 @@ def core():
                     f"{use_case.replace('/', '_')}-{gt_backend}-{pmap_precision[0]}-"
                     f"{threads_layout.num_nodes}-"
                 )
-                job_script = generate_run_pmapl.core(
+                job_script = make_run_pmapl.core(
                     branch=BRANCH,
                     copy_gt_cache_to_dev_shm=COPY_GT_CACHE_TO_DEV_SHM,
                     copy_gt_cache_to_tmp=COPY_GT_CACHE_TO_TMP,

@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 
 import defs
-from generate_prepare_cloudsc import core
+from make_prepare_cloudsc import core
 
 
 # >>> config: start
