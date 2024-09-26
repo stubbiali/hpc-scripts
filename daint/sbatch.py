@@ -5,13 +5,16 @@ import importlib
 import os
 import typing
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
-import utils
 
 
 # >>> config: start
-project_id = "$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
-ACCOUNT: str = project_id
+# project_id = "$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
+# ACCOUNT: str = project_id
+ACCOUNT: str = "s299"
 CONTIGUOUS_NODES: bool = False
 DRY_RUN: bool = False
 JOB_NAME: str = "test_job"
@@ -46,10 +49,10 @@ def core(
         assert cb is not None, f"Module `{callback_module}` must define `callback()`."
         job_script = cb()
 
-    with utils.batch_directory() as job_dir:
+    with common_utils.batch_directory() as job_dir:
         error = os.path.join(job_dir, "error.txt")
         output = os.path.join(job_dir, "output.txt")
-        with utils.batch_file(filename="batch") as (_, batch_file):
+        with common_utils.batch_file(filename="batch") as (_, batch_file):
             command = [
                 "sbatch",
                 f"--account={account}{'m' if partition == 'mc' else ''}",
@@ -76,10 +79,10 @@ def core(
                 command.append(f"--switches={1 + (num_nodes - 1) // 384}")
                 # command.append(f"--switches={num_switches}@12:00:00")
             command.append(job_script)
-            utils.run(*command, split=True)
+            common_utils.run(*command, split=True)
 
     if not dry_run:
-        utils.run(f". {batch_file}")
+        common_utils.run(f". {batch_file}")
 
 
 if __name__ == "__main__":

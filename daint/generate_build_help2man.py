@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse
 import os
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
 import utils
 
@@ -17,23 +20,22 @@ VERSION: str = "1.49.3"
 
 
 def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
-    with utils.batch_file(filename="build_help2man"):
-        utils.module_purge(force=True)
-        utils.load_partition(partition)
-        utils.load_env(env)
+    with common_utils.batch_file(filename="build_help2man"):
+        utils.setup_env(env, partition)
         root_dir = os.path.abspath(root_dir)
-        with utils.chdir(root_dir):
-            utils.run("mkdir -p help2man")
-            branch = f"master"
-            utils.run(
+        with common_utils.chdir(root_dir):
+            common_utils.run("mkdir -p help2man")
+            branch = "master"
+            common_utils.run(
                 f"git clone --branch={branch} "
                 f"https://github.com/Distrotech/help2man.git help2man/{version}"
             )
-            with utils.chdir(f"help2man/{version}"):
+            with common_utils.chdir(f"help2man/{version}"):
                 build_dir = os.path.join(root_dir, f"help2man/{version}/build/{env}")
-                utils.run("CC=cc", "CXX=CC", "./configure", f"--prefix={build_dir}")
-                utils.run("make -j 8 install")
-                utils.append_to_path("PATH", f"{build_dir}/bin")
+                common_utils.run("CC=cc", "CXX=CC", "./configure", f"--prefix={build_dir}")
+                common_utils.run("make -j 8 install")
+                common_utils.append_to_path("PATH", f"{build_dir}/bin")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

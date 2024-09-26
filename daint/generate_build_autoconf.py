@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse
 import os
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
 import utils
 
@@ -17,25 +20,23 @@ VERSION: str = "2.72"
 
 
 def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
-    with utils.batch_file(filename="build_autoconf"):
-        utils.module_purge(force=True)
-        utils.load_partition(partition)
-        utils.load_env(env)
+    with common_utils.batch_file(filename="build_autoconf"):
+        utils.setup_env(env, partition)
         root_dir = os.path.abspath(root_dir)
-        with utils.chdir(root_dir):
-            utils.run("mkdir -p autoconf")
+        with common_utils.chdir(root_dir):
+            common_utils.run("mkdir -p autoconf")
             branch = f"v{version}"
-            utils.run(
+            common_utils.run(
                 f"git clone --branch={branch} "
                 f"http://git.sv.gnu.org/r/autoconf.git autoconf/{version}"
             )
-            with utils.chdir(f"autoconf/{version}"):
-                utils.run("./bootstrap")
+            with common_utils.chdir(f"autoconf/{version}"):
+                common_utils.run("./bootstrap")
                 build_dir = os.path.join(root_dir, f"autoconf/{version}/build/{env}")
-                utils.run("CC=cc", "CXX=CC", "./configure", f"--prefix={build_dir}")
-                utils.run("make -j 8 install")
-                utils.export_variable("AUTOCONF_ROOT", build_dir)
-                utils.append_to_path("PATH", f"{build_dir}/bin")
+                common_utils.run("CC=cc", "CXX=CC", "./configure", f"--prefix={build_dir}")
+                common_utils.run("make -j 8 install")
+                common_utils.export_variable("AUTOCONF_ROOT", build_dir)
+                common_utils.append_to_path("PATH", f"{build_dir}/bin")
 
 
 if __name__ == "__main__":

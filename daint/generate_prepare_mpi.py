@@ -3,8 +3,10 @@
 from __future__ import annotations
 import argparse
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
-import utils
 
 
 # >>> config: start
@@ -13,20 +15,20 @@ PARTITION: defs.Partition = "gpu"
 
 
 def core(partition: defs.Partition) -> str:
-    with utils.batch_file(filename="prepare_mpi") as (f, fname):
+    with common_utils.batch_file(filename="prepare_mpi") as (f, fname):
         # configure MPICH
-        utils.export_variable("MPICH_CRAY_OPT_THREAD_SYNC", 1)
-        utils.export_variable("MPICH_GNI_USE_UNASSIGNED_CPUS", "enabled")
-        utils.export_variable("MPICH_MAX_THREAD_SAFETY", "multiple")
-        utils.export_variable("MPICH_NEMESIS_ASYNC_PROGRESS", "MC")
-        utils.export_variable("MPICH_NEMESIS_ON_NODE_ASYNC_OPT", 1)
-        utils.export_variable("MPICH_OPTIMIZED_MEMCPY", 2)
+        common_utils.export_variable("MPICH_CRAY_OPT_THREAD_SYNC", 1)
+        common_utils.export_variable("MPICH_GNI_USE_UNASSIGNED_CPUS", "enabled")
+        common_utils.export_variable("MPICH_MAX_THREAD_SAFETY", "multiple")
+        common_utils.export_variable("MPICH_NEMESIS_ASYNC_PROGRESS", "MC")
+        common_utils.export_variable("MPICH_NEMESIS_ON_NODE_ASYNC_OPT", 1)
+        common_utils.export_variable("MPICH_OPTIMIZED_MEMCPY", 2)
         if partition == "gpu":
-            utils.export_variable("MPICH_GPU_SUPPORT_ENABLED", 1)
-            utils.export_variable("CRAY_ACCEL_TARGET", "nvidia60")
-            utils.export_variable("MPICH_RDMA_ENABLED_CUDA", 1)
+            common_utils.export_variable("MPICH_GPU_SUPPORT_ENABLED", 1)
+            common_utils.export_variable("CRAY_ACCEL_TARGET", "nvidia60")
+            common_utils.export_variable("MPICH_RDMA_ENABLED_CUDA", 1)
         else:
-            utils.export_variable("MPICH_GPU_SUPPORT_ENABLED", 0)
+            common_utils.export_variable("MPICH_GPU_SUPPORT_ENABLED", 0)
     return fname
 
 

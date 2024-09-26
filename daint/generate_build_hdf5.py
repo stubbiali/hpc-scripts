@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse
 import os
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
 import utils
 
@@ -16,28 +19,24 @@ VERSION: str = "1.14.4.2"
 # >>> config: end
 
 
-def core(
-    env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str
-):
-    with utils.batch_file(filename="build_hdf5"):
-        utils.module_purge(force=True)
-        utils.load_partition(partition)
-        utils.load_env(env)
-        utils.module_load("cray-mpich")
+def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
+    with common_utils.batch_file(filename="build_hdf5"):
+        utils.setup_env(env, partition)
+        common_utils.module_load("cray-mpich")
         root_dir = os.path.abspath(root_dir)
-        with utils.chdir(root_dir):
-            utils.run("mkdir -p hdf5")
+        with common_utils.chdir(root_dir):
+            common_utils.run("mkdir -p hdf5")
             # branch = f"hdf5-{version.replace('.', '_')}"
             branch = f"hdf5_{version}"
-            utils.run(
+            common_utils.run(
                 f"git clone --branch={branch} --depth=1 "
                 f"https://github.com/HDFGroup/hdf5.git hdf5/{version}"
             )
-            with utils.chdir(f"hdf5/{version}"):
-                utils.run("chmod +x autogen.sh")
-                utils.run("./autogen.sh")
+            with common_utils.chdir(f"hdf5/{version}"):
+                common_utils.run("chmod +x autogen.sh")
+                common_utils.run("./autogen.sh")
                 build_dir = os.path.join(root_dir, f"hdf5/{version}/build/{env}")
-                utils.run(
+                common_utils.run(
                     "CC=cc",
                     "CFLAGS='-fPIC'",
                     "./configure",
@@ -48,8 +47,8 @@ def core(
                     "--enable-tests",
                     "--enable-tools",
                 )
-                utils.run("make -j 8 install")
-                utils.export_variable("HDF5_ROOT", build_dir)
+                common_utils.run("make -j 8 install")
+                common_utils.export_variable("HDF5_ROOT", build_dir)
 
 
 if __name__ == "__main__":

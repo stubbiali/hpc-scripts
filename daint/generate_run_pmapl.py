@@ -5,9 +5,11 @@ import argparse
 import os
 import typing
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
 import generate_prepare_pmapl
-import utils
 
 
 # >>> config: start
@@ -64,24 +66,32 @@ def core(
         branch, env, ghex_transport_backend, partition, root_dir
     )
 
-    with utils.batch_file(filename="run_pmapl") as (f, fname):
-        utils.run(f". {prepare_pmapl_fname}")
+    with common_utils.batch_file(filename="run_pmapl") as (f, fname):
+        common_utils.run(f". {prepare_pmapl_fname}")
 
-        with utils.chdir("$PMAPL"):
-            with utils.chdir("drivers"):
-                utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
-                utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
-                utils.export_variable("GHEX_TRANSPORT_BACKEND", ghex_transport_backend.upper())
-                utils.export_variable("GT_BACKEND", gt_backend)
-                utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
-                utils.export_variable("OMP_PLACES", "cores")
-                utils.export_variable("OMP_PROC_BIND", "close")
-                utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
-                utils.export_variable("FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
-                utils.export_variable("FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing))
-                utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
-                utils.export_variable("FVM_PRECISION", pmap_precision)
-                # utils.export_variable("CUDA_LAUNCH_BLOCKING", 1)
+        with common_utils.chdir("$PMAPL"):
+            with common_utils.chdir("drivers"):
+                common_utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
+                common_utils.export_variable(
+                    "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
+                )
+                common_utils.export_variable(
+                    "GHEX_TRANSPORT_BACKEND", ghex_transport_backend.upper()
+                )
+                common_utils.export_variable("GT_BACKEND", gt_backend)
+                common_utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
+                common_utils.export_variable("OMP_PLACES", "cores")
+                common_utils.export_variable("OMP_PROC_BIND", "close")
+                common_utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
+                common_utils.export_variable(
+                    "FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
+                )
+                common_utils.export_variable(
+                    "FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
+                )
+                common_utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
+                common_utils.export_variable("FVM_PRECISION", pmap_precision)
+                # common_utils.export_variable("CUDA_LAUNCH_BLOCKING", 1)
 
                 gt_backend_str = gt_backend.replace(":", "")
 
@@ -102,22 +112,22 @@ def core(
                         gt_cache_root, f".gt_cache/py39_1013/{gt_backend_str}.tar"
                     )
                     if not os.path.exists(gt_cache_backend_tar):
-                        utils.run(f"tar cf {gt_cache_backend_tar} {gt_cache_backend_dir}")
+                        common_utils.run(f"tar cf {gt_cache_backend_tar} {gt_cache_backend_dir}")
 
                     new_gt_cache_root = dest + gt_cache_root
-                    utils.run(f"srun rm -rf {new_gt_cache_root}")
-                    utils.run(f"srun mkdir -p {new_gt_cache_root}/.gt_cache/py39_1013")
-                    utils.run(
+                    common_utils.run(f"srun rm -rf {new_gt_cache_root}")
+                    common_utils.run(f"srun mkdir -p {new_gt_cache_root}/.gt_cache/py39_1013")
+                    common_utils.run(
                         f"srun tar xf {gt_cache_backend_tar} "
                         f"-C {new_gt_cache_root}/.gt_cache/py39_1013"
                     )
-                    utils.export_variable("GT_CACHE_ROOT", new_gt_cache_root)
+                    common_utils.export_variable("GT_CACHE_ROOT", new_gt_cache_root)
 
                 if output_dir is not None:
                     output_dir = os.path.abspath(output_dir)
                 else:
                     output_dir = os.path.join("$PWD", use_case, pmap_precision, gt_backend_str)
-                utils.run(f"mkdir -p {output_dir}")
+                common_utils.run(f"mkdir -p {output_dir}")
 
                 command = (
                     f"CC=cc CXX=CC "
@@ -135,10 +145,10 @@ def core(
                     command += " --write-profiling-data"
 
                 for _ in range(num_runs):
-                    utils.run(command)
+                    common_utils.run(command)
 
                 if dest is not None:
-                    utils.run(f"srun rm -rf {new_gt_cache_root}")
+                    common_utils.run(f"srun rm -rf {new_gt_cache_root}")
 
     return fname
 
@@ -168,5 +178,5 @@ if __name__ == "__main__":
     parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()
-    with utils.batch_directory():
+    with common_utils.batch_directory():
         core(**args.__dict__)

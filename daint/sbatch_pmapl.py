@@ -5,10 +5,12 @@ import itertools
 import os
 import typing
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
 import generate_run_pmapl
 import sbatch
-import utils
 
 
 # >>> config: start
@@ -95,70 +97,70 @@ SET_SWITCHES: bool = False
 TIME: str = "01:00:00"
 
 # list of use cases
-USE_CASE: dict[str, list[utils.ThreadsLayout]] = {
-    **{
-        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/128x128/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
-        ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    },
-    **{
-        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/160x160/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
-        ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    },
-    **{
-        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
-        ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    },
-    **{
-        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/128x128/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
-        ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    },
-    **{
-        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/160x160/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
-        ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    },
-    **{
-        f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/256x256/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
-        ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
-    },
+USE_CASE: dict[str, list[common_utils.ThreadsLayout]] = {
+    # **{
+    #     f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/128x128/{num_nodes}": [
+    #         common_utils.ThreadsLayout(num_nodes, 1, 12)
+    #     ]
+    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    # },
+    # **{
+    #     f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/160x160/{num_nodes}": [
+    #         common_utils.ThreadsLayout(num_nodes, 1, 12)
+    #     ]
+    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    # },
+    # **{
+    #     f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/{num_nodes}": [
+    #         common_utils.ThreadsLayout(num_nodes, 1, 12)
+    #     ]
+    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    # },
+    # **{
+    #     f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/128x128/{num_nodes}": [
+    #         common_utils.ThreadsLayout(num_nodes, 1, 12)
+    #     ]
+    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    # },
+    # **{
+    #     f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/160x160/{num_nodes}": [
+    #         common_utils.ThreadsLayout(num_nodes, 1, 12)
+    #     ]
+    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    # },
+    # **{
+    #     f"weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-tracer/256x256/{num_nodes}": [
+    #         common_utils.ThreadsLayout(num_nodes, 1, 12)
+    #     ]
+    #     for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+    # },
     **{
         f"weak-scaling/bomex-prescribed-boundary/{num_nodes}": [
-            utils.ThreadsLayout(num_nodes, 1, 12)
+            common_utils.ThreadsLayout(num_nodes, 1, 36)
         ]
-        for num_nodes in (1, 4, 16, 64, 256, 1024, 4096)
+        for num_nodes in (1, 2, 4, 8, 12, 16, 32, 64, 128, 256, 512, 1024)
     },
-    **{
-        f"weak-scaling/bomex/{num_nodes}": [utils.ThreadsLayout(num_nodes, 1, 12)]
-        for num_nodes in (1, 4, 16, 64)  # , 256, 1024, 4096)
-    },
-    # "weak-scaling/bomex-prescribed-boundary/1": [utils.ThreadsLayout(1, 1, 12)],
+    # **{
+    #     f"weak-scaling/bomex/{num_nodes}": [common_utils.ThreadsLayout(num_nodes, 1, 12)]
+    #     for num_nodes in (1, 4, 16, 64)  # , 256, 1024, 4096)
+    # },
+    # "weak-scaling/bomex-prescribed-boundary/1": [common_utils.ThreadsLayout(1, 1, 12)],
     # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/1": [
-    #     utils.ThreadsLayout(1, 1, 12)
+    #     common_utils.ThreadsLayout(1, 1, 12)
     # ],
     # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/1": [
-    #     utils.ThreadsLayout(1, 1, 12)
+    #     common_utils.ThreadsLayout(1, 1, 12)
     # ],
     # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/4": [
-    #     utils.ThreadsLayout(4, 1, 12)
+    #     common_utils.ThreadsLayout(4, 1, 12)
     # ],
     # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/8": [
-    #     utils.ThreadsLayout(8, 1, 12)
+    #     common_utils.ThreadsLayout(8, 1, 12)
     # ],
     # "weak-scaling/fuhrer-et-al-gmd-2018/baroclinic-wave-sphere-dry/256x256/256": [
-    #     utils.ThreadsLayout(256, 1, 12)
+    #     common_utils.ThreadsLayout(256, 1, 12)
     # ],
-    # "weak-scaling/baroclinic-wave-sphere-moist-mpdata-vector/1": [utils.ThreadsLayout(1, 1, 12)],
+    # "weak-scaling/baroclinic-wave-sphere-moist-mpdata-vector/1": [common_utils.ThreadsLayout(1, 1, 12)],
 }
 # >>> config: end
 
@@ -171,7 +173,7 @@ def core():
             job_dir = os.path.join(
                 JOB_ROOT_DIR, BRANCH, use_case, pmap_precision, gt_backend.replace(":", "")
             )
-            with utils.batch_directory(path=job_dir) as output_dir:
+            with common_utils.batch_directory(path=job_dir) as output_dir:
                 job_name = (
                     f"{use_case.replace('/', '_')}-{gt_backend}-{pmap_precision[0]}-"
                     f"{threads_layout.num_nodes}-"

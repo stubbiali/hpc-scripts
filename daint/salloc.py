@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 import argparse
 
+import update_path  # noqa: F401
+
+import common_utils
 import defs
-import utils
 
 
 # >>> config: start
-
 # project_id="$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')"
 # ACCOUNT: str = project_id
 ACCOUNT: str = "s299"
@@ -15,6 +16,7 @@ NUM_NODES: int = 1
 PARTITION: defs.Partition = "gpu"
 TIME: str = "01:00:00"
 # >>> config: end
+
 
 def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> None:
     command = [
@@ -25,7 +27,7 @@ def core(account: int, num_nodes: int, partition: defs.Partition, time: str) -> 
         f"--partition=normal",
         f"--time={time}",
     ]
-    utils.run(*command)
+    common_utils.run(*command)
 
 
 if __name__ == "__main__":
