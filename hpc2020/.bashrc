@@ -95,6 +95,10 @@ alias l='ls -CF'
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
+# nvim
+alias vim='/home/"$USER"/neovim/0.9.5/install/bin/nvim'
+export VIMRUNTIME=/home/"$USER"/neovim/0.9.5/install/share/nvim/runtime
+
 # slurm shortcuts and settings
 alias sb='sbatch'
 alias sc='scancel'
@@ -102,5 +106,5 @@ alias sq='squeue -u $USER'
 alias sr='srun'
 export SQUEUE_FORMAT="%.9i %.60j %.10u %.10q %.15T %.10M %.10l %.5D %.13f %R"
 
-PATH=~/help2man/1.49.3/build/gnu/bin/:$PATH
-PATH=~/autoconf/2.72/build/gnu/bin/:$PATH
+# update path with manually built software
+export PATH="$HPCPERM"/autoconf/2.72/build/gnu/bin/:"$HPCPERM"/help2man/build/gnu/bin/:$PATH
