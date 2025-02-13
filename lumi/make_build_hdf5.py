@@ -7,7 +7,7 @@ from typing import Optional
 
 import update_path  # noqa: F401
 
-import common_utils
+import common.utils as common_utils
 import defaults
 import defs
 import utils
@@ -20,7 +20,7 @@ def core(
     stack_version: Optional[str],
     version: str,
 ) -> None:
-    with utils.batch_file(filename="build_hdf5"):
+    with common_utils.batch_file(filename="build_hdf5"):
         utils.setup_env(env, partition, stack, stack_version)
         common_utils.module_load("buildtools")
 

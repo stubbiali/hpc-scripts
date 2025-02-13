@@ -3,23 +3,23 @@ from __future__ import annotations
 
 import update_path  # noqa: F401
 
-import common_utils
+import common.utils as common_utils
 import defs
 
 
 def load_partition(partition: defs.Partition) -> None:
-    with check_argument("partition", partition, defs.valid_partitions):
+    with common_utils.check_argument("partition", partition, defs.valid_partitions):
         common_utils.module_load(f"daint-{partition}")
 
 
 def load_env(env: defs.ProgrammingEnvironment) -> None:
-    with check_argument("env", env, defs.valid_programming_environments):
+    with common_utils.check_argument("env", env, defs.valid_programming_environments):
         common_utils.module_load("PrgEnv-gnu")
 
 
 def setup_env(env: defs.ProgrammingEnvironment, partition: defs.Partition) -> None:
-    with check_argument("env", env, defs.valid_programming_environments):
-        with check_argument("partition", partition, defs.valid_partitions):
+    with common_utils.check_argument("env", env, defs.valid_programming_environments):
+        with common_utils.check_argument("partition", partition, defs.valid_partitions):
             common_utils.module_purge(force=True)
             load_partition(partition)
             load_env(env)

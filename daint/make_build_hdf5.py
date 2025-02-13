@@ -6,7 +6,7 @@ import os
 
 import update_path  # noqa: F401
 
-import common_utils
+import common.utils as common_utils
 import defs
 import utils
 
