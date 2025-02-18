@@ -6,7 +6,10 @@ import os
 import shutil
 import subprocess
 import tempfile
-import typing
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any, Optional
 
 
 BATCH_DIRECTORY_REGISTRY = []
@@ -14,7 +17,7 @@ BATCH_FILE_REGISTRY = []
 
 
 @contextlib.contextmanager
-def batch_directory(path: typing.Optional[str] = None):
+def batch_directory(path: Optional[str] = None):
     assert len(BATCH_DIRECTORY_REGISTRY) <= 1
     try:
         if len(BATCH_DIRECTORY_REGISTRY) > 0:
@@ -43,7 +46,7 @@ def batch_directory(path: typing.Optional[str] = None):
 
 
 @contextlib.contextmanager
-def batch_file(filename: typing.Optional[str] = None):
+def batch_file(filename: Optional[str] = None):
     if filename is not None:
         if len(BATCH_DIRECTORY_REGISTRY) > 0:
             fname = os.path.abspath(os.path.join(BATCH_DIRECTORY_REGISTRY[-1], filename + ".sh"))
@@ -78,19 +81,6 @@ def run(*args: str, split: bool = False, verbose: bool = False) -> None:
         subprocess.run(command, capture_output=False, shell=True)
 
 
-def module_purge(force: bool = False) -> None:
-    run(f"module{' --force ' if force else ' '}purge")
-
-
-def module_reset() -> None:
-    run("module reset")
-
-
-def module_load(*module_names: str) -> None:
-    for module_name in module_names:
-        run(f"module load {module_name}")
-
-
 class InvalidArgumentError(Exception):
     def __init__(self, name: str, token: str, options: list[str]):
         options = [f"`{opt}`" for opt in options]
@@ -111,11 +101,11 @@ def check_argument(name, token, options):
         pass
 
 
-def export_variable(name: str, value: typing.Any) -> None:
+def export_variable(name: str, value: Any) -> None:
     run(f"export {name}={str(value)}")
 
 
-def append_to_path(path: str, value: typing.Any) -> None:
+def append_to_path(path: str, value: Any) -> None:
     run(f"{path}={str(value)}:${path}")
 
 

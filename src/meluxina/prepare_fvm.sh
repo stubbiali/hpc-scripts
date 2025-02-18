@@ -9,8 +9,7 @@ PREFIX=${PREFIX:-nasu}
 module purge --force
 
 # load env
-#module load env/release/2022.1
-module load env/staging/2022.1
+module load env/release/2022.1
 
 # load compilers and libraries
 if [ "$ENV" = "gnu" ]; then

@@ -38,7 +38,7 @@ DRY_RUN: bool = True
 ENABLE_CPROFILE: bool = False
 
 # partition of Piz Daint
-PARTITION: defs.Partition = "gpu"
+PARTITION: defs.Partition = "mc"
 
 # programming environment
 ENV: defs.ProgrammingEnvironment = "gnu"
@@ -54,16 +54,16 @@ GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 
 # list of GT4Py backends to be used
 GT_BACKEND: list[str] = [
-    # "gt:cpu_kfirst",
+    "gt:cpu_kfirst",
     # "gt:cpu_ifirst",
     # "dace:cpu",
     # "cuda",
     # "gt:gpu",
-    "dace:gpu"
+    # "dace:gpu"
 ]
 
 # folder (relative to the current directory) where scripts will be placed
-JOB_ROOT_DIR: str = "test-scripts"
+JOB_ROOT_DIR: str = "bomex-prescribed-boundary-noswitch"
 
 # number of model runs to perform
 NUM_RUNS: int = 3
@@ -81,7 +81,7 @@ PMAP_ENABLE_OVERCOMPUTING: bool = True
 PMAP_EXTENDED_TIMERS: bool = False
 
 # values of the env variable FVM_PRECISION
-PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["double"]
+PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["double", "single"]
 
 # the model source code is assumed to be found under PMAP_ROOT_DIR/pmapl/BRANCH
 # if not otherwise specified, PMAP_ROOT_DIR is the current directory

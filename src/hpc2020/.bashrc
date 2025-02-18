@@ -95,6 +95,10 @@ alias l='ls -CF'
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
+# nvim
+alias vim='/home/"$USER"/neovim/0.9.5/install/bin/nvim'
+export VIMRUNTIME=/home/"$USER"/neovim/0.9.5/install/share/nvim/runtime
+
 # slurm shortcuts and settings
 alias sb='sbatch'
 alias sc='scancel'

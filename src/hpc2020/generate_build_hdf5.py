@@ -16,9 +16,7 @@ VERSION: str = "1.14.2"
 # >>> config: end
 
 
-def core(
-    env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str
-):
+def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: str, version: str):
     with utils.batch_file(prefix="build_hdf5"):
         utils.module_purge(force=True)
         utils.load_env(env)

@@ -33,6 +33,7 @@ def core(env: defs.ProgrammingEnvironment, partition: defs.Partition, root_dir: 
                 utils.run("make -j 8 install")
                 utils.append_to_path("PATH", f"{build_dir}/bin")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", type=str, default=ENV)

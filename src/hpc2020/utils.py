@@ -90,7 +90,6 @@ def check_argument(parameter, token, options):
         pass
 
 
-
 def load_env(env: str) -> None:
     with check_argument("env", env, defs.valid_programming_environments):
         module_load("prgenv/gnu")
@@ -100,7 +99,7 @@ def export_variable(name: str, value: typing.Any) -> None:
     run(f"export {name}={str(value)}")
 
 
-def append_to_path( name: str, value: typing.Any) -> None:
+def append_to_path(name: str, value: typing.Any) -> None:
     run(f"{name}={str(value)}:${name}")
 
 
@@ -127,5 +126,3 @@ class ThreadsLayout:
     num_nodes: int
     num_tasks_per_node: int
     num_threads_per_task: int
-
-

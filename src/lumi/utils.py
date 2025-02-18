@@ -52,10 +52,14 @@ def setup_env(
     partition: defs.Partition,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
+    load_cdo: bool = False,
 ) -> str:
     common_utils.module_reset()
     load_stack(stack, stack_version)
     load_partition(partition)
+    if load_cdo:
+        # note(stubbiali): the CDO module could only be built using easybuild for cpeGNU
+        common_utils.module_load("CDO/2.4.3-cpeGNU-24.03")
     cpe = load_cpe(env, stack_version)
     return cpe
 

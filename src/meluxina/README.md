@@ -9,7 +9,7 @@ The following files are application-agnostic:
 
 We suggest creating a symlink to the files above in your `$SCRATCH`.
 
-**Remark:** It is intended that *all* files mentioned in this README should be issued 
+**Remark:** It is intended that *all* files mentioned in this README should be issued
 from within `$SCRATCH`.
 
 The following applications are fully supported:
@@ -24,7 +24,7 @@ It is assumed that you have cloned the branch `$BRANCH` of the FVM repository un
 `$SCRATH/fvm-gt4py/$BRANCH`. The following files are available:
 
 * `install_fvm.sh`, to install FVM and all its dependencies;
-* `prepare_fvm.sh`, to load all the modules required to run the model and set the path to the 
+* `prepare_fvm.sh`, to load all the modules required to run the model and set the path to the
 source code;
 * `run_fvm_cpu.sh`, to run the model on CPU;
 * `run_fvm_gpu.sh`, to run the model on GPU;

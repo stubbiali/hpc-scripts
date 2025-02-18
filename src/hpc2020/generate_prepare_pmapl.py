@@ -23,7 +23,7 @@ def core(branch: str, env: defs.ProgrammingEnvironment, partition: defs.Partitio
 
         # load relevant modules
         utils.load_env(env)
-        utils.module_load("gcc/11.2.0",  "boost", "openmpi", "cmake", "python3/3.10.10-01", "cmake")
+        utils.module_load("gcc/11.2.0", "boost", "openmpi", "cmake", "python3/3.10.10-01", "cmake")
         utils.append_to_path("LD_LIBRARY_PATH", f"/usr/local/apps/gcc/11.2.0/lib64")
         if partition == "gpu":
             utils.module_load("nvidia/22.11")

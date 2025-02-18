@@ -27,12 +27,12 @@ It is assumed that you have cloned the branch `$BRANCH` of the FVM repository un
 `$SCRATH/fvm-gt4py/$BRANCH`. The following files are available:
 
 * `install_fvm.sh`, to install FVM and all its dependencies;
-* `prepare_fvm.sh`, to load all the modules required to run the model and set the path to the 
+* `prepare_fvm.sh`, to load all the modules required to run the model and set the path to the
 source code;
 * `run_fvm.sh`, to run the model;
 * `submit_fvm.sh`, to run the model from within Slurm jobs.
 
-You can set the programming environment via the variable `ENV` (options are `amd`, `gnu` and `intel`) 
+You can set the programming environment via the variable `ENV` (options are `amd`, `gnu` and `intel`)
 and the MPI library via `MPI` (options are `hpcx`, `intel`, and `openmpi`). It then follows that:
 
 * The virtual environment is placed under `$SCRATH/fvm-gt4py/$BRANCH/venv/$ENV-$MPI`;
@@ -43,5 +43,3 @@ and the MPI library via `MPI` (options are `hpcx`, `intel`, and `openmpi`). It t
 ## CLOUDSC
 
 [TODO]
-
-

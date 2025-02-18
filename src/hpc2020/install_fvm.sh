@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-BRANCH=distributed
+BRANCH=distributed-dev
 ENV_L=( gnu )
 MPI_L=( hpcx )
 PYTHON3_MINOR_VERSION_L=( 10 )
@@ -29,14 +29,16 @@ for ENV in "${ENV_L[@]}"; do
         MPICXX=mpicxx \
         VENV=venv/"$PREFIX" \
         FRESH_INSTALL=1 \
-        INSTALL_PARALLEL_HDF5=1 \
-        PARALLEL_HDF5_BUILD_PREFIX="$PREFIX" \
-        INSTALL_PARALLEL_NETCDF=1 \
-        PARALLEL_NETCDF_BUILD_PREFIX="$PREFIX" \
+        PARALLEL_HDF5_DIR="$ROOT"/fvm-gt4py/distributed/_externals/hdf5/build/"$PREFIX" \
+        PARALLEL_NETCDF_DIR="$ROOT"/fvm-gt4py/distributed/_externals/netcdf-c/build/"$PREFIX" \
         . bootstrap_venv.sh
+#        INSTALL_PARALLEL_HDF5=1 \
+#        PARALLEL_HDF5_BUILD_PREFIX="$PREFIX" \
+#        INSTALL_PARALLEL_NETCDF=1 \
+#        PARALLEL_NETCDF_BUILD_PREFIX="$PREFIX" \
 
-      echo -n "patching netcdf python bindings... "
       pushd _externals/netcdf4-python || return
+      echo -n "patching netcdf python bindings... "
       mpicc -shared \
         -g -Wl,-rpath,/usr/local/apps/python3/3.8.8-01/lib \
         -L/usr/local/apps/proj/7.2.1/lib -Wl,-rpath,/usr/local/apps/proj/7.2.1/lib \

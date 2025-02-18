@@ -88,3 +88,9 @@ export SQUEUE_FORMAT="%.9i %.50j %.15u %.15q %.15T %.10M %.10l %.5D %.13f %R"
 # folders
 export PROJECT=/project/project_465000527/nasu
 export SCRATCH=/scratch/project_465000527/nasu
+
+# easybuild
+export EBU_USER_PREFIX=$PROJECT/_easybuild
+
+# cdo
+# export PATH=$EBU_USER_PREFIX/SW/LUMI-24.03/G/CDO/2.4.3-cpeGNU-24.03/bin:$PATH

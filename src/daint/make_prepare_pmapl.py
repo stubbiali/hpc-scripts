@@ -17,7 +17,7 @@ import utils
 BRANCH: str = "benchmarking"
 ENV: defs.ProgrammingEnvironment = "gnu"
 GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
-PARTITION: defs.Partition = "mc"
+PARTITION: defs.Partition = "gpu"
 ROOT_DIR: typing.Optional[str] = None
 # >>> config: end
 

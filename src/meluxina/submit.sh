@@ -9,7 +9,6 @@ TIME=${TIME:-01:00:00}
 
 sbatch \
 	--account="$ACCOUNT" \
-	--contiguous \
 	--error=error/"$JOB_NAME".err \
   --export=ALL \
 	--job-name="$JOB_NAME" \
@@ -20,3 +19,4 @@ sbatch \
 	--qos=default \
 	--time="$TIME" \
 	"$JOB_SCRIPT"
+#--contiguous \
