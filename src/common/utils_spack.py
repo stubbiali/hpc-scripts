@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-import utils
+from . import utils
 
 if TYPE_CHECKING:
     from typing import Optional
