@@ -7,6 +7,7 @@ import os
 from typing import TYPE_CHECKING
 
 import common.utils
+import defaults
 import utils_slurm
 
 if TYPE_CHECKING:
@@ -16,13 +17,11 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-ACCOUNT: str = "bd1069"
 DRY_RUN: bool = False
 JOB_NAME: str = "test_job"
 JOB_SCRIPT: str = "test_job"
 NUM_NODES: int = 1
 NUM_TASKS_PER_NODE: int = 1
-PARTITION: defs.Partition = "gpu"
 RESERVATION: Optional[str] = None
 TIME: str = "01:00:00"
 # >>> config: end
@@ -78,13 +77,13 @@ def core(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Submit a batch job.")
-    parser.add_argument("--account", type=str, default=ACCOUNT)
+    parser.add_argument("--account", type=str, default=defaults.ACCOUNT)
     parser.add_argument("--dry-run", type=bool, default=DRY_RUN)
     parser.add_argument("--job-name", type=str, default=JOB_NAME)
     parser.add_argument("--job-script", type=str, default=JOB_SCRIPT)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
     parser.add_argument("--num-tasks-per-node", type=int, default=NUM_TASKS_PER_NODE)
-    parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     parser.add_argument("--time", type=str, default=TIME)
     parser.add_argument("--callback-module", type=str, default=None)
     args = parser.parse_args()

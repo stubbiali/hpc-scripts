@@ -1,13 +1,13 @@
 #!/sw/spack-levante/mambaforge-22.9.0-2-Linux-x86_64-kptncg/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
-import importlib
 import itertools
 import os
 from typing import Literal, Optional
 
 import common.utils
 import defs
+import make_run_pmap
 import sbatch
 
 
@@ -21,9 +21,10 @@ ARGS = {
     "ghex_aggregate_fields": False,
     "ghex_collect_statistics": False,
     "gt_backend_list": ["gt:gpu"],
+    "gt_backend_list": ["dace:gpu"],
     "job_root_dir": "_jobs",
     "mpi": "openmpi@4.1.5",
-    "num_runs": 3,
+    "num_runs": 1,
     "partition": "gpu",
     "pmap_disable_log": False,
     "pmap_enable_benchmarking": True,
@@ -62,7 +63,6 @@ def core(
     use_case_dict: dict[str, list[common.utils.ThreadsLayout]],
     project_name: Literal["pmap-les", "pmap-les-dlr"],
 ) -> None:
-    project_name_with_underscores = project_name.replace("-", "_")
     for gt_backend, pmap_precision, use_case in itertools.product(
         gt_backend_list, pmap_precision_list, use_case_dict
     ):
@@ -80,10 +80,7 @@ def core(
                     f"{use_case.replace('/', '_')}-{gt_backend}-{pmap_precision[0]}-"
                     f"{threads_layout.num_nodes * threads_layout.num_tasks_per_node}"
                 )
-                make_run_module = importlib.import_module(
-                    f"make_run_{project_name_with_underscores}"
-                )
-                job_script = make_run_module.core(
+                job_script = make_run_pmap.core(
                     branch=branch,
                     compiler=compiler,
                     dace_default_block_size=dace_default_block_size,

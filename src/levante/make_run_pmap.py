@@ -1,32 +1,11 @@
-#!/sw/spack-levante/mambaforge-22.9.0-2-Linux-x86_64-kptncg/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
-import argparse
 import importlib
 import os
 from typing import Literal
 
 import common.utils
 import defs
-import defaults
-
-
-# >>> config: start
-BRANCH: str = "main"
-DACE_DEFAULT_BLOCK_SIZE: str = ""
-GHEX_AGGREGATE_FIELDS: bool = False
-GHEX_COLLECT_STATISTICS: bool = False
-GT_BACKEND: str = "gt:gpu"
-NUM_NODES: int = 1
-NUM_RUNS: int = 1
-NUM_TASKS_PER_NODE: int = 1
-NUM_THREADS_PER_TASK: int = 1
-PMAP_DISABLE_LOG: bool = False
-PMAP_ENABLE_BENCHMARKING: bool = False
-PMAP_EXTENDED_TIMERS: bool = False
-PMAP_PRECISION: defs.FloatingPointPrecision = "double"
-USE_CASE: str = "thermal"
-# >>> config: end
 
 
 def core(
@@ -35,6 +14,7 @@ def core(
     dace_default_block_size: str,
     ghex_aggregate_fields: bool,
     ghex_collect_statistics: bool,
+    ghex_transport_backend: defs.GHEXTransportBackend,
     gt_backend: str,
     mpi: defs.MPI,
     num_nodes: int,
@@ -56,7 +36,7 @@ def core(
     make_prepare_module = importlib.import_module(f"make_prepare_{project_name_with_underscores}")
     assert hasattr(make_prepare_module, "core")
     prepare_fname = make_prepare_module.core(
-        branch, compiler, mpi, num_nodes, partition, python, project_name
+        branch, compiler, ghex_transport_backend, mpi, num_nodes, partition, python, project_name
     )
 
     with common.utils.batch_file(filename=f"run_{project_name_with_underscores}") as (f, fname):
@@ -100,7 +80,6 @@ def core(
                 if partition == "gpu":
                     srun_options.append("--gpus-per-task=1")
                 command = (
-                    f"CC=cc CXX=CC "
                     f"srun {' '.join(srun_options)} python run_model.py "
                     f"{os.path.join('../config', use_case + '.yml')} "
                     f"--output-directory={output_dir}"
@@ -112,27 +91,3 @@ def core(
                     common.utils.run(command)
 
     return fname
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--compiler", type=str, default=defaults.COMPILER)
-    parser.add_argument("--dace-default-block-size", type=str, default=DACE_DEFAULT_BLOCK_SIZE)
-    parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
-    parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)
-    parser.add_argument("--gt-backend", type=str, default=GT_BACKEND)
-    parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
-    parser.add_argument("--num-runs", type=int, default=NUM_RUNS)
-    parser.add_argument("--num-tasks-per-node", type=int, default=NUM_TASKS_PER_NODE)
-    parser.add_argument("--num-threads-per-task", type=int, default=NUM_THREADS_PER_TASK)
-    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
-    parser.add_argument("--pmap-disable-log", type=bool, default=PMAP_DISABLE_LOG)
-    parser.add_argument("--pmap-enable-benchmarking", type=bool, default=PMAP_ENABLE_BENCHMARKING)
-    parser.add_argument("--pmap-extended-timers", type=bool, default=PMAP_EXTENDED_TIMERS)
-    parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
-    parser.add_argument("--python", type=str, default=defaults.PYTHON)
-    parser.add_argument("--use-case", type=str, default=USE_CASE)
-    args = parser.parse_args()
-    with common.utils.batch_directory():
-        core(**args.__dict__, project_name="pmap-les")

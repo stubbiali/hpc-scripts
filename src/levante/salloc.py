@@ -5,6 +5,7 @@ import argparse
 from typing import TYPE_CHECKING
 
 import common.utils
+import defaults
 import utils_slurm
 
 if TYPE_CHECKING:
@@ -12,9 +13,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-ACCOUNT: str = "bd1069"
 NUM_NODES: int = 1
-PARTITION: defs.Partition = "gpu"
 TIME: str = "01:00:00"
 # >>> config: end
 
@@ -34,9 +33,9 @@ def core(account: str, num_nodes: int, partition: defs.Partition, time: str) -> 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get an allocation on the compute nodes.")
-    parser.add_argument("--account", type=str, default=ACCOUNT)
+    parser.add_argument("--account", type=str, default=defaults.ACCOUNT)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
-    parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     parser.add_argument("--time", type=str, default=TIME)
     args = parser.parse_args()
     core(**args.__dict__)

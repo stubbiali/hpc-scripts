@@ -7,17 +7,11 @@ from typing import TYPE_CHECKING
 import common.utils
 import common.utils_module
 import common.utils_spack
+import defaults
 import utils_module
 
 if TYPE_CHECKING:
     import defs
-
-
-# >>> config: start
-COMPILER: defs.Compiler = "gcc@11.2.0"
-MPI: defs.MPI = "openmpi@4.1.6"
-PARTITION: defs.Partition = "gpu"
-# >>> config: end
 
 
 def core(compiler: defs.Compiler, mpi: defs.MPI, partition: defs.Partition):
@@ -59,8 +53,8 @@ def core(compiler: defs.Compiler, mpi: defs.MPI, partition: defs.Partition):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--compiler", type=str, default=COMPILER)
-    parser.add_argument("--mpi", type=str, default=MPI)
-    parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--compiler", type=str, default=defaults.COMPILER)
+    parser.add_argument("--mpi", type=str, default=defaults.MPI)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     args = parser.parse_args()
     core(**args.__dict__)

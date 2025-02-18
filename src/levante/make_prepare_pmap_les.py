@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 import common.utils
 import common.utils_module
 import common.utils_spack
+import defaults
 import utils_module
 import utils_mpi
 import utils_spack
@@ -18,11 +19,7 @@ if TYPE_CHECKING:
 
 # >>> config: start
 BRANCH: str = "main"
-COMPILER: defs.Compiler = "nvhpc@23.9"
-MPI: defs.MPI = "openmpi@4.1.6"
 NUM_NODES: int = 1
-PARTITION: defs.Partition = "gpu"
-PYTHON: str = "python@3.11"
 # >>> config: end
 
 
@@ -107,10 +104,10 @@ def core(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--compiler", type=str, default=COMPILER)
-    parser.add_argument("--mpi", type=str, default=MPI)
+    parser.add_argument("--compiler", type=str, default=defaults.COMPILER)
+    parser.add_argument("--mpi", type=str, default=defaults.MPI)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
-    parser.add_argument("--partition", type=str, default=PARTITION)
-    parser.add_argument("--python", type=str, default=PYTHON)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
+    parser.add_argument("--python", type=str, default=defaults.PYTHON)
     args = parser.parse_args()
     core(**args.__dict__)
