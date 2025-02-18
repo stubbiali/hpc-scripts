@@ -2,7 +2,7 @@
 from __future__ import annotations
 import importlib
 import os
-from typing import Literal
+from typing import Literal, Optional
 
 import common.utils
 import defs
@@ -11,7 +11,7 @@ import defs
 def core(
     branch: str,
     compiler: defs.Compiler,
-    dace_default_block_size: str,
+    dace_default_block_size: Optional[str],
     ghex_aggregate_fields: bool,
     ghex_collect_statistics: bool,
     ghex_transport_backend: defs.GHEXTransportBackend,
@@ -62,7 +62,10 @@ def core(
                 common.utils.export_variable("FVM_PRECISION", pmap_precision)
                 # common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
                 if partition == "gpu":
-                    common.utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
+                    if dace_default_block_size is not None:
+                        common.utils.export_variable(
+                            "DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size
+                        )
 
                 if output_dir is not None:
                     output_dir = os.path.abspath(output_dir)

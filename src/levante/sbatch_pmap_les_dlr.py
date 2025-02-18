@@ -9,7 +9,7 @@ ARGS = {
     "account": "bd1069",
     "branch": "main",
     "compiler": "nvhpc@24.7",
-    "dace_default_block_size": "",
+    "dace_default_block_size": None,
     "dry_run": False,
     "ghex_aggregate_fields": False,
     "ghex_collect_statistics": False,
