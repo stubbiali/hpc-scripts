@@ -3,6 +3,7 @@ from typing import Literal, get_args
 
 Compiler = Literal["gcc@11.2.0", "gcc@13.3.0", "nvhpc@23.9", "nvhpc@24.7"]
 FloatingPointPrecision = Literal["double", "single"]
+GHEXTransportBackend = Literal["MPI", "UCX"]
 MPI = Literal[
     "hpcx-mpi@2.21",
     "openmpi@4.1.2",

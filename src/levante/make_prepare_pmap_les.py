@@ -26,6 +26,7 @@ NUM_NODES: int = 1
 def core(
     branch: str,
     compiler: defs.Compiler,
+    ghex_transport_backend: defs.GHEXTransportBackend,
     mpi: defs.MPI,
     num_nodes: int,
     partition: defs.Partition,
@@ -75,7 +76,7 @@ def core(
         common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
-        common.utils.export_variable("GHEX_TRANSPORT_BACKEND", "UCX")
+        common.utils.export_variable("GHEX_TRANSPORT_BACKEND", ghex_transport_backend)
         if partition == "gpu":
             common.utils.export_variable("GHEX_USE_GPU", "True")
             common.utils.export_variable("GHEX_GPU_TYPE", "NVIDIA")
@@ -105,6 +106,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--compiler", type=str, default=defaults.COMPILER)
+    parser.add_argument(
+        "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
+    )
     parser.add_argument("--mpi", type=str, default=defaults.MPI)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)

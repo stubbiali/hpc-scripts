@@ -13,6 +13,7 @@ ARGS = {
     "dry_run": False,
     "ghex_aggregate_fields": False,
     "ghex_collect_statistics": False,
+    "ghex_transport_backend": "MPI",
     "gt_backend_list": ["dace:gpu"],
     "job_root_dir": "_jobs",
     "mpi": "openmpi@4.1.5",
