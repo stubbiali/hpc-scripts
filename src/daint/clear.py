@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import utils
+import common.utils
 
 
 def core():
@@ -42,7 +42,7 @@ def core():
         "var",
     ]
     for folder in folders:
-        utils.run(f"rm -rf {folder}")
+        common.utils.run(f"rm -rf {folder}")
 
 
 if __name__ == "__main__":

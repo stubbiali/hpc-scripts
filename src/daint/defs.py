@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import typing
+from typing import Literal, get_args
 
-FloatingPointPrecision = typing.Literal["double", "single"]
-GHEXTransportBackend = typing.Literal["libfabric", "mpi", "ucx"]
-Partition = typing.Literal["gpu", "mc"]
-ProgrammingEnvironment = typing.Literal["gnu"]
+FloatingPointPrecision = Literal["double", "single"]
+GHEXTransportBackend = Literal["libfabric", "mpi", "ucx"]
+Partition = Literal["gpu", "mc"]
+ProgrammingEnvironment = Literal["gnu"]
 
-valid_programming_environments = typing.get_args(ProgrammingEnvironment)
-valid_partitions = typing.get_args(Partition)
+valid_programming_environments = get_args(ProgrammingEnvironment)
+valid_partitions = get_args(Partition)

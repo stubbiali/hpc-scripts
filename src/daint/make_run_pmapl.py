@@ -3,13 +3,17 @@
 from __future__ import annotations
 import argparse
 import os
-import typing
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
-import defs
+import common.utils
+import common.utils_module
+import defaults
 import make_prepare_pmapl
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    import defs
 
 
 # >>> config: start
@@ -17,23 +21,19 @@ BRANCH: str = "main"
 COPY_GT_CACHE_TO_DEV_SHM: bool = False
 COPY_GT_CACHE_TO_TMP: bool = False
 ENABLE_CPROFILE: bool = False
-ENV: defs.ProgrammingEnvironment = "gnu"
 GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
-GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 GT_BACKEND: str = "dace:gpu"
 NUM_NODES: int = 1
 NUM_RUNS: int = 1
 NUM_TASKS_PER_NODE: int = 1
 NUM_THREADS_PER_TASK: int = 1
-OUTPUT_DIR: typing.Optional[str] = None
-PARTITION: defs.Partition = "gpu"
+OUTPUT_DIR: Optional[str] = None
 PMAP_DISABLE_LOG: bool = False
 PMAP_ENABLE_BENCHMARKING: bool = False
 PMAP_ENABLE_OVERCOMPUTING: bool = False
 PMAP_EXTENDED_TIMERS: bool = False
-PMAP_PRECISION: defs.FloatingPointPrecision = "double"
-ROOT_DIR: typing.Optional[str] = None
+ROOT_DIR: Optional[str] = None
 USE_CASE: str = "thermal"
 # >>> config: end
 
@@ -59,39 +59,39 @@ def core(
     pmap_enable_overcomputing: bool,
     pmap_extended_timers: bool,
     pmap_precision: defs.FloatingPointPrecision,
-    root_dir: typing.Optional[str],
+    root_dir: Optional[str],
     use_case: str,
 ) -> str:
     prepare_pmapl_fname, gt_cache_root = make_prepare_pmapl.core(
         branch, env, ghex_transport_backend, partition, root_dir
     )
 
-    with common_utils.batch_file(filename="run_pmapl") as (f, fname):
-        common_utils.run(f". {prepare_pmapl_fname}")
+    with common.utils.batch_file(filename="run_pmapl") as (f, fname):
+        common.utils.run(f". {prepare_pmapl_fname}")
 
-        with common_utils.chdir("$PMAPL"):
-            with common_utils.chdir("drivers"):
-                common_utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
-                common_utils.export_variable(
+        with common.utils.chdir("$PMAPL"):
+            with common.utils.chdir("drivers"):
+                common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
+                common.utils.export_variable(
                     "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
                 )
-                common_utils.export_variable(
+                common.utils.export_variable(
                     "GHEX_TRANSPORT_BACKEND", ghex_transport_backend.upper()
                 )
-                common_utils.export_variable("GT_BACKEND", gt_backend)
-                common_utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
-                common_utils.export_variable("OMP_PLACES", "cores")
-                common_utils.export_variable("OMP_PROC_BIND", "close")
-                common_utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
-                common_utils.export_variable(
+                common.utils.export_variable("GT_BACKEND", gt_backend)
+                common.utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
+                common.utils.export_variable("OMP_PLACES", "cores")
+                common.utils.export_variable("OMP_PROC_BIND", "close")
+                common.utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
+                common.utils.export_variable(
                     "FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
                 )
-                common_utils.export_variable(
+                common.utils.export_variable(
                     "FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
                 )
-                common_utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
-                common_utils.export_variable("FVM_PRECISION", pmap_precision)
-                # common_utils.export_variable("CUDA_LAUNCH_BLOCKING", 1)
+                common.utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
+                common.utils.export_variable("FVM_PRECISION", pmap_precision)
+                # common.utils.export_variable("CUDA_LAUNCH_BLOCKING", 1)
 
                 gt_backend_str = gt_backend.replace(":", "")
 
@@ -112,22 +112,22 @@ def core(
                         gt_cache_root, f".gt_cache/py39_1013/{gt_backend_str}.tar"
                     )
                     if not os.path.exists(gt_cache_backend_tar):
-                        common_utils.run(f"tar cf {gt_cache_backend_tar} {gt_cache_backend_dir}")
+                        common.utils.run(f"tar cf {gt_cache_backend_tar} {gt_cache_backend_dir}")
 
                     new_gt_cache_root = dest + gt_cache_root
-                    common_utils.run(f"srun rm -rf {new_gt_cache_root}")
-                    common_utils.run(f"srun mkdir -p {new_gt_cache_root}/.gt_cache/py39_1013")
-                    common_utils.run(
+                    common.utils.run(f"srun rm -rf {new_gt_cache_root}")
+                    common.utils.run(f"srun mkdir -p {new_gt_cache_root}/.gt_cache/py39_1013")
+                    common.utils.run(
                         f"srun tar xf {gt_cache_backend_tar} "
                         f"-C {new_gt_cache_root}/.gt_cache/py39_1013"
                     )
-                    common_utils.export_variable("GT_CACHE_ROOT", new_gt_cache_root)
+                    common.utils.export_variable("GT_CACHE_ROOT", new_gt_cache_root)
 
                 if output_dir is not None:
                     output_dir = os.path.abspath(output_dir)
                 else:
                     output_dir = os.path.join("$PWD", use_case, pmap_precision, gt_backend_str)
-                common_utils.run(f"mkdir -p {output_dir}")
+                common.utils.run(f"mkdir -p {output_dir}")
 
                 command = (
                     f"CC=cc CXX=CC "
@@ -145,10 +145,10 @@ def core(
                     command += " --write-profiling-data"
 
                 for _ in range(num_runs):
-                    common_utils.run(command)
+                    common.utils.run(command)
 
                 if dest is not None:
-                    common_utils.run(f"srun rm -rf {new_gt_cache_root}")
+                    common.utils.run(f"srun rm -rf {new_gt_cache_root}")
 
     return fname
 
@@ -159,24 +159,26 @@ if __name__ == "__main__":
     parser.add_argument("--copy-gt-cache-to-dev-shm", type=bool, default=COPY_GT_CACHE_TO_DEV_SHM)
     parser.add_argument("--copy-gt-cache-to-tmp", type=bool, default=COPY_GT_CACHE_TO_TMP)
     parser.add_argument("--enable-cprofile", type=bool, default=ENABLE_CPROFILE)
-    parser.add_argument("--env", type=str, default=ENV)
+    parser.add_argument("--env", type=str, default=defaults.ENV)
     parser.add_argument("--ghex-aggregate-fields", type=bool, default=GHEX_AGGREGATE_FIELDS)
     parser.add_argument("--ghex-collect-statistics", type=bool, default=GHEX_COLLECT_STATISTICS)
-    parser.add_argument("--ghex-transport-backend", type=str, default=GHEX_TRANSPORT_BACKEND)
+    parser.add_argument(
+        "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
+    )
     parser.add_argument("--gt-backend", type=str, default=GT_BACKEND)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
     parser.add_argument("--num-runs", type=int, default=NUM_RUNS)
     parser.add_argument("--num-tasks-per-node", type=int, default=NUM_TASKS_PER_NODE)
     parser.add_argument("--num-threads-per-task", type=int, default=NUM_THREADS_PER_TASK)
     parser.add_argument("--output-dir", type=str, default=OUTPUT_DIR)
-    parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     parser.add_argument("--pmap-disable-log", type=bool, default=PMAP_DISABLE_LOG)
     parser.add_argument("--pmap-enable-benchmarking", type=bool, default=PMAP_ENABLE_BENCHMARKING)
     parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
     parser.add_argument("--pmap-extended-timers", type=bool, default=PMAP_EXTENDED_TIMERS)
-    parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
+    parser.add_argument("--pmap-precision", type=str, default=defaults.PRECISION)
     parser.add_argument("--root-dir", type=str, default=ROOT_DIR)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()
-    with common_utils.batch_directory():
+    with common.utils.batch_directory():
         core(**args.__dict__)
