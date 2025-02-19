@@ -3,14 +3,16 @@
 from __future__ import annotations
 import argparse
 import os
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
+import common.utils
+import common.utils_module
 import defaults
-import defs
 import make_prepare_pmapl
 import utils
+
+if TYPE_CHECKING:
+    import defs
 
 
 # >>> config: start
@@ -70,33 +72,33 @@ def core(
         stack_version,
     )
 
-    with common_utils.batch_file(filename="run_pmapl") as (f, fname):
-        common_utils.run(f". {prepare_pmapl_fname}")
+    with common.utils.batch_file(filename="run_pmapl") as (f, fname):
+        common.utils.run(f". {prepare_pmapl_fname}")
 
-        with common_utils.chdir("$PMAPL"):
-            common_utils.run(f". $PMAPL_VENV/bin/activate")
-            with common_utils.chdir("drivers"):
-                common_utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
-                common_utils.export_variable(
+        with common.utils.chdir("$PMAPL"):
+            common.utils.run(f". $PMAPL_VENV/bin/activate")
+            with common.utils.chdir("drivers"):
+                common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
+                common.utils.export_variable(
                     "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
                 )
-                common_utils.export_variable("GT_BACKEND", gt_backend)
-                common_utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
-                common_utils.export_variable("OMP_PLACES", "cores")
-                common_utils.export_variable("OMP_PROC_BIND", "close")
-                # common_utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
-                common_utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
-                common_utils.export_variable(
+                common.utils.export_variable("GT_BACKEND", gt_backend)
+                common.utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
+                common.utils.export_variable("OMP_PLACES", "cores")
+                common.utils.export_variable("OMP_PROC_BIND", "close")
+                # common.utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
+                common.utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
+                common.utils.export_variable(
                     "FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
                 )
-                common_utils.export_variable(
+                common.utils.export_variable(
                     "FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
                 )
-                common_utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
-                common_utils.export_variable("FVM_PRECISION", pmap_precision)
-                common_utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
+                common.utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
+                common.utils.export_variable("FVM_PRECISION", pmap_precision)
+                common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
                 if utils.get_partition_type(partition) == "gpu":
-                    common_utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
+                    common.utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
 
                 srun_options = utils.get_srun_options(
                     num_nodes,
@@ -111,7 +113,7 @@ def core(
                     output_dir = os.path.join(
                         "$PWD", use_case, pmap_precision, gt_backend.replace(":", "")
                     )
-                common_utils.run(f"mkdir -p {output_dir}")
+                common.utils.run(f"mkdir -p {output_dir}")
                 command = (
                     f"CC=cc CXX=CC "
                     f"srun {' '.join(srun_options)} ./../../../select_gpu.sh python run_model.py "
@@ -122,7 +124,7 @@ def core(
                     command += f" --write-profiling-data"
 
                 for _ in range(num_runs):
-                    common_utils.run(command)
+                    common.utils.run(command)
 
     return fname
 
@@ -144,7 +146,7 @@ if __name__ == "__main__":
     parser.add_argument("--num-runs", type=int, default=NUM_RUNS)
     parser.add_argument("--num-tasks-per-node", type=int, default=NUM_TASKS_PER_NODE)
     parser.add_argument("--num-threads-per-task", type=int, default=NUM_THREADS_PER_TASK)
-    parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     parser.add_argument("--pmap-disable-log", type=bool, default=PMAP_DISABLE_LOG)
     parser.add_argument("--pmap-enable-benchmarking", type=bool, default=PMAP_ENABLE_BENCHMARKING)
     parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
@@ -155,5 +157,5 @@ if __name__ == "__main__":
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()
-    with common_utils.batch_directory():
+    with common.utils.batch_directory():
         core(**args.__dict__)

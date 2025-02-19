@@ -3,14 +3,17 @@
 from __future__ import annotations
 import argparse
 import os
-from typing import Optional
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
+import common.utils
+import common.utils_module
 import defaults
-import defs
 import utils
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    import defs
 
 
 def core(
@@ -20,29 +23,29 @@ def core(
     stack_version: Optional[str],
     version: str,
 ) -> None:
-    with common_utils.batch_file(filename="build_hdf5"):
+    with common.utils.batch_file(filename="build_hdf5"):
         utils.setup_env(env, partition, stack, stack_version)
-        common_utils.module_load("buildtools")
+        common.utils_module.module_load("buildtools")
 
         root_dir = os.path.abspath(os.curdir)
-        with common_utils.chdir(root_dir):
-            common_utils.run("mkdir -p hdf5")
+        with common.utils.chdir(root_dir):
+            common.utils.run("mkdir -p hdf5")
             branch = (
                 f"hdf5-{version.replace('.', '_')}" if version < "1.14.4" else f"hdf5_{version}"
             )
-            common_utils.run(
+            common.utils.run(
                 f"git clone --branch={branch} --depth=1 "
                 f"https://github.com/HDFGroup/hdf5.git hdf5/{version}"
             )
 
-            with common_utils.chdir(f"hdf5/{version}"):
-                common_utils.run("chmod +x autogen.sh")
-                common_utils.run("./autogen.sh")
+            with common.utils.chdir(f"hdf5/{version}"):
+                common.utils.run("chmod +x autogen.sh")
+                common.utils.run("./autogen.sh")
                 build_dir = os.path.join(
                     root_dir, "hdf5", version, "build", utils.get_subtree(env, stack, stack_version)
                 )
-                common_utils.run(f"rm -rf {build_dir}")
-                common_utils.run(
+                common.utils.run(f"rm -rf {build_dir}")
+                common.utils.run(
                     "CC=cc",
                     "CFLAGS='-fPIC'",
                     "CXX=CC",
@@ -59,10 +62,10 @@ def core(
                     "--enable-tests",
                     "--enable-tools",
                 )
-                common_utils.run("make -j 8 install")
+                common.utils.run("make -j 8 install")
 
-                common_utils.export_variable("HDF5_ROOT", build_dir)
-                common_utils.export_variable("HDF5_DIR", build_dir)
+                common.utils.export_variable("HDF5_ROOT", build_dir)
+                common.utils.export_variable("HDF5_DIR", build_dir)
 
 
 if __name__ == "__main__":

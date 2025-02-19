@@ -1,16 +1,19 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 import argparse
 import importlib
 import os
-import typing
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
+import common.utils
 import defaults
-import defs
 import utils
+
+if TYPE_CHECKING:
+    from typing import Callable, Optional
+
+    import defs
 
 
 # >>> config: start
@@ -32,18 +35,18 @@ def core(
     num_tasks_per_node: int,
     partition: defs.Partition,
     time: str,
-    callback_module: typing.Optional[str] = None,
+    callback_module: Optional[str] = None,
 ) -> None:
     if callback_module is not None:
         mod = importlib.import_module(callback_module)
-        cb: typing.Callable[[], str] = getattr(mod, "callback", None)
+        cb: Callable[[], str] = getattr(mod, "callback", None)
         assert cb is not None, f"Module `{callback_module}` must define `callback()`."
         job_script = cb()
 
-    with common_utils.batch_directory() as job_dir:
+    with common.utils.batch_directory() as job_dir:
         error = os.path.join(job_dir, "error.txt")
         output = os.path.join(job_dir, "output.txt")
-        with common_utils.batch_file(filename="batch") as (_, batch_file):
+        with common.utils.batch_file(filename="batch") as (_, batch_file):
             command = [
                 "sbatch",
                 f"--account=project_{account}",
@@ -61,10 +64,10 @@ def core(
             if utils.get_partition_type(partition) == "gpu":
                 command.append(f"--gpus-per-node=8")
             command.append(job_script)
-            common_utils.run(*command, split=True)
+            common.utils.run(*command, split=True)
 
     if not dry_run:
-        common_utils.run(f". {batch_file}")
+        common.utils.run(f". {batch_file}")
 
 
 if __name__ == "__main__":

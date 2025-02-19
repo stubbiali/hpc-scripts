@@ -3,14 +3,15 @@
 from __future__ import annotations
 import itertools
 import os
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
+import common.utils
 import defaults
-import defs
 import make_run_pmapl
 import sbatch
+
+if TYPE_CHECKING:
+    import defs
 
 
 # >>> config: start
@@ -37,20 +38,20 @@ ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
 TIME: str = "00:45:00"
-USE_CASE: dict[str, list[common_utils.ThreadsLayout]] = {
-    "weak-scaling/bomex-prescribed-boundary/4": [common_utils.ThreadsLayout(1, 1, 7)],
-    "weak-scaling/bomex-prescribed-boundary/8": [common_utils.ThreadsLayout(1, 2, 7)],
-    "weak-scaling/bomex-prescribed-boundary/16": [common_utils.ThreadsLayout(1, 4, 7)],
-    "weak-scaling/bomex-prescribed-boundary/32": [common_utils.ThreadsLayout(1, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/64": [common_utils.ThreadsLayout(2, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/128": [common_utils.ThreadsLayout(4, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/256": [common_utils.ThreadsLayout(8, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/512": [common_utils.ThreadsLayout(16, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/1024": [common_utils.ThreadsLayout(32, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/2048": [common_utils.ThreadsLayout(64, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/4096": [common_utils.ThreadsLayout(128, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/8192": [common_utils.ThreadsLayout(256, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/16384": [common_utils.ThreadsLayout(512, 8, 7)],
+USE_CASE: dict[str, list[common.utils.ThreadsLayout]] = {
+    "weak-scaling/bomex-prescribed-boundary/4": [common.utils.ThreadsLayout(1, 1, 7)],
+    "weak-scaling/bomex-prescribed-boundary/8": [common.utils.ThreadsLayout(1, 2, 7)],
+    "weak-scaling/bomex-prescribed-boundary/16": [common.utils.ThreadsLayout(1, 4, 7)],
+    "weak-scaling/bomex-prescribed-boundary/32": [common.utils.ThreadsLayout(1, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/64": [common.utils.ThreadsLayout(2, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/128": [common.utils.ThreadsLayout(4, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/256": [common.utils.ThreadsLayout(8, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/512": [common.utils.ThreadsLayout(16, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/1024": [common.utils.ThreadsLayout(32, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/2048": [common.utils.ThreadsLayout(64, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/4096": [common.utils.ThreadsLayout(128, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/8192": [common.utils.ThreadsLayout(256, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/16384": [common.utils.ThreadsLayout(512, 8, 7)],
 }
 # >>> config: end
 
@@ -68,7 +69,7 @@ def core():
                 GHEX_TRANSPORT_BACKEND,
                 gt_backend.replace(":", ""),
             )
-            with common_utils.batch_directory(path=job_dir) as output_dir:
+            with common.utils.batch_directory(path=job_dir) as output_dir:
                 job_name = (
                     f"{use_case.replace('/', '-')}-{threads_layout.num_tasks}-{pmap_precision[0]}"
                 )

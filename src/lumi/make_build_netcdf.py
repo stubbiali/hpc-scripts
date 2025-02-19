@@ -3,14 +3,17 @@
 from __future__ import annotations
 import argparse
 import os
-from typing import Optional
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
+import common.utils
+import common.utils_module
 import defaults
-import defs
 import utils
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+    import defs
 
 
 def core(
@@ -21,32 +24,32 @@ def core(
     stack_version: Optional[str],
     version: str,
 ) -> None:
-    with common_utils.batch_file(filename="build_netcdf"):
+    with common.utils.batch_file(filename="build_netcdf"):
         utils.setup_env(env, partition, stack, stack_version)
-        common_utils.module_load("buildtools")
+        common.utils_module.module_load("buildtools")
 
         root_dir = os.path.abspath(os.curdir)
         subtree = utils.get_subtree(env, stack, stack_version)
 
         hdf5_root = os.path.join(root_dir, "hdf5", hdf5_version, "build", subtree)
-        common_utils.export_variable("HDF5_ROOT", hdf5_root)
+        common.utils.export_variable("HDF5_ROOT", hdf5_root)
 
-        with common_utils.chdir(root_dir):
+        with common.utils.chdir(root_dir):
             os.makedirs("netcdf-c", exist_ok=True)
             branch = f"v{version}"
-            common_utils.run(
+            common.utils.run(
                 f"git clone --branch={branch} --depth=1 "
                 f"https://github.com/Unidata/netcdf-c.git netcdf-c/{version}"
             )
 
-            with common_utils.chdir(f"netcdf-c/{version}"):
-                common_utils.run("autoupdate")
-                common_utils.run("autoreconf -if")
+            with common.utils.chdir(f"netcdf-c/{version}"):
+                common.utils.run("autoupdate")
+                common.utils.run("autoreconf -if")
                 build_dir = os.path.join(root_dir, "netcdf-c", version, "build", subtree)
-                common_utils.run(f"rm -rf {build_dir}")
+                common.utils.run(f"rm -rf {build_dir}")
                 hdf5_include_dir = os.path.join(hdf5_root, "include")
                 hdf5_lib_dir = os.path.join(hdf5_root, "lib")
-                common_utils.run(
+                common.utils.run(
                     "CC=cc",
                     "CXX=CC",
                     f"CFLAGS='-fPIC -I{hdf5_include_dir}'",
@@ -59,10 +62,10 @@ def core(
                     "--disable-shared",
                     "--enable-parallel-tests",
                 )
-                common_utils.run("make -j 8 install")
+                common.utils.run("make -j 8 install")
 
-                common_utils.export_variable("NETCDF_ROOT", build_dir)
-                common_utils.export_variable("NETCDF4_DIR", build_dir)
+                common.utils.export_variable("NETCDF_ROOT", build_dir)
+                common.utils.export_variable("NETCDF4_DIR", build_dir)
 
 
 if __name__ == "__main__":

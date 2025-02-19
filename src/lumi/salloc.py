@@ -1,13 +1,15 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 import argparse
+from typing import TYPE_CHECKING
 
-import update_path  # noqa: F401
-
-import common.utils as common_utils
+import common.utils
 import defaults
-import defs
 import utils
+
+if TYPE_CHECKING:
+    import defs
 
 
 # >>> config: start
@@ -31,7 +33,7 @@ def core(
     ]
     if utils.get_partition_type(partition) == "gpu":
         command.append("--gpus-per-node=8")
-    common_utils.run(*command, verbose=True)
+    common.utils.run(*command, verbose=True)
 
 
 if __name__ == "__main__":

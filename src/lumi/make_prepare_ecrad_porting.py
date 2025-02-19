@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 import common.utils
 import common.utils_module
 import defaults
-import make_prepare_mpi
 import utils
 
 if TYPE_CHECKING:
@@ -18,58 +17,46 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "benchmarking-lumi"
+BRANCH: str = "gas-optics-cy49r1-dev"
 # >>> config: end
 
 
 def core(
     branch: str,
     env: defs.ProgrammingEnvironment,
-    ghex_transport_backend: defs.GHEXTransportBackend,
     hdf5_version: str,
     netcdf_version: str,
     partition: defs.Partition,
     rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
-) -> tuple[str, str]:
-    with common.utils.batch_file(filename="prepare_pmapl") as (f, fname):
+) -> None:
+    with common.utils.batch_file(filename="prepare_ecrad_porting"):
         # clear environment and load relevant modules
-        cpe = utils.setup_env(env, partition, stack, stack_version)
+        cpe = utils.setup_env(env, partition, stack, stack_version, load_cdo=True)
         common.utils_module.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
         partition_type = utils.get_partition_type(partition)
         if partition_type == "gpu":
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
-        # set path to PMAP code
+        # set path to ecrad-porting code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
-        pmapl_dir = os.path.join(pwd, "pmapl", branch)
-        assert os.path.exists(pmapl_dir)
-        common.utils.export_variable("PMAPL", pmapl_dir)
-        pmapl_subtree = utils.get_subtree(
-            env,
-            stack,
-            stack_version,
-            ghex_transport_backend=ghex_transport_backend,
-            rocm_version=rocm_version if partition_type == "gpu" else None,
-        )
-        pmapl_venv_dir = os.path.join(pmapl_dir, "_venv", pmapl_subtree)
-        common.utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
+        ecrad_dir = os.path.join(pwd, "ecrad-porting", branch)
+        assert os.path.exists(ecrad_dir)
+        common.utils.export_variable("ECRAD", ecrad_dir)
+        subtree = utils.get_subtree(env, stack, stack_version)
+        venv_dir = os.path.join(ecrad_dir, "_venv", subtree)
+        common.utils.export_variable("ECRAD_VENV", venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        subtree = utils.get_subtree(env, stack, stack_version)
-        gt_cache_root = os.path.join(pwd, "pmapl", "_gtcache", subtree)
-        common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
-        common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
-        common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+        # gt_cache_root = os.path.join(pwd, "ecrad-porting", "_gtcache", subtree)
+        # common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
+        # common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
+        # common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
 
         # set/fix HIP-related variables
         if partition_type == "gpu":
             utils.setup_hip(rocm_version)
-
-        # configure MPICH
-        prepare_mpi_fname = make_prepare_mpi.core(ghex_transport_backend, partition)
-        common.utils.run(f". {prepare_mpi_fname}")
 
         # path to custom build of HDF5 and NetCDF-C
         common.utils.export_variable(
@@ -86,29 +73,22 @@ def core(
         )
 
         # jump into project source directory
-        with common.utils.chdir(pmapl_dir, restore=False):
-            if not os.path.exists(pmapl_venv_dir):
+        with common.utils.chdir(ecrad_dir, restore=False):
+            if not os.path.exists(venv_dir):
                 # create virtual environment if it does not exist yet
-                common.utils.run(f"python -m venv --prompt={pmapl_subtree} {pmapl_venv_dir}")
-                common.utils.run(f"source {pmapl_venv_dir}/bin/activate")
+                common.utils.run(f"python -m venv --prompt={subtree} {venv_dir}")
+                common.utils.run(f"source {venv_dir}/bin/activate")
                 common.utils.run(f"pip install --upgrade pip setuptools wheel")
-                common.utils.run(
-                    f"CC=cc CXX=CC MPICC=cc MPICXX=CC pip install -e .[mpi,gpu-rocm] --no-cache-dir"
-                )
+                common.utils.run(f"CC=cc CXX=CC pip install -e .[dev,gpu-rocm,test] --no-cache-dir")
             else:
                 # activate virtual environment
-                common.utils.run(f"source {pmapl_venv_dir}/bin/activate")
-
-    return fname
+                common.utils.run(f"source {venv_dir}/bin/activate")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=defaults.ENV)
-    parser.add_argument(
-        "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
-    )
     parser.add_argument("--hdf5-version", type=str, default=defaults.HDF5_VERSION)
     parser.add_argument("--netcdf-version", type=str, default=defaults.NETCDF_VERSION)
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)
