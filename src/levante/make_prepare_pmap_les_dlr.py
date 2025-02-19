@@ -4,16 +4,13 @@ from __future__ import annotations
 import argparse
 
 import defaults
-import make_prepare_pmap_les
+from make_prepare_pmap_les import core
 
 
 # >>> config: start
 BRANCH: str = "main"
 NUM_NODES: int = 1
 # >>> config: end
-
-
-core = make_prepare_pmap_les.core
 
 
 if __name__ == "__main__":
