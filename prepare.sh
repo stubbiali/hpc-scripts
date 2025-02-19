@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for host in levante lumi
+for host in daint hpc2020 levante lumi meluxina
 do
   rm -rf "$PWD"/src/"$host"/common
   mkdir -p "$PWD"/src/"$host"/common
