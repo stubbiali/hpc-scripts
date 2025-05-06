@@ -97,6 +97,10 @@ def setup_hip(rocm_version: str) -> None:
     common.utils.export_variable("GHEX_GPU_ARCH", "gfx90a")
     common.utils.export_variable("GT4PY_USE_HIP", 1)
     common.utils.export_variable("HCC_AMDGPU_TARGET", "gfx90a")
+    common.utils.export_variable(
+        "HIPCC_COMPILE_FLAGS_APPEND", "'--offload-arch=gfx90a $(CC --cray-print-opts=cflags)'"
+    )
+    common.utils.export_variable("HIPCC_LINK_FLAGS_APPEND", "$(CC --cray-print-opts=libs)")
     common.utils.export_variable("ROCM_HOME", f"/opt/rocm-{rocm_version}")
 
 
