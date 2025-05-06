@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "gas-optics-cy49r1-dev"
+BRANCH: str = "solvers-cy49r1"
 # >>> config: end
 
 
@@ -30,8 +30,8 @@ def core(
     rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
-) -> None:
-    with common.utils.batch_file(filename="prepare_ecrad_porting"):
+) -> str:
+    with common.utils.batch_file(filename="prepare_ecrad_porting") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version, load_cdo=True)
         common.utils_module.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
@@ -83,6 +83,8 @@ def core(
             else:
                 # activate virtual environment
                 common.utils.run(f"source {venv_dir}/bin/activate")
+
+    return fname
 
 
 if __name__ == "__main__":
