@@ -16,11 +16,13 @@ def spack_install(spec: str, compiler: str, dependencies: Optional[list[str]] = 
     utils.run(command)
 
 
-def spack_load(spec: str, compiler: str, dependencies: Optional[list[str]] = None) -> None:
-    command = f"spack load {spec} %{compiler}"
+def spack_load(
+    spec: str, compiler: Optional[str] = None, dependencies: Optional[list[str]] = None
+) -> None:
+    command = f"spack load {spec}{f' %{compiler}' if compiler else ''}"
     dependencies = dependencies or []
     for dependency in dependencies:
-        command += f" ^{dependency} %{compiler}"
+        command += f" ^{dependency}{f' %{compiler}' if compiler else ''}"
     utils.run(command)
 
 
