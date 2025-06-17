@@ -79,7 +79,9 @@ def core(
                 common.utils.run(f"python -m venv --prompt={subtree} {venv_dir}")
                 common.utils.run(f"source {venv_dir}/bin/activate")
                 common.utils.run(f"pip install --upgrade pip setuptools wheel")
-                common.utils.run(f"CC=cc CXX=CC pip install -e .[dev,gpu-rocm,test] --no-cache-dir")
+                common.utils.run(
+                    f"CC=cc CXX=CC pip install -e .[dev,gpu-rocm6x,test] --no-cache-dir"
+                )
             else:
                 # activate virtual environment
                 common.utils.run(f"source {venv_dir}/bin/activate")
