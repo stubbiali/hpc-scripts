@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "benchmarking-lumi"
+BRANCH: str = "main"
 # >>> config: end
 
 
@@ -33,7 +33,7 @@ def core(
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
 ) -> tuple[str, str]:
-    with common.utils.batch_file(filename="prepare_pmapl") as (f, fname):
+    with common.utils.batch_file(filename="prepare_pmap_les") as (f, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
@@ -43,24 +43,25 @@ def core(
 
         # set path to PMAP code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
-        pmapl_dir = os.path.join(pwd, "pmapl", branch)
-        assert os.path.exists(pmapl_dir)
-        common.utils.export_variable("PMAPL", pmapl_dir)
-        pmapl_subtree = utils.get_subtree(
+        pmap_dir = os.path.join(pwd, "pmap-les", branch)
+        assert os.path.exists(pmap_dir)
+        common.utils.export_variable("PMAP", pmap_dir)
+        pmap_subtree = utils.get_subtree(
             env,
             stack,
             stack_version,
             ghex_transport_backend=ghex_transport_backend,
             rocm_version=rocm_version if partition_type == "gpu" else None,
         )
-        pmapl_venv_dir = os.path.join(pmapl_dir, "_venv", pmapl_subtree)
-        common.utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
+        pmap_venv_dir = os.path.join(pmap_dir, "_venv", pmap_subtree)
+        common.utils.export_variable("PMAP_VENV", pmap_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
         subtree = utils.get_subtree(env, stack, stack_version)
-        gt_cache_root = os.path.join(pwd, "pmapl", "_gtcache", subtree)
+        gt_cache_root = os.path.join(pwd, "pmap-les", "_gtcache", subtree)
         common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
+        common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
         common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
 
         # set/fix HIP-related variables
@@ -86,18 +87,15 @@ def core(
         )
 
         # jump into project source directory
-        with common.utils.chdir(pmapl_dir, restore=False):
-            if not os.path.exists(pmapl_venv_dir):
+        with common.utils.chdir(pmap_dir, restore=False):
+            if not os.path.exists(pmap_venv_dir):
                 # create virtual environment if it does not exist yet
-                common.utils.run(f"python -m venv --prompt={pmapl_subtree} {pmapl_venv_dir}")
-                common.utils.run(f"source {pmapl_venv_dir}/bin/activate")
-                common.utils.run(f"pip install --upgrade pip setuptools wheel")
-                common.utils.run(
-                    f"CC=cc CXX=CC MPICC=cc MPICXX=CC pip install -e .[mpi,gpu-rocm] --no-cache-dir"
-                )
+                common.utils.run(f"uv venv --python=python --prompt={pmap_subtree} {pmap_venv_dir}")
+                common.utils.run(f"source {pmap_venv_dir}/bin/activate")
+                common.utils.run("uv pip install -e .[dev,gpu,mpi-test]")
             else:
                 # activate virtual environment
-                common.utils.run(f"source {pmapl_venv_dir}/bin/activate")
+                common.utils.run(f"source {pmap_venv_dir}/bin/activate")
 
     return fname
 

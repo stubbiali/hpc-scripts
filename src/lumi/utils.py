@@ -60,6 +60,10 @@ def setup_env(
         # note(stubbiali): the CDO module could only be built using easybuild for cpeGNU
         common.utils_module.module_load("CDO/2.4.3-cpeGNU-24.03")
     cpe = load_cpe(env, stack_version)
+    common.utils.export_variable("CC", "cc")
+    common.utils.export_variable("CXX", "CC")
+    common.utils.export_variable("MPICC", "cc")
+    common.utils.export_variable("MPICXX", "CC")
     return cpe
 
 

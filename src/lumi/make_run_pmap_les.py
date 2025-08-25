@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 import common.utils
 import common.utils_module
 import defaults
-import make_prepare_pmapl
+import make_prepare_pmap_les
 import utils
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "coupling-refactoring"
+BRANCH: str = "main"
 DACE_DEFAULT_BLOCK_SIZE: str = ""
 GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
@@ -60,7 +60,7 @@ def core(
     stack_version: str,
     use_case: str,
 ) -> str:
-    prepare_pmapl_fname = make_prepare_pmapl.core(
+    prepare_pmap_les_fname = make_prepare_pmap_les.core(
         branch,
         env,
         ghex_transport_backend,
@@ -72,11 +72,11 @@ def core(
         stack_version,
     )
 
-    with common.utils.batch_file(filename="run_pmapl") as (f, fname):
-        common.utils.run(f". {prepare_pmapl_fname}")
+    with common.utils.batch_file(filename="run_pmap_les") as (f, fname):
+        common.utils.run(f". {prepare_pmap_les_fname}")
 
-        with common.utils.chdir("$PMAPL"):
-            common.utils.run(f". $PMAPL_VENV/bin/activate")
+        with common.utils.chdir("$PMAP"):
+            common.utils.run(f". $PMAP_VENV/bin/activate")
             with common.utils.chdir("drivers"):
                 common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
                 common.utils.export_variable(
@@ -87,16 +87,15 @@ def core(
                 common.utils.export_variable("OMP_PLACES", "cores")
                 common.utils.export_variable("OMP_PROC_BIND", "close")
                 # common.utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
-                common.utils.export_variable("FVM_DISABLE_LOG", int(pmap_disable_log))
+                common.utils.export_variable("PMAP_DISABLE_LOG", int(pmap_disable_log))
                 common.utils.export_variable(
-                    "FVM_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
+                    "PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
                 )
                 common.utils.export_variable(
-                    "FVM_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
+                    "PMAP_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
                 )
-                common.utils.export_variable("FVM_EXTENDED_TIMERS", int(pmap_extended_timers))
-                common.utils.export_variable("FVM_PRECISION", pmap_precision)
-                common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
+                common.utils.export_variable("PMAP_EXTENDED_TIMERS", int(pmap_extended_timers))
+                common.utils.export_variable("PMAP_PRECISION", pmap_precision)
                 if utils.get_partition_type(partition) == "gpu":
                     common.utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
 
@@ -115,7 +114,6 @@ def core(
                     )
                 common.utils.run(f"mkdir -p {output_dir}")
                 command = (
-                    f"CC=cc CXX=CC "
                     f"srun {' '.join(srun_options)} ./../../../select_gpu.sh python run_model.py "
                     f"{os.path.join('../config', use_case + '.yml')} "
                     f"--output-directory={output_dir}"
