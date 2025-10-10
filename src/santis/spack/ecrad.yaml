@@ -1,0 +1,69 @@
+# This is a Spack Environment file.
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+spack:
+  # add package specs to the `specs` list
+  specs:
+  - gcc@13.4.0
+  - boost@1.88.0 %gcc@13.4.0
+  - cdo@2.5.2 %gcc@13.4.0
+  - cmake@3.31.8 %gcc@13.4.0
+  - cuda@12.9.0
+  - hdf5@1.14.6 %gcc@13.4.0
+  - nco@5.3.4 %gcc@13.4.0
+  - netcdf-c@4.9.3 +mpi %gcc@13.4.0
+  - netcdf-fortran@4.6.2 %gcc@13.4.0
+  - python@3.11.11 %gcc@13.4.0
+  view: true
+  concretizer:
+    reuse: true
+    unify: when_possible
+  upstreams:
+    pmap:
+      install_tree: /capstor/scratch/cscs/ciextc28/software_stack/spack/opt/spack/
+  repos:
+    software:
+      /capstor/scratch/cscs/ciextc28/software_stack/spack_repo/software
+    alps:
+      /capstor/scratch/cscs/ciextc28/software_stack/spack_repo/cluster/alps/
+    builtin:
+      commit: f2db2dec4857d36749cdb368c5b0583503081509
+  packages:  # taken from spack_env_pmap.yaml
+    mpi:
+      require: cray-mpich
+    # Cluster config from here: https://github.com/eth-cscs/alps-cluster-config/blob/master/todi/packages.yaml
+    # patchelf v0.18 leads to errors when it was used to set RPATHS
+    #   ELF load command address/offset not properly aligned
+    # c.f.  https://github.com/NixOS/patchelf/issues/492
+    cray-gtl:
+      buildable: true
+    cray-mpich:
+      require: '@8.1.32 +cuda'
+      buildable: true
+    cray-pals:
+      buildable: true
+    cray-pmi:
+      buildable: true
+    patchelf:
+      require: '@:0.17'
+    libfabric:
+      buildable: false
+      externals:
+        - spec: libfabric@1.15.2.0
+          prefix: /opt/cray/libfabric/1.15.2.0/
+    slurm:
+      buildable: false
+      externals:
+        - spec: slurm@23-02-6
+          prefix: /usr
+    egl:
+      buildable: false
+      externals:
+        - spec: egl@1.5
+          prefix: /usr
+    xpmem:
+      buildable: false
+      externals:
+        - spec: xpmem@2.9.6
+          prefix: /usr

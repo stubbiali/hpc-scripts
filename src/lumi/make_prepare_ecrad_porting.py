@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "solvers-cy49r1"
+BRANCH: str = "cy49r1s-pmap"
 # >>> config: end
 
 
@@ -25,6 +25,7 @@ def core(
     branch: str,
     env: defs.ProgrammingEnvironment,
     hdf5_version: str,
+    nco_version: str,
     netcdf_version: str,
     partition: defs.Partition,
     rocm_version: str,
@@ -58,30 +59,28 @@ def core(
         if partition_type == "gpu":
             utils.setup_hip(rocm_version)
 
-        # path to custom build of HDF5 and NetCDF-C
+        # path to custom build of HDF5, NetCDF-C and NCO
+        # note: NCO provides the utility ncks used in scripts/setup_optical_data.sh
         common.utils.export_variable(
-            "HDF5_ROOT", os.path.join(pwd, "hdf5", hdf5_version, "build", subtree)
+            "HDF5_ROOT", (hdf5_root := os.path.join(pwd, "hdf5", hdf5_version, "build", subtree))
         )
+        common.utils.export_variable("HDF5_DIR", hdf5_root)
         common.utils.export_variable(
-            "HDF5_DIR", os.path.join(pwd, "hdf5", hdf5_version, "build", subtree)
+            "NETCDF_ROOT",
+            (netcdf_root := os.path.join(pwd, "netcdf-c", netcdf_version, "build", subtree)),
         )
-        common.utils.export_variable(
-            "NETCDF_ROOT", os.path.join(pwd, "netcdf-c", netcdf_version, "build", subtree)
-        )
-        common.utils.export_variable(
-            "NETCDF4_DIR", os.path.join(pwd, "netcdf-c", netcdf_version, "build", subtree)
+        common.utils.export_variable("NETCDF4_DIR", netcdf_root)
+        common.utils.append_to_path(
+            "PATH", os.path.join(pwd, "nco", nco_version, "build", subtree, "bin")
         )
 
         # jump into project source directory
         with common.utils.chdir(ecrad_dir, restore=False):
             if not os.path.exists(venv_dir):
                 # create virtual environment if it does not exist yet
-                common.utils.run(f"python -m venv --prompt={subtree} {venv_dir}")
+                common.utils.run(f"uv venv --prompt={subtree} {venv_dir}")
                 common.utils.run(f"source {venv_dir}/bin/activate")
-                common.utils.run(f"pip install --upgrade pip setuptools wheel")
-                common.utils.run(
-                    f"CC=cc CXX=CC pip install -e .[dev,gpu-rocm6x,test] --no-cache-dir"
-                )
+                common.utils.run("uv pip install -e .[dev,gpu,test]")
             else:
                 # activate virtual environment
                 common.utils.run(f"source {venv_dir}/bin/activate")
@@ -94,6 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=defaults.ENV)
     parser.add_argument("--hdf5-version", type=str, default=defaults.HDF5_VERSION)
+    parser.add_argument("--nco-version", type=str, default=defaults.NCO_VERSION)
     parser.add_argument("--netcdf-version", type=str, default=defaults.NETCDF_VERSION)
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     parser.add_argument("--rocm-version", type=str, default=defaults.ROCM_VERSION)

@@ -98,3 +98,6 @@ export EBU_USER_PREFIX=$PROJECT/_easybuild
 # uv
 export UV_LINK_MODE=symlink
 eval "$(uv generate-shell-completion bash)"
+
+# spack
+export SPACK_USER_PREFIX=/project/project_465000527/nasu/spack

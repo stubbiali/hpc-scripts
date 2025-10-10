@@ -8,6 +8,7 @@ ACCOUNT: int = 465000527
 ENV: defs.ProgrammingEnvironment = "cray"
 GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 HDF5_VERSION: str = "1.14.4.3"
+NCO_VERSION: str = "5.3.4"
 NETCDF_VERSION: str = "4.9.2"
 PARTITION: defs.Partition = "standard-g"
 ROCM_VERSION: str = "6.0.3"

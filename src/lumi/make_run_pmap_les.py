@@ -77,52 +77,51 @@ def core(
 
         with common.utils.chdir("$PMAP"):
             common.utils.run(f". $PMAP_VENV/bin/activate")
-            with common.utils.chdir("drivers"):
-                common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
-                common.utils.export_variable(
-                    "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
-                )
-                common.utils.export_variable("GT_BACKEND", gt_backend)
-                common.utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
-                common.utils.export_variable("OMP_PLACES", "cores")
-                common.utils.export_variable("OMP_PROC_BIND", "close")
-                # common.utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
-                common.utils.export_variable("PMAP_DISABLE_LOG", int(pmap_disable_log))
-                common.utils.export_variable(
-                    "PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
-                )
-                common.utils.export_variable(
-                    "PMAP_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
-                )
-                common.utils.export_variable("PMAP_EXTENDED_TIMERS", int(pmap_extended_timers))
-                common.utils.export_variable("PMAP_PRECISION", pmap_precision)
-                if utils.get_partition_type(partition) == "gpu":
-                    common.utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
+            common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
+            common.utils.export_variable(
+                "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
+            )
+            common.utils.export_variable("GT_BACKEND", gt_backend)
+            common.utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
+            common.utils.export_variable("OMP_PLACES", "cores")
+            common.utils.export_variable("OMP_PROC_BIND", "close")
+            # common.utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
+            common.utils.export_variable("PMAP_DISABLE_LOG", int(pmap_disable_log))
+            common.utils.export_variable(
+                "PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
+            )
+            common.utils.export_variable(
+                "PMAP_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
+            )
+            common.utils.export_variable("PMAP_EXTENDED_TIMERS", int(pmap_extended_timers))
+            common.utils.export_variable("PMAP_PRECISION", pmap_precision)
+            if utils.get_partition_type(partition) == "gpu":
+                common.utils.export_variable("DACE_DEFAULT_BLOCK_SIZE", dace_default_block_size)
 
-                srun_options = utils.get_srun_options(
-                    num_nodes,
-                    num_tasks_per_node,
-                    num_threads_per_task,
-                    partition,
-                    gt_backend=gt_backend,
+            srun_options = utils.get_srun_options(
+                num_nodes,
+                num_tasks_per_node,
+                num_threads_per_task,
+                partition,
+                gt_backend=gt_backend,
+            )
+            if output_dir is not None:
+                output_dir = os.path.abspath(output_dir)
+            else:
+                output_dir = os.path.join(
+                    "_data", use_case, pmap_precision, gt_backend.replace(":", "")
                 )
-                if output_dir is not None:
-                    output_dir = os.path.abspath(output_dir)
-                else:
-                    output_dir = os.path.join(
-                        "$PWD", use_case, pmap_precision, gt_backend.replace(":", "")
-                    )
-                common.utils.run(f"mkdir -p {output_dir}")
-                command = (
-                    f"srun {' '.join(srun_options)} ./../../../select_gpu.sh python run_model.py "
-                    f"{os.path.join('../config', use_case + '.yml')} "
-                    f"--output-directory={output_dir}"
-                )
-                if pmap_enable_benchmarking:
-                    command += f" --write-profiling-data"
+            common.utils.run(f"mkdir -p {output_dir}")
+            command = (
+                f"srun {' '.join(srun_options)} ./../../select_gpu.sh pmap-les "
+                f"{os.path.join('config', use_case + '.yml')} "
+                f"--output-directory={output_dir}"
+            )
+            if pmap_enable_benchmarking:
+                command += f" --write-profiling-data"
 
-                for _ in range(num_runs):
-                    common.utils.run(command)
+            for _ in range(num_runs):
+                common.utils.run(command)
 
     return fname
 

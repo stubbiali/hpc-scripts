@@ -15,26 +15,26 @@ if TYPE_CHECKING:
 
 # >>> config: start
 ACCOUNT: int = defaults.ACCOUNT
-BRANCH: str = "solvers-cy49r1"
+BRANCH: str = "solvers-cy49r1-dev"
 DACE_DEFAULT_BLOCK_SIZE: str = "'256,1,1'"
 DRY_RUN: bool = False
 ECRAD_ENABLE_CHECKS: bool = True
 ECRAD_MODE: Literal["fortran", "gt4py"] = "gt4py"
-ECRAD_NUM_RUNS: int = 2
-ECRAD_PRECISION: list[defs.FloatingPointPrecision] = ["double"]
-ECRAD_STENCIL_NAME: list[str] = ["ecrad_ecckd_tripleclouds"]
+ECRAD_NUM_RUNS: int = 0
+ECRAD_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
+ECRAD_STENCIL_NAME: list[str] = ["solver_tripleclouds_lw", "solver_tripleclouds_sw"]
 ECRAD_STENCIL_VERSION: list[str] = ["cy49r1s"]
 ECRAD_VERBOSE: bool = True
 ENV: defs.ProgrammingEnvironment = "cray"
-GT_BACKEND: list[str] = ["dace:gpu"]
+GT_BACKEND: list[str] = ["gt:cpu_kfirst", "gt:gpu"]
 HDF5_VERSION: str = defaults.HDF5_VERSION
 NETCDF_VERSION: str = defaults.NETCDF_VERSION
-NUM_RUNS: int = 3
+NUM_RUNS: int = 1
 PARTITION: defs.Partition = "standard-g"
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
-TIME: str = "02:00:00"
+TIME: str = "05:00:00"
 # >>> config: end
 
 

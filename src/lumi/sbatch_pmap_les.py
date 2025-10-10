@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import common.utils
 import defaults
-import make_run_pmapl
+import make_run_pmap_les
 import sbatch
 
 if TYPE_CHECKING:
@@ -16,18 +16,18 @@ if TYPE_CHECKING:
 
 # >>> config: start
 ACCOUNT: int = defaults.ACCOUNT
-BRANCH: str = "benchmarking-lumi"
+BRANCH: str = "unified-interface"
 DACE_DEFAULT_BLOCK_SIZE: str = "'256,1,1'"
-DRY_RUN: bool = True
+DRY_RUN: bool = False
 ENV: defs.ProgrammingEnvironment = "cray"
 GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
 GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 GT_BACKEND: list[str] = ["gt:gpu"]
-JOB_ROOT_DIR: str = "bomex-prescribed-boundary"
+JOB_ROOT_DIR: str = "jobs/pmap-les/"
 HDF5_VERSION: str = defaults.HDF5_VERSION
 NETCDF_VERSION: str = defaults.NETCDF_VERSION
-NUM_RUNS: int = 10
+NUM_RUNS: int = 15
 PARTITION: defs.Partition = "standard-g"
 PMAP_DISABLE_LOG: bool = False
 PMAP_ENABLE_BENCHMARKING: bool = True
@@ -37,21 +37,21 @@ PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
-TIME: str = "00:45:00"
+TIME: str = "01:00:00"
 USE_CASE: dict[str, list[common.utils.ThreadsLayout]] = {
-    "weak-scaling/bomex-prescribed-boundary/4": [common.utils.ThreadsLayout(1, 1, 7)],
-    "weak-scaling/bomex-prescribed-boundary/8": [common.utils.ThreadsLayout(1, 2, 7)],
-    "weak-scaling/bomex-prescribed-boundary/16": [common.utils.ThreadsLayout(1, 4, 7)],
-    "weak-scaling/bomex-prescribed-boundary/32": [common.utils.ThreadsLayout(1, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/64": [common.utils.ThreadsLayout(2, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/128": [common.utils.ThreadsLayout(4, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/256": [common.utils.ThreadsLayout(8, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/512": [common.utils.ThreadsLayout(16, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/1024": [common.utils.ThreadsLayout(32, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/2048": [common.utils.ThreadsLayout(64, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/4096": [common.utils.ThreadsLayout(128, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/8192": [common.utils.ThreadsLayout(256, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/16384": [common.utils.ThreadsLayout(512, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/1": [common.utils.ThreadsLayout(1, 1, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/2": [common.utils.ThreadsLayout(1, 2, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/4": [common.utils.ThreadsLayout(1, 4, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/8": [common.utils.ThreadsLayout(1, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/16": [common.utils.ThreadsLayout(2, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/32": [common.utils.ThreadsLayout(4, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/64": [common.utils.ThreadsLayout(8, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/128": [common.utils.ThreadsLayout(16, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/256": [common.utils.ThreadsLayout(32, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/512": [common.utils.ThreadsLayout(64, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/lumi/1024": [common.utils.ThreadsLayout(128, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/2048": [common.utils.ThreadsLayout(256, 8, 7)],
+    # "weak-scaling/bomex-prescribed-boundary/lumi/4096": [common.utils.ThreadsLayout(512, 8, 7)],
 }
 # >>> config: end
 
@@ -73,7 +73,7 @@ def core():
                 job_name = (
                     f"{use_case.replace('/', '-')}-{threads_layout.num_tasks}-{pmap_precision[0]}"
                 )
-                job_script = make_run_pmapl.core(
+                job_script = make_run_pmap_les.core(
                     branch=BRANCH,
                     dace_default_block_size=DACE_DEFAULT_BLOCK_SIZE,
                     env=ENV,

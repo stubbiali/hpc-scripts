@@ -50,8 +50,6 @@ def core(
                 hdf5_include_dir = os.path.join(hdf5_root, "include")
                 hdf5_lib_dir = os.path.join(hdf5_root, "lib")
                 common.utils.run(
-                    "CC=cc",
-                    "CXX=CC",
                     f"CFLAGS='-fPIC -I{hdf5_include_dir}'",
                     f"CPPFLAGS='-fPIC -I{hdf5_include_dir}'",
                     f"LDFLAGS='-fPIC -L{hdf5_lib_dir}'",

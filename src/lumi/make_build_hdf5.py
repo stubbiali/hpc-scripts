@@ -46,9 +46,7 @@ def core(
                 )
                 common.utils.run(f"rm -rf {build_dir}")
                 common.utils.run(
-                    "CC=cc",
                     "CFLAGS='-fPIC'",
-                    "CXX=CC",
                     "CXXFLAGS='-fPIC'",
                     "FC=ftn",
                     "FCFLAGS='-fPIC'",
