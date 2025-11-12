@@ -96,6 +96,7 @@ export EBU_USER_PREFIX=$PROJECT/_easybuild
 # export PATH=$EBU_USER_PREFIX/SW/LUMI-24.03/G/CDO/2.4.3-cpeGNU-24.03/bin:$PATH
 
 # uv
+export UV_CACHE_DIR=$PROJECT/_uvcache
 export UV_LINK_MODE=symlink
 eval "$(uv generate-shell-completion bash)"
 
