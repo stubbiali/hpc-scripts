@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 # >>> config: start
 ACCOUNT: int = defaults.ACCOUNT
-BRANCH: str = "unified-interface"
+BRANCH: str = "main"
 DACE_DEFAULT_BLOCK_SIZE: str = "'256,1,1'"
 DRY_RUN: bool = False
 ENV: defs.ProgrammingEnvironment = "cray"
@@ -34,6 +34,7 @@ PMAP_ENABLE_BENCHMARKING: bool = True
 PMAP_ENABLE_OVERCOMPUTING: bool = True
 PMAP_EXTENDED_TIMERS: bool = False
 PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
+PROJECT_ROOT_DIR: str = "pmap-les"
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
@@ -94,6 +95,7 @@ def core():
                     pmap_enable_overcomputing=PMAP_ENABLE_OVERCOMPUTING,
                     pmap_extended_timers=PMAP_EXTENDED_TIMERS,
                     pmap_precision=pmap_precision,
+                    project_root_dir=PROJECT,
                     rocm_version=ROCM_VERSION,
                     stack=STACK,
                     stack_version=STACK_VERSION,

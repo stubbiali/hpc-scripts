@@ -30,6 +30,7 @@ PMAP_ENABLE_BENCHMARKING: bool = False
 PMAP_ENABLE_OVERCOMPUTING: bool = False
 PMAP_EXTENDED_TIMERS: bool = False
 PMAP_PRECISION: defs.FloatingPointPrecision = "double"
+PROJECT_ROOT_DIR: str = "pmap-les"
 USE_CASE: str = "thermal"
 # >>> config: end
 
@@ -55,6 +56,7 @@ def core(
     pmap_enable_overcomputing: bool,
     pmap_extended_timers: bool,
     pmap_precision: defs.FloatingPointPrecision,
+    project_root_dir: str,
     rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: str,
@@ -67,6 +69,7 @@ def core(
         hdf5_version,
         netcdf_version,
         partition,
+        project_root_dir,
         rocm_version,
         stack,
         stack_version,
@@ -78,18 +81,14 @@ def core(
         with common.utils.chdir("$PMAP"):
             common.utils.run(f". $PMAP_VENV/bin/activate")
             common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
-            common.utils.export_variable(
-                "GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics)
-            )
+            common.utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
             common.utils.export_variable("GT_BACKEND", gt_backend)
             common.utils.export_variable("OMP_NUM_THREADS", num_threads_per_task)
             common.utils.export_variable("OMP_PLACES", "cores")
             common.utils.export_variable("OMP_PROC_BIND", "close")
             # common.utils.export_variable("OMP_DISPLAY_AFFINITY", "True")
             common.utils.export_variable("PMAP_DISABLE_LOG", int(pmap_disable_log))
-            common.utils.export_variable(
-                "PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking)
-            )
+            common.utils.export_variable("PMAP_ENABLE_BENCHMARKING", int(pmap_enable_benchmarking))
             common.utils.export_variable(
                 "PMAP_ENABLE_OVERCOMPUTING", int(pmap_enable_overcomputing)
             )
@@ -149,6 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
     parser.add_argument("--pmap-extended-timers", type=bool, default=PMAP_EXTENDED_TIMERS)
     parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
+    parser.add_argument("--project-root-dir", type=str, default=PROJECT_ROOT_DIR)
     parser.add_argument("--rocm-version", type=str, default=defaults.ROCM_VERSION)
     parser.add_argument("--stack", type=str, default=defaults.STACK)
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)

@@ -18,7 +18,8 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "unified-interface"
+BRANCH: str = "main"
+PROJECT_ROOT_DIR: str = "pmap-les"
 # >>> config: end
 
 
@@ -29,6 +30,7 @@ def core(
     hdf5_version: str,
     netcdf_version: str,
     partition: defs.Partition,
+    project_root_dir: str,
     rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
@@ -43,7 +45,7 @@ def core(
 
         # set path to PMAP code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
-        pmap_dir = os.path.join(pwd, "pmap-les", branch)
+        pmap_dir = os.path.join(pwd, project_root_dir, branch)
         assert os.path.exists(pmap_dir)
         common.utils.export_variable("PMAP", pmap_dir)
         pmap_subtree = utils.get_subtree(
@@ -58,7 +60,7 @@ def core(
 
         # low-level GT4Py, DaCe and GHEX config
         subtree = utils.get_subtree(env, stack, stack_version)
-        gt_cache_root = os.path.join(pwd, "pmap-les", "_gtcache", subtree)
+        gt_cache_root = os.path.join(pwd, project_root_dir, "_gtcache", subtree)
         common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
@@ -110,6 +112,7 @@ if __name__ == "__main__":
     parser.add_argument("--hdf5-version", type=str, default=defaults.HDF5_VERSION)
     parser.add_argument("--netcdf-version", type=str, default=defaults.NETCDF_VERSION)
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)
+    parser.add_argument("--project-root-dir", type=str, default=PROJECT_ROOT_DIR)
     parser.add_argument("--rocm-version", type=str, default=defaults.ROCM_VERSION)
     parser.add_argument("--stack", type=str, default=defaults.STACK)
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
