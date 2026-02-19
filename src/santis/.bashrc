@@ -113,40 +113,12 @@ fi
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
-# activate spack env
-spack_branch=c4449cb201
-spack_root=/users/subbiali/spack/${spack_branch}
-source ${spack_root}/share/spack/setup-env.sh
-spack env activate ${spack_root}/_env/subbiali
+# add uenv-spack to the path
+export PATH=/users/subbiali/uenv-spack:$PATH
 
-# cdo
-spack load cdo
-cdo_root=$(spack location -i cdo)
-alias cdo='${cdo_root}/bin/cdo'
-
-# nvim
-spack load neovim
-vim_root=$(spack location -i neovim)
-alias vim='${vim_root}/bin/nvim'
-export EDITOR="${vim_root}"/bin/nvim
-export VIM="${vim_root}"/bin/nvim
-export VIMRUNTIME="${vim_root}"/share/nvim/runtime
-
-# # python 3.11
-# spack load python@3.11.11
-# py311_root=$(spack location -i python@3.11.11)
-# alias py311="$py311_root"/bin/python3
-# export PY311="$py311_root"/bin/python3
-
-# python 3.12
-spack load python@3.12.9
-py312_root=$(spack location -i python@3.12.9)
-alias py312="$py312_root"/bin/python3
-export PY312="$py312_root"/bin/python3
-
-# project
-# project_id=$(sacct --format=Account --noheader | head -n 1 | awk '{$1=$1}1')
-# export PROJECT=/project/"$project_id"/"$USER"
+# uv
+export UV_LINK_MODE=symlink
+eval "$(uv generate-shell-completion bash)"
 
 # slurm shortcuts and settings
 alias sb='sbatch'
