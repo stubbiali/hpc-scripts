@@ -1,50 +1,64 @@
 #!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
 
 import common
+import defaults
 import defs
 import utils
 
-
 # >>> config: start
-BRANCH: str = "unified-interface"
-PYTHON_VERSION: defs.PythonVersion = "3.11"
+BRANCH: str = "main"
 # >>> config: end
 
 
-def core(branch: str, python_version: defs.PythonVersion) -> str:
-    with common.utils.batch_file(filename="prepare_ecrad") as (_, fname):
-        # load spack env
-        utils.spack_activate_ecrad_env(python_version)
-        common.utils_spack.spack_load("boost")
-        common.utils_spack.spack_load("cmake")
-        common.utils_spack.spack_load("gcc")
-        common.utils_spack.spack_load("hdf5")
-        common.utils_spack.spack_load("netcdf-c")
-        common.utils_spack.spack_load("netcdf-fortran")
-        # common.utils_spack.spack_load(f"python@{python_version}")
-        # py = utils.load_python(python_version)
-
-        # set path to ecrad code
-        pwd = os.path.abspath(os.environ.get("SCRATCH", os.path.curdir))
-        ecrad_dir = os.path.join(pwd, "ecrad", branch)
-        assert os.path.exists(ecrad_dir)
-        common.utils.export_variable("ECRAD", ecrad_dir)
-
-        # add netcdf libs to linker and loader path
-        common.utils.run("netcdfc_root=$(spack location -i netcdf-c)")
-        common.utils.run("netcdff_root=$(spack location -i netcdf-fortran)")
-        common.utils.export_variable("LDFLAGS", "-L${netcdfc_root}/lib")
-        common.utils.export_variable(
-            "LD_LIBRARY_PATH",
-            "${netcdfc_root}/lib:${netcdff_root}/lib:$LD_LIBRARY_PATH",
+def core(
+    branch: str,
+    ghex_transport_backend: defs.GHEXTransportBackend,
+    python_version: defs.PythonVersion,
+    uenv: defs.UEnv,
+) -> str:
+    with common.utils.batch_file(filename="prepare_pmap_les") as (_, fname):
+        common.utils.run(
+            f". {defs.uenv_spack_builds_root}/"
+            f"{(uenv_with_dashes := uenv.replace('/', '-').replace(':', '-'))}/"
+            f"pmap-les/view/activate.sh"
         )
 
-        with common.utils.chdir(ecrad_dir, restore=False):
-            pass
+        utils.setup_mpi()
+        utils.setup_ghex(ghex_transport_backend)
+
+        pwd = os.path.abspath(os.environ.get("SCRATCH", os.path.curdir))
+        pmap_root = os.path.join(pwd, "pmap-les")
+        pmap_dir = os.path.join(pmap_root, branch)
+        assert os.path.exists(pmap_dir)
+        common.utils.export_variable("PMAP", pmap_dir)
+
+        common.utils.export_variable(
+            "GT_CACHE_ROOT",
+            (gt_cache_root := os.path.join(pmap_root, "_gtcache", uenv_with_dashes)),
+        )
+        # common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
+        common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+
+        with common.utils.chdir(pmap_dir, restore=False):
+            venv_dir = os.path.join(
+                pmap_dir, "_venv", uenv_with_dashes, f"py{python_version.replace('.', '')}"
+            )
+            common.utils.export_variable("PMAP_VENV", venv_dir)
+            if not os.path.exists(venv_dir):
+                utils.setup_uv(uenv)
+                common.utils.run(f"uv venv --python=$(which python{python_version}) {venv_dir}")
+                common.utils.run(f". {venv_dir}/bin/activate")
+                common.utils.run(
+                    f"uv pip install -e "
+                    f".[dev,gpu{'-cuda12x' if python_version < '3.14' else ''},mpi-test]"
+                )
+            else:
+                common.utils.run(f". {venv_dir}/bin/activate")
 
     return fname
 
@@ -52,6 +66,10 @@ def core(branch: str, python_version: defs.PythonVersion) -> str:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--python-version", type=str, default=PYTHON_VERSION)
+    parser.add_argument(
+        "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
+    )
+    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
+    parser.add_argument("--uenv", type=str, default=defaults.UENV)
     args = parser.parse_args()
     core(**args.__dict__)
