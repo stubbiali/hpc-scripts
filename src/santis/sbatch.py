@@ -17,13 +17,11 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-ACCOUNT: str = "c46"
 DRY_RUN: bool = False
 JOB_NAME: str = "test_job"
 JOB_SCRIPT: str = "test_job"
 NUM_NODES: int = 1
 NUM_TASKS_PER_NODE: int = 4
-PARTITION: defs.Partition = "normal"
 TIME: str = "01:00:00"
 # >>> config: end
 
@@ -37,6 +35,7 @@ def core(
     num_tasks_per_node: int,
     partition: defs.Partition,
     time: str,
+    uenv: Optional[defs.UEnv],
     callback_module: Optional[str] = None,
 ) -> None:
     if callback_module is not None:
@@ -60,8 +59,10 @@ def core(
                 f"--output={output}",
                 f"--partition={partition}",
                 f"--time={time}",
-                job_script,
             )
+            if uenv is not None:
+                command = (*command, f"--uenv={uenv}")
+            command = (*command, job_script)
             common.utils.run(*command, split=True)
 
     if not dry_run:
@@ -70,13 +71,14 @@ def core(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Submit a batch job.")
-    parser.add_argument("--account", type=int, default=ACCOUNT)
+    parser.add_argument("--account", type=int, default=defaults.ACCOUNT)
     parser.add_argument("--job-name", type=str, default=JOB_NAME)
     parser.add_argument("--job-script", type=str, default=JOB_SCRIPT)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
     parser.add_argument("--num-tasks-per-node", type=int, default=NUM_TASKS_PER_NODE)
-    parser.add_argument("--partition", type=str, default=PARTITION)
+    parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     parser.add_argument("--time", type=str, default=TIME)
+    parser.add_argument("--uenv", type=str, default=None)
     parser.add_argument("--callback-module", type=str, default=None)
     args = parser.parse_args()
     core(**args.__dict__)
