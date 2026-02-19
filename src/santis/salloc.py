@@ -6,6 +6,7 @@ import argparse
 from typing import TYPE_CHECKING
 
 import common
+import defaults
 
 if TYPE_CHECKING:
     import defs
