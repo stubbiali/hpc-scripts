@@ -1,13 +1,13 @@
 #!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 from typing import Literal
 
 import common.utils
 import defs
 import make_prepare_ecrad_porting
-
 
 # >>> config: start
 BRANCH: str = "solvers-cy49r1"

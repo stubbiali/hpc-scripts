@@ -1,12 +1,16 @@
 #!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
+from typing import TYPE_CHECKING
 
 import common
-import defs
 import utils
+
+if TYPE_CHECKING:
+    import defs
 
 
 # >>> config: start
@@ -39,8 +43,7 @@ def core(branch: str, python_version: defs.PythonVersion) -> str:
         common.utils.run("netcdff_root=$(spack location -i netcdf-fortran)")
         common.utils.export_variable("LDFLAGS", "-L${netcdfc_root}/lib")
         common.utils.export_variable(
-            "LD_LIBRARY_PATH",
-            "${netcdfc_root}/lib:${netcdff_root}/lib:$LD_LIBRARY_PATH",
+            "LD_LIBRARY_PATH", "${netcdfc_root}/lib:${netcdff_root}/lib:$LD_LIBRARY_PATH"
         )
 
         with common.utils.chdir(ecrad_dir, restore=False):

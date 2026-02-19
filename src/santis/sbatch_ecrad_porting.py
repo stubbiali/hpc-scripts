@@ -1,13 +1,16 @@
 #!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import itertools
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import common.utils
-import defs
 import make_run_ecrad_porting
 import sbatch
+
+if TYPE_CHECKING:
+    import defs
 
 
 # >>> config: start

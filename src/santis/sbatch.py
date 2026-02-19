@@ -1,16 +1,19 @@
 #!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import importlib
 import os
 from typing import TYPE_CHECKING
 
 import common.utils
-import defs
+import defaults
 
 if TYPE_CHECKING:
     from typing import Callable, Optional
+
+    import defs
 
 
 # >>> config: start
@@ -50,7 +53,7 @@ def core(
                 "sbatch",
                 f"--account={account}",
                 f"--error={error}",
-                f"--export=ALL",
+                "--export=ALL",
                 f"--job-name={job_name}",
                 f"--nodes={num_nodes}",
                 f"--ntasks-per-node={num_tasks_per_node}",

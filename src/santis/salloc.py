@@ -1,10 +1,15 @@
 #!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
+from typing import TYPE_CHECKING
 
 import common
-import defs
+import defaults
+
+if TYPE_CHECKING:
+    import defs
 
 
 # >>> config: start
@@ -20,7 +25,7 @@ def core(
     account: str, num_nodes: int, num_tasks_per_node: int, partition: defs.Partition, time: str
 ) -> None:
     command = [
-        f"salloc",
+        "salloc",
         f"--account={account}",
         f"--nodes={num_nodes}",
         f"--ntasks-per-node={num_tasks_per_node}",
