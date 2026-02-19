@@ -1,4 +1,4 @@
-#!/users/subbiali/spack/c4449cb201/opt/spack/linux-sles15-neoverse_v2/gcc-13.3.0/python-3.12.9-t554gwycoz72hebgyyp6am6btc6pfa4m/bin/python3.12
+#!/usr/bin/python3.11
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 import itertools
