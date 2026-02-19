@@ -1,0 +1,4 @@
+ipdb
+ipython
+pre-commit
+ruff==0.15.1
