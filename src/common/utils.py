@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import contextlib
 import dataclasses
 import os
@@ -51,8 +52,6 @@ def batch_file(filename: Optional[str] = None):
         if len(BATCH_DIRECTORY_REGISTRY) > 0:
             fname = os.path.abspath(os.path.join(BATCH_DIRECTORY_REGISTRY[-1], filename + ".sh"))
         else:
-            # os.makedirs("_tmp", exist_ok=True)
-            # fname = os.path.abspath(tempfile.mktemp(prefix=prefix + "_", suffix=".sh", dir="_tmp"))
             fname = os.path.abspath(filename + ".sh")
 
         try:
@@ -78,7 +77,7 @@ def run(*args: str, split: bool = False, verbose: bool = False) -> None:
     if len(BATCH_FILE_REGISTRY) > 0:
         BATCH_FILE_REGISTRY[-1].write(command + "\n")
     else:
-        subprocess.run(command, capture_output=False, shell=True)
+        subprocess.run(command, capture_output=False, check=True, shell=True)
 
 
 class InvalidArgumentError(Exception):
@@ -102,11 +101,11 @@ def check_argument(name, token, options):
 
 
 def export_variable(name: str, value: Any) -> None:
-    run(f"export {name}={str(value)}")
+    run(f"export {name}={value!s}")
 
 
 def append_to_path(path: str, value: Any) -> None:
-    run(f"{path}={str(value)}:${path}")
+    run(f"{path}={value!s}:${path}")
 
 
 @contextlib.contextmanager
