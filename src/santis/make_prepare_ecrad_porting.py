@@ -57,7 +57,7 @@ def core(branch: str, python_version: defs.PythonVersion, uenv: defs.UEnv) -> st
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--python", type=str, default=defaults.PYTHON_VERSION)
+    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
     parser.add_argument("--uenv", type=str, default=defaults.UENV)
     args = parser.parse_args()
     core(**args.__dict__)
