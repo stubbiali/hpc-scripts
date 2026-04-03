@@ -23,7 +23,7 @@ FloatingPointPrecision = typing.Literal["double", "single"]
 GHEXTransportBackend = typing.Literal["mpi", "libfabric"]
 valid_ghex_transport_backends = typing.get_args(GHEXTransportBackend)
 
-UEnv = typing.Literal["prgenv-gnu/24.11:v2", "prgenv-gnu/25.6:v2"]
+UEnv = typing.Literal["prgenv-gnu/24.11:v2", "prgenv-gnu/25.6:v2", "pregenv-gnu/25.11:v1"]
 valid_uenvs = typing.get_args(UEnv)
 
 uenv_spack_builds_root: str = os.path.join(user_project_dir, "uenv-spack-builds")
