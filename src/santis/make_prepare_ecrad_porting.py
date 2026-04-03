@@ -4,53 +4,52 @@ from __future__ import annotations
 
 import argparse
 import os
-from typing import TYPE_CHECKING
 
 import common
+import defaults
+import defs
 import utils
 
-if TYPE_CHECKING:
-    import defs
-
-
 # >>> config: start
-BRANCH: str = "solvers-cy49r1"
-PYTHON_VERSION: defs.PythonVersion = "3.11"
+BRANCH: str = "cy49r1s-pmap"
 # >>> config: end
 
 
-def core(branch: str, python_version: defs.PythonVersion) -> str:
+def core(branch: str, python_version: defs.PythonVersion, uenv: defs.UEnv) -> str:
     with common.utils.batch_file(filename="prepare_ecrad_porting") as (_, fname):
-        # load spack env
-        utils.spack_activate_ecrad_env(python_version)
-        common.utils_spack.spack_load("boost")
-        common.utils_spack.spack_load("cmake")
-        common.utils_spack.spack_load("cuda")
-        common.utils_spack.spack_load("gcc")
-        common.utils_spack.spack_load("hdf5")
-        common.utils_spack.spack_load("netcdf-c")
-        common.utils_spack.spack_load(f"python@{python_version}")
-        # py = utils.load_python(python_version)
+        common.utils.run(
+            f". {defs.uenv_spack_builds_root}/"
+            f"{(uenv_with_dashes := uenv.replace('/', '-').replace(':', '-'))}/"
+            f"ecrad/view/activate.sh"
+        )
 
         # set path to ecrad-porting code
-        pwd = os.path.abspath(os.environ.get("SCRATCH", os.path.curdir))
-        ecrad_dir = os.path.join(pwd, "ecrad-porting", branch)
+        ecrad_root = os.path.join(defs.scratch_dir, "ecrad-porting")
+        ecrad_dir = os.path.join(ecrad_root, branch)
         assert os.path.exists(ecrad_dir)
         common.utils.export_variable("ECRAD", ecrad_dir)
-        venv_dir = os.path.join(ecrad_dir, f"_venv/py{python_version.replace('.', '')}")
-        common.utils.export_variable("ECRAD_VENV", venv_dir)
 
-        # jump into project source directory
+        common.utils.export_variable(
+            "GT_CACHE_ROOT",
+            (gt_cache_root := os.path.join(ecrad_root, "_gtcache", uenv_with_dashes)),
+        )
+        # common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
+        common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+
         with common.utils.chdir(ecrad_dir, restore=False):
+            venv_dir = os.path.join(
+                ecrad_dir, "_venv", uenv_with_dashes, f"py{python_version.replace('.', '')}"
+            )
+            common.utils.export_variable("ECRAD_VENV", venv_dir)
             if not os.path.exists(venv_dir):
-                # create virtual environment if it does not exist yet
-                common.utils.run(f"python -m venv {venv_dir}")
-                common.utils.run(f"source {venv_dir}/bin/activate")
-                common.utils.run("pip install --upgrade pip setuptools wheel")
-                common.utils.run("pip install -e .[dev,gpu-cuda12x,test] --no-cache-dir")
+                utils.setup_uv(uenv)
+                common.utils.run(f"uv venv --python=$(which python{python_version}) {venv_dir}")
+                common.utils.run(f". {venv_dir}/bin/activate")
+                common.utils.run(
+                    f"uv pip install -e .[dev,gpu{'-cuda12x' if python_version < '3.14' else ''}]"
+                )
             else:
-                # activate virtual environment
-                common.utils.run(f"source {venv_dir}/bin/activate")
+                common.utils.run(f". {venv_dir}/bin/activate")
 
     return fname
 
@@ -58,6 +57,7 @@ def core(branch: str, python_version: defs.PythonVersion) -> str:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
-    parser.add_argument("--python-version", type=str, default=PYTHON_VERSION)
+    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
+    parser.add_argument("--uenv", type=str, default=defaults.UENV)
     args = parser.parse_args()
     core(**args.__dict__)
