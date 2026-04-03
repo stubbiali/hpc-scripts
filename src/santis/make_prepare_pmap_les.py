@@ -31,8 +31,7 @@ def core(
         utils.setup_mpi()
         utils.setup_ghex(ghex_transport_backend)
 
-        pwd = os.path.abspath(os.environ.get("SCRATCH", os.path.curdir))
-        pmap_root = os.path.join(pwd, "pmap-les")
+        pmap_root = os.path.join(defs.scratch_dir, "pmap-les")
         pmap_dir = os.path.join(pmap_root, branch)
         assert os.path.exists(pmap_dir)
         common.utils.export_variable("PMAP", pmap_dir)
