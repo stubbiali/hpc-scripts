@@ -124,7 +124,7 @@ if __name__ == "__main__":
     parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
     parser.add_argument("--pmap-extended-timers", type=bool, default=PMAP_EXTENDED_TIMERS)
     parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
-    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
+    parser.add_argument("--python", type=str, default=defaults.PYTHON_VERSION)
     parser.add_argument("--uenv", type=str, default=defaults.UENV)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()

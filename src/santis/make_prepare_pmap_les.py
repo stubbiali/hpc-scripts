@@ -68,7 +68,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
     )
-    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
+    parser.add_argument("--python", type=str, default=defaults.PYTHON_VERSION)
     parser.add_argument("--uenv", type=str, default=defaults.UENV)
     args = parser.parse_args()
     core(**args.__dict__)
