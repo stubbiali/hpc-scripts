@@ -1,0 +1,69 @@
+spack:
+  specs:
+    - gcc@13.4 # gt4py, ghex
+    - python@3.11 # gt4py
+    - py-pip
+    - boost
+    - cmake  # todo(tehrengruber): only for pmap-g right now
+    - py-cupy@13.1 cuda_arch=90 ^cuda@12.4+allow-unsupported-compilers ^nccl+cuda cuda_arch=90
+    - cray-mpich +cuda  # required for ghex
+    - py-mpi4py
+    - py-ghex +cuda
+    - py-netcdf4 +mpi
+    #- gdb
+    #- ghex@develop +cuda cuda_arch=90
+  #- gdb
+  # TODO: mpi4py?
+  repos:
+    software:
+      $spack/../spack_repo/software
+    alps:
+      $spack/../spack_repo/cluster/alps
+    builtin:
+      commit: f2db2dec4857d36749cdb368c5b0583503081509
+  # TODO: mpi4py?
+  view:
+    default:
+      root: views/default
+      # otherwise we might pull dependencies of the compiler itself which have been compiled with
+      # the system compiler and will collide
+      select: ["%[when=%c]c=gcc@13.4 %[when=%cxx]cxx=gcc@13.4"]
+  concretizer:
+    unify: true
+  packages:
+    mpi:
+      require: cray-mpich
+    # Cluster config from here: https://github.com/eth-cscs/alps-cluster-config/blob/master/todi/packages.yaml
+    # patchelf v0.18 leads to errors when it was used to set RPATHS
+    #   ELF load command address/offset not properly aligned
+    # c.f.  https://github.com/NixOS/patchelf/issues/492
+    cray-gtl:
+      buildable: true
+    cray-mpich:
+      buildable: true
+    cray-pals:
+      buildable: true
+    cray-pmi:
+      buildable: true
+    patchelf:
+      require: "@:0.17"
+    libfabric:
+      buildable: false
+      externals:
+      - spec: libfabric@1.15.2.0
+        prefix: /opt/cray/libfabric/1.15.2.0/
+    slurm:
+      buildable: false
+      externals:
+      - spec: slurm@23-02-6
+        prefix: /usr
+    egl:
+      buildable: false
+      externals:
+      - spec: egl@1.5
+        prefix: /usr
+    xpmem:
+      buildable: false
+      externals:
+      - spec: xpmem@2.9.6
+        prefix: /usr
