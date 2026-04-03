@@ -35,7 +35,7 @@ def load_python(version: defs.PythonVersion) -> str:
 def setup_uv(uenv: defs.UEnv) -> None:
     common.utils.export_variable(
         "UV_CACHE_DIR",
-        os.path.join(defs.project_dir, "_uvcache", uenv.replace("/", "-").replace(":", "-")),
+        os.path.join(defs.user_project_dir, "_uvcache", uenv.replace("/", "-").replace(":", "-")),
     )
 
 

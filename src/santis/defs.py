@@ -5,8 +5,10 @@ import typing
 Account = typing.Literal["c28", "c46"]
 Partition = typing.Literal["debug", "normal"]
 
-home_dir: str = os.environ.get("HOME", "/users/subbiali")
-project_dir: str = os.environ.get("PROJECT", "/capstor/store/cscs/pasc/c46/subbiali")
+user: str = os.environ.get("USER", "subbiali")
+home_dir: str = os.environ.get("HOME", f"/users/{user}")
+project_dir: str = os.environ.get("PROJECT", "/capstor/store/cscs/pasc/c46/")
+user_project_dir: str = os.path.join(project_dir, user)
 scratch_dir: str = os.environ.get("SCRATCH", "/capstor/scratch/cscs/subbiali")
 
 spack_root: str = "/users/subbiali/spack/08eaa297ea"
@@ -24,4 +26,4 @@ valid_ghex_transport_backends = typing.get_args(GHEXTransportBackend)
 UEnv = typing.Literal["prgenv-gnu/24.11:v2", "prgenv-gnu/25.6:v2"]
 valid_uenvs = typing.get_args(UEnv)
 
-uenv_spack_builds_root: str = os.path.join(project_dir, "subbiali/uenv-spack-builds")
+uenv_spack_builds_root: str = os.path.join(user_project_dir, "uenv-spack-builds")
