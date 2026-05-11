@@ -98,6 +98,7 @@ export EBU_USER_PREFIX=$PROJECT/_easybuild
 # uv
 export UV_CACHE_DIR=$PROJECT/_uvcache
 export UV_LINK_MODE=symlink
+export UV_PYTHON_INSTALL_DIR=$PROJECT/_uvpython
 eval "$(uv generate-shell-completion bash)"
 
 # spack
