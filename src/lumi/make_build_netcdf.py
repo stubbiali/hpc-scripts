@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
 from typing import TYPE_CHECKING
@@ -31,7 +32,7 @@ def core(
         root_dir = os.path.abspath(os.curdir)
         subtree = utils.get_subtree(env, stack, stack_version)
 
-        hdf5_root = os.path.join(root_dir, "hdf5", hdf5_version, "build", subtree)
+        hdf5_root = os.path.join(root_dir, "hdf5", hdf5_version, "install", subtree)
         common.utils.export_variable("HDF5_ROOT", hdf5_root)
 
         with common.utils.chdir(root_dir):
@@ -45,8 +46,8 @@ def core(
             with common.utils.chdir(f"netcdf-c/{version}"):
                 common.utils.run("autoupdate")
                 common.utils.run("autoreconf -if")
-                build_dir = os.path.join(root_dir, "netcdf-c", version, "build", subtree)
-                common.utils.run(f"rm -rf {build_dir}")
+                install_dir = os.path.join(root_dir, "netcdf-c", version, "install", subtree)
+                common.utils.run(f"rm -rf {install_dir}")
                 hdf5_include_dir = os.path.join(hdf5_root, "include")
                 hdf5_lib_dir = os.path.join(hdf5_root, "lib")
                 common.utils.run(
@@ -55,15 +56,15 @@ def core(
                     f"LDFLAGS='-fPIC -L{hdf5_lib_dir}'",
                     "LIBS=-ldl",
                     "./configure",
-                    f"--prefix={build_dir}",
+                    f"--prefix={install_dir}",
                     "--disable-libxml2",
                     "--disable-shared",
                     "--enable-parallel-tests",
                 )
                 common.utils.run("make -j 8 install")
 
-                common.utils.export_variable("NETCDF_ROOT", build_dir)
-                common.utils.export_variable("NETCDF4_DIR", build_dir)
+                common.utils.export_variable("NETCDF_ROOT", install_dir)
+                common.utils.export_variable("NETCDF4_DIR", install_dir)
 
 
 if __name__ == "__main__":
