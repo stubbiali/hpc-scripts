@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
 from typing import TYPE_CHECKING
@@ -34,7 +35,6 @@ def core(
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version, load_cdo=True)
         common.utils_module.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
-        partition_type = utils.get_partition_type(partition)
 
         # set path to ecrad code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))

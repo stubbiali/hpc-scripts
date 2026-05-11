@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import Literal, get_args
 
-
 FloatingPointPrecision = Literal["double", "single"]
 GHEXTransportBackend = Literal["libfabric", "mpi", "ucx"]
 Partition = Literal["dev-g", "small-g", "standard", "standard-g"]

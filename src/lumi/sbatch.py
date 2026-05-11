@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import importlib
 import os
@@ -50,10 +51,10 @@ def core(
             command = [
                 "sbatch",
                 f"--account=project_{account}",
-                f"--distribution=block:block",
+                "--distribution=block:block",
                 f"--error={error}",
                 "--exclusive",
-                f"--export=ALL",
+                "--export=ALL",
                 f"--job-name={job_name}",
                 f"--nodes={num_nodes}",
                 f"--ntasks-per-node={num_tasks_per_node}",
@@ -62,7 +63,7 @@ def core(
                 f"--time={time}",
             ]
             if utils.get_partition_type(partition) == "gpu":
-                command.append(f"--gpus-per-node=8")
+                command.append("--gpus-per-node=8")
             command.append(job_script)
             common.utils.run(*command, split=True)
 

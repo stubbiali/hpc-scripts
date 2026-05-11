@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
 from typing import TYPE_CHECKING
@@ -30,7 +31,7 @@ def core(
     stack_version: Optional[str],
     project: str = "cloudsc",
 ) -> str:
-    with common.utils.batch_file(filename="prepare_" + project) as (f, fname):
+    with common.utils.batch_file(filename="prepare_" + project) as (_, fname):
         # clear environment
         common.utils_module.module_reset()
 

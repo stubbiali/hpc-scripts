@@ -1,11 +1,11 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import common.utils
-import common.utils_module
 import defaults
 import make_prepare_ecrad_porting
 import utils
@@ -56,14 +56,7 @@ def core(
     stack_version: str,
 ) -> str:
     prepare_ecrad_fname = make_prepare_ecrad_porting.core(
-        branch,
-        env,
-        hdf5_version,
-        netcdf_version,
-        partition,
-        rocm_version,
-        stack,
-        stack_version,
+        branch, env, hdf5_version, netcdf_version, partition, rocm_version, stack, stack_version
     )
 
     with common.utils.batch_file(filename="run_ecrad_porting") as (_, fname):
@@ -85,7 +78,11 @@ def core(
                 partition,
                 gt_backend=gt_backend,
             )
-            ecrad_command = f"ecrad_{ecrad_mode} --name={ecrad_stencil_name} --version={ecrad_stencil_version} --precision={ecrad_precision} --num-runs={ecrad_num_runs} {'--verbose ' if ecrad_verbose else ''}"
+            ecrad_command = (
+                f"ecrad_{ecrad_mode} --name={ecrad_stencil_name} "
+                f"--version={ecrad_stencil_version} --precision={ecrad_precision} "
+                f"--num-runs={ecrad_num_runs} {'--verbose ' if ecrad_verbose else ''}"
+            )
             if ecrad_mode == "gt4py":
                 ecrad_command += (
                     f"--backend={gt_backend} {'--enable-checks' if ecrad_enable_checks else ''}"

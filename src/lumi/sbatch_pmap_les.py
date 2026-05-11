@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import itertools
 import os
 from typing import TYPE_CHECKING
@@ -50,7 +51,7 @@ USE_CASE: dict[str, list[common.utils.ThreadsLayout]] = {
     # "weak-scaling/bomex-prescribed-boundary/lumi/128": [common.utils.ThreadsLayout(16, 8, 7)],
     # "weak-scaling/bomex-prescribed-boundary/lumi/256": [common.utils.ThreadsLayout(32, 8, 7)],
     # "weak-scaling/bomex-prescribed-boundary/lumi/512": [common.utils.ThreadsLayout(64, 8, 7)],
-    "weak-scaling/bomex-prescribed-boundary/lumi/1024": [common.utils.ThreadsLayout(128, 8, 7)],
+    "weak-scaling/bomex-prescribed-boundary/lumi/1024": [common.utils.ThreadsLayout(128, 8, 7)]
     # "weak-scaling/bomex-prescribed-boundary/lumi/2048": [common.utils.ThreadsLayout(256, 8, 7)],
     # "weak-scaling/bomex-prescribed-boundary/lumi/4096": [common.utils.ThreadsLayout(512, 8, 7)],
 }
@@ -95,7 +96,7 @@ def core():
                     pmap_enable_overcomputing=PMAP_ENABLE_OVERCOMPUTING,
                     pmap_extended_timers=PMAP_EXTENDED_TIMERS,
                     pmap_precision=pmap_precision,
-                    project_root_dir=PROJECT,
+                    project_root_dir=PROJECT_ROOT_DIR,
                     rocm_version=ROCM_VERSION,
                     stack=STACK,
                     stack_version=STACK_VERSION,

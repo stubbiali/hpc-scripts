@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 from typing import TYPE_CHECKING
 
@@ -23,7 +24,7 @@ def core(
     account: int, num_nodes: int, num_tasks_per_node: int, partition: defs.Partition, time: str
 ) -> None:
     command = [
-        f"salloc",
+        "salloc",
         f"--account=project_{account}",
         "--exclusive",
         f"--nodes={num_nodes}",

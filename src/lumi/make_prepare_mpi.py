@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 from typing import TYPE_CHECKING
 
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def core(ghex_transport_backend: defs.GHEXTransportBackend, partition: defs.Partition) -> str:
-    with common.utils.batch_file(filename="prepare_mpi") as (f, fname):
+    with common.utils.batch_file(filename="prepare_mpi") as (_, fname):
         # common.utils.export_variable("MPICH_CRAY_OPT_THREAD_SYNC", 1)
         # common.utils.export_variable("MPICH_GNI_USE_UNASSIGNED_CPUS", "enabled")
         # common.utils.export_variable("MPICH_NEMESIS_ASYNC_PROGRESS", "MC")

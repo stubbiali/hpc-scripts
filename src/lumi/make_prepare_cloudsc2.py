@@ -1,11 +1,11 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 
 import defaults
 import make_prepare_cloudsc
-
 
 # >>> config: start
 BRANCH: str = "gt4py"

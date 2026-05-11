@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from . import utils
@@ -27,4 +28,4 @@ def spack_load(
 
 
 def spack_unload() -> None:
-    utils.run(f"spack unload --all")
+    utils.run("spack unload --all")

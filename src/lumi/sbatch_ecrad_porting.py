@@ -1,8 +1,9 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import itertools
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import common.utils
 import defaults
@@ -42,14 +43,20 @@ def core():
     for ecrad_precision, ecrad_stencil_name, ecrad_stencil_version, gt_backend in itertools.product(
         ECRAD_PRECISION, ECRAD_STENCIL_NAME, ECRAD_STENCIL_VERSION, GT_BACKEND
     ):
-        job_dir = f"ecrad-porting/{BRANCH}/_jobs/{PARTITION}/{ECRAD_MODE}/{ecrad_stencil_version}/{ecrad_stencil_name}/"
+        job_dir = (
+            f"ecrad-porting/{BRANCH}/_jobs/{PARTITION}/{ECRAD_MODE}/{ecrad_stencil_version}/"
+            f"{ecrad_stencil_name}/"
+        )
         job_dir += (
             f"{ecrad_precision}"
             if ECRAD_MODE == "fortran"
             else f"{gt_backend.replace(':', '')}/{ecrad_precision}"
         )
         with common.utils.batch_directory(path=job_dir):
-            job_name = f"ecrad_{ECRAD_MODE}-{ecrad_stencil_name}-{ecrad_stencil_version}-{gt_backend}-{ecrad_precision[0]}"
+            job_name = (
+                f"ecrad_{ECRAD_MODE}-{ecrad_stencil_name}-{ecrad_stencil_version}-"
+                f"{gt_backend}-{ecrad_precision[0]}"
+            )
             job_script = make_run_ecrad_porting.core(
                 branch=BRANCH,
                 dace_default_block_size=DACE_DEFAULT_BLOCK_SIZE,

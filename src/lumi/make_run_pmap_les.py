@@ -1,12 +1,12 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
 from typing import TYPE_CHECKING
 
 import common.utils
-import common.utils_module
 import defaults
 import make_prepare_pmap_les
 import utils
@@ -75,11 +75,11 @@ def core(
         stack_version,
     )
 
-    with common.utils.batch_file(filename="run_pmap_les") as (f, fname):
+    with common.utils.batch_file(filename="run_pmap_les") as (_, fname):
         common.utils.run(f". {prepare_pmap_les_fname}")
 
         with common.utils.chdir("$PMAP"):
-            common.utils.run(f". $PMAP_VENV/bin/activate")
+            common.utils.run(". $PMAP_VENV/bin/activate")
             common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
             common.utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
             common.utils.export_variable("GT_BACKEND", gt_backend)
@@ -117,7 +117,7 @@ def core(
                 f"--output-directory={output_dir}"
             )
             if pmap_enable_benchmarking:
-                command += f" --write-profiling-data"
+                command += " --write-profiling-data"
 
             for _ in range(num_runs):
                 common.utils.run(command)
