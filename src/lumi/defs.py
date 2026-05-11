@@ -11,10 +11,12 @@ PartitionType: dict[Partition, Literal["gpu", "host"]] = {
     "standard-g": "gpu",
 }
 ProgrammingEnvironment = Literal["amd", "aocc", "cray", "gnu"]
+PythonVersion = Literal["cray-python", "3.10", "3.11", "3.12", "3.12.0", "3.13"]
 SoftwareStack = Literal["cray", "lumi"]
 
 valid_ghex_transport_backends = get_args(GHEXTransportBackend)
 valid_programming_environments = get_args(ProgrammingEnvironment)
 valid_partitions = get_args(Partition)
 valid_partition_types = set(PartitionType.values())
+valid_python_versions = get_args(PythonVersion)
 valid_software_stacks = get_args(SoftwareStack)
