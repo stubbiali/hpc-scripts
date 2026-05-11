@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING
 
@@ -67,10 +68,21 @@ def setup_env(
     return cpe
 
 
+def load_python(python_version: defs.PythonVersion) -> str:
+    with common.utils.check_argument("python_version", python_version, defs.valid_python_versions):
+        if python_version == "cray-python":
+            common.utils_module.module_load("cray-python")
+            return "python"
+        else:
+            # uv-installed python interpreters do not need to be loaded
+            return "python" + python_version
+
+
 def get_subtree(
     env: defs.ProgrammingEnvironment,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
+    python_version: Optional[defs.PythonVersion] = None,
     ghex_transport_backend: Optional[defs.GHEXTransportBackend] = None,
     rocm_version: Optional[str] = None,
 ) -> str:
@@ -80,6 +92,16 @@ def get_subtree(
                 stack + ("-" + stack_version if stack_version else ""),
                 env + ("-" + stack_version if stack_version else ""),
             )
+
+            if python_version is not None:
+                with common.utils.check_argument(
+                    "python_version", python_version, defs.valid_python_versions
+                ):
+                    if python_version == "cray-python":
+                        subtree = os.path.join(subtree, python_version)
+                    else:
+                        subtree = os.path.join(subtree, "py" + python_version.replace(".", ""))
+
             if ghex_transport_backend is not None:
                 with common.utils.check_argument(
                     "ghex_transport_backend",
@@ -87,8 +109,10 @@ def get_subtree(
                     defs.valid_ghex_transport_backends,
                 ):
                     subtree = os.path.join(subtree, ghex_transport_backend)
+
             if rocm_version is not None:
                 subtree = os.path.join(subtree, "rocm-" + rocm_version)
+
             return subtree
 
 
