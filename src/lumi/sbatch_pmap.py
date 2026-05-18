@@ -8,10 +8,12 @@ from typing import TYPE_CHECKING
 
 import common.utils
 import defaults
-import make_run_pmap_les
+import make_run_pmap
 import sbatch
 
 if TYPE_CHECKING:
+    from typing import Literal
+
     import defs
 
 
@@ -35,7 +37,7 @@ PMAP_ENABLE_BENCHMARKING: bool = True
 PMAP_ENABLE_OVERCOMPUTING: bool = True
 PMAP_EXTENDED_TIMERS: bool = False
 PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
-PROJECT_ROOT_DIR: str = "pmap-les"
+PROJECT: Literal["pmap", "pmap-les-real-cases-shared"] = "pmap"
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
@@ -75,7 +77,7 @@ def core():
                 job_name = (
                     f"{use_case.replace('/', '-')}-{threads_layout.num_tasks}-{pmap_precision[0]}"
                 )
-                job_script = make_run_pmap_les.core(
+                job_script = make_run_pmap.core(
                     branch=BRANCH,
                     dace_default_block_size=DACE_DEFAULT_BLOCK_SIZE,
                     env=ENV,
@@ -96,7 +98,7 @@ def core():
                     pmap_enable_overcomputing=PMAP_ENABLE_OVERCOMPUTING,
                     pmap_extended_timers=PMAP_EXTENDED_TIMERS,
                     pmap_precision=pmap_precision,
-                    project_root_dir=PROJECT_ROOT_DIR,
+                    project=PROJECT,
                     rocm_version=ROCM_VERSION,
                     stack=STACK,
                     stack_version=STACK_VERSION,
