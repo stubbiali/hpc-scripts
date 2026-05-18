@@ -1,6 +1,7 @@
 #!/opt/cray/pe/python/3.11.7/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+
 import argparse
 import os
 from typing import TYPE_CHECKING
@@ -12,14 +13,14 @@ import make_prepare_mpi
 import utils
 
 if TYPE_CHECKING:
-    from typing import Optional
+    from typing import Literal, Optional
 
     import defs
 
 
 # >>> config: start
 BRANCH: str = "main"
-PROJECT_ROOT_DIR: str = "pmap-les"
+PROJECT: Literal["pmap", "pmap-les-real-cases-shared"] = "pmap"
 # >>> config: end
 
 
@@ -30,37 +31,39 @@ def core(
     hdf5_version: str,
     netcdf_version: str,
     partition: defs.Partition,
-    project_root_dir: str,
+    project: str,
+    python_version: defs.PythonVersion,
     rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
 ) -> tuple[str, str]:
-    with common.utils.batch_file(filename="prepare_pmap_les") as (f, fname):
+    with common.utils.batch_file(filename=f"prepare_{project}") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version)
-        common.utils_module.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
+        common.utils_module.module_load(f"Boost/1.88.0-{cpe}", "buildtools")
+        python = utils.load_python(python_version)
         partition_type = utils.get_partition_type(partition)
         if partition_type == "gpu":
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
         # set path to PMAP code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
-        pmap_dir = os.path.join(pwd, project_root_dir, branch)
+        pmap_dir = os.path.join(pwd, project, branch)
         assert os.path.exists(pmap_dir)
-        common.utils.export_variable("PMAP", pmap_dir)
+        common.utils.export_variable(project.upper(), pmap_dir)
         pmap_subtree = utils.get_subtree(
             env,
             stack,
             stack_version,
+            python_version,
             ghex_transport_backend=ghex_transport_backend,
             rocm_version=rocm_version if partition_type == "gpu" else None,
         )
         pmap_venv_dir = os.path.join(pmap_dir, "_venv", pmap_subtree)
-        common.utils.export_variable("PMAP_VENV", pmap_venv_dir)
+        common.utils.export_variable(f"{project.upper()}_VENV", pmap_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        subtree = utils.get_subtree(env, stack, stack_version)
-        gt_cache_root = os.path.join(pwd, project_root_dir, "_gtcache", subtree)
+        gt_cache_root = os.path.join(pwd, project, "_gtcache", pmap_subtree)
         common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
@@ -75,24 +78,27 @@ def core(
         common.utils.run(f". {prepare_mpi_fname}")
 
         # path to custom build of HDF5 and NetCDF-C
+        subtree = utils.get_subtree(env, stack, stack_version)
         common.utils.export_variable(
-            "HDF5_ROOT", os.path.join(pwd, "hdf5", hdf5_version, "build", subtree)
+            "HDF5_ROOT", os.path.join(pwd, "hdf5", hdf5_version, "install", subtree)
         )
         common.utils.export_variable(
-            "HDF5_DIR", os.path.join(pwd, "hdf5", hdf5_version, "build", subtree)
+            "HDF5_DIR", os.path.join(pwd, "hdf5", hdf5_version, "install", subtree)
         )
         common.utils.export_variable(
-            "NETCDF_ROOT", os.path.join(pwd, "netcdf-c", netcdf_version, "build", subtree)
+            "NETCDF_ROOT", os.path.join(pwd, "netcdf-c", netcdf_version, "install", subtree)
         )
         common.utils.export_variable(
-            "NETCDF4_DIR", os.path.join(pwd, "netcdf-c", netcdf_version, "build", subtree)
+            "NETCDF4_DIR", os.path.join(pwd, "netcdf-c", netcdf_version, "install", subtree)
         )
 
         # jump into project source directory
         with common.utils.chdir(pmap_dir, restore=False):
             if not os.path.exists(pmap_venv_dir):
                 # create virtual environment if it does not exist yet
-                common.utils.run(f"uv venv --python=python --prompt={pmap_subtree} {pmap_venv_dir}")
+                common.utils.run(
+                    f"uv venv --python={python} --prompt={pmap_subtree} {pmap_venv_dir}"
+                )
                 common.utils.run(f"source {pmap_venv_dir}/bin/activate")
                 common.utils.run("uv pip install -e .[dev,gpu,mpi-test]")
             else:
@@ -112,7 +118,8 @@ if __name__ == "__main__":
     parser.add_argument("--hdf5-version", type=str, default=defaults.HDF5_VERSION)
     parser.add_argument("--netcdf-version", type=str, default=defaults.NETCDF_VERSION)
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)
-    parser.add_argument("--project-root-dir", type=str, default=PROJECT_ROOT_DIR)
+    parser.add_argument("--project", type=str, default=PROJECT)
+    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
     parser.add_argument("--rocm-version", type=str, default=defaults.ROCM_VERSION)
     parser.add_argument("--stack", type=str, default=defaults.STACK)
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
