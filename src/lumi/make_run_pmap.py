@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import argparse
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import common.utils
 import defaults
-import make_prepare_pmap_les
+import make_prepare_pmap
 import utils
 
 if TYPE_CHECKING:
@@ -30,7 +30,7 @@ PMAP_ENABLE_BENCHMARKING: bool = False
 PMAP_ENABLE_OVERCOMPUTING: bool = False
 PMAP_EXTENDED_TIMERS: bool = False
 PMAP_PRECISION: defs.FloatingPointPrecision = "double"
-PROJECT_ROOT_DIR: str = "pmap-les"
+PROJECT: Literal["pmap", "pmap-les-real-cases-shared"] = "pmap"
 USE_CASE: str = "thermal"
 # >>> config: end
 
@@ -56,30 +56,30 @@ def core(
     pmap_enable_overcomputing: bool,
     pmap_extended_timers: bool,
     pmap_precision: defs.FloatingPointPrecision,
-    project_root_dir: str,
+    project: str,
     rocm_version: str,
     stack: defs.SoftwareStack,
     stack_version: str,
     use_case: str,
 ) -> str:
-    prepare_pmap_les_fname = make_prepare_pmap_les.core(
+    prepare_pmap_fname = make_prepare_pmap.core(
         branch,
         env,
         ghex_transport_backend,
         hdf5_version,
         netcdf_version,
         partition,
-        project_root_dir,
+        project,
         rocm_version,
         stack,
         stack_version,
     )
 
-    with common.utils.batch_file(filename="run_pmap_les") as (_, fname):
-        common.utils.run(f". {prepare_pmap_les_fname}")
+    with common.utils.batch_file(filename=f"run_{project}") as (_, fname):
+        common.utils.run(f". {prepare_pmap_fname}")
 
-        with common.utils.chdir("$PMAP"):
-            common.utils.run(". $PMAP_VENV/bin/activate")
+        with common.utils.chdir(f"${project.upper()}"):
+            common.utils.run(f". ${project.upper()}_VENV/bin/activate")
             common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
             common.utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
             common.utils.export_variable("GT_BACKEND", gt_backend)
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--pmap-enable-overcomputing", type=bool, default=PMAP_ENABLE_OVERCOMPUTING)
     parser.add_argument("--pmap-extended-timers", type=bool, default=PMAP_EXTENDED_TIMERS)
     parser.add_argument("--pmap-precision", type=str, default=PMAP_PRECISION)
-    parser.add_argument("--project-root-dir", type=str, default=PROJECT_ROOT_DIR)
+    parser.add_argument("--project", type=str, default=PROJECT)
     parser.add_argument("--rocm-version", type=str, default=defaults.ROCM_VERSION)
     parser.add_argument("--stack", type=str, default=defaults.STACK)
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
