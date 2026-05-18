@@ -37,9 +37,8 @@ def core(
 
         # load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version)
-        common.utils_module.module_load(
-            f"Boost/1.83.0-{cpe}", "buildtools", "cray-hdf5", "cray-python", "git"
-        )
+        common.utils_module.module_load("buildtools", "cray-hdf5", "cray-python", "git")
+        utils.load_boost(cpe, stack_version)
         partition_type = utils.get_partition_type(partition)
         if partition_type == "gpu":
             common.utils_module.module_load(f"rocm/{rocm_version}")

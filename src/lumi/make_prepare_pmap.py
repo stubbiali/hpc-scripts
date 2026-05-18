@@ -40,7 +40,8 @@ def core(
     with common.utils.batch_file(filename=f"prepare_{project}") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version)
-        common.utils_module.module_load(f"Boost/1.88.0-{cpe}", "buildtools")
+        common.utils_module.module_load("buildtools")
+        utils.load_boost(cpe, stack_version)
         python = utils.load_python(python_version)
         partition_type = utils.get_partition_type(partition)
         if partition_type == "gpu":

@@ -34,7 +34,8 @@ def core(
     with common.utils.batch_file(filename="prepare_ecrad") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version, load_cdo=True)
-        common.utils_module.module_load(f"Boost/1.83.0-{cpe}", "buildtools", "cray-python")
+        common.utils_module.module_load("buildtools", "cray-python")
+        utils.load_boost(cpe, stack_version)
 
         # set path to ecrad code
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))

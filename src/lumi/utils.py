@@ -47,6 +47,17 @@ def load_cpe(env: defs.ProgrammingEnvironment, stack_version: Optional[str]) -> 
         return cpe
 
 
+def load_boost(cpe: str, stack_version: str) -> None:
+    if stack_version == "24.03":
+        boost_version = "1.83.0"
+    elif stack_version == "25.03":
+        boost_version = "1.88.0"
+    else:
+        raise RuntimeError(f"Cannot determine boost version for {stack_version=}.")
+
+    common.utils_module.module_load(f"Boost/{boost_version}-{cpe}")
+
+
 def setup_env(
     env: defs.ProgrammingEnvironment,
     partition: defs.Partition,
