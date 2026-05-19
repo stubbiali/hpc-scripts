@@ -39,7 +39,8 @@ def core(
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
 ) -> tuple[str, str]:
-    with common.utils.batch_file(filename=f"prepare_{project}") as (_, fname):
+    project_with_underscores = project.replace("-", "_")
+    with common.utils.batch_file(filename=f"prepare_{project_with_underscores}") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load("buildtools")
@@ -53,7 +54,7 @@ def core(
         pwd = os.path.abspath(os.environ.get("PROJECT", os.path.curdir))
         pmap_dir = os.path.join(pwd, project, branch)
         assert os.path.exists(pmap_dir)
-        common.utils.export_variable(project.upper(), pmap_dir)
+        common.utils.export_variable(project_with_underscores.upper(), pmap_dir)
         pmap_subtree = utils.get_subtree(
             env,
             stack,
@@ -63,7 +64,7 @@ def core(
             rocm_version=rocm_version if partition_type == "gpu" else None,
         )
         pmap_venv_dir = os.path.join(pmap_dir, "_venv", pmap_subtree)
-        common.utils.export_variable(f"{project.upper()}_VENV", pmap_venv_dir)
+        common.utils.export_variable(f"{project_with_underscores.upper()}_VENV", pmap_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
         gt_cache_root = os.path.join(pwd, project, "_gtcache", pmap_subtree)

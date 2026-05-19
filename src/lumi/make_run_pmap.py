@@ -75,11 +75,12 @@ def core(
         stack_version,
     )
 
-    with common.utils.batch_file(filename=f"run_{project}") as (_, fname):
+    project_with_underscores = project.replace("-", "_")
+    with common.utils.batch_file(filename=f"run_{project_with_underscores}") as (_, fname):
         common.utils.run(f". {prepare_pmap_fname}")
 
-        with common.utils.chdir(f"${project.upper()}"):
-            common.utils.run(f". ${project.upper()}_VENV/bin/activate")
+        with common.utils.chdir(f"${project_with_underscores.upper()}"):
+            common.utils.run(f". ${project_with_underscores.upper()}_VENV/bin/activate")
             common.utils.export_variable("GHEX_AGGREGATE_FIELDS", int(ghex_aggregate_fields))
             common.utils.export_variable("GHEX_COLLECT_STATISTICS", int(ghex_collect_statistics))
             common.utils.export_variable("GT_BACKEND", gt_backend)
