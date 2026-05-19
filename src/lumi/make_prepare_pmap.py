@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING
 import common.utils
 import common.utils_module
 import defaults
+import make_build_hdf5
+import make_build_netcdf
 import make_prepare_mpi
 import utils
 
@@ -81,20 +83,9 @@ def core(
         prepare_mpi_fname = make_prepare_mpi.core(ghex_transport_backend, partition)
         common.utils.run(f". {prepare_mpi_fname}")
 
-        # path to custom build of HDF5 and NetCDF-C
-        subtree = utils.get_subtree(env, stack, stack_version)
-        common.utils.export_variable(
-            "HDF5_ROOT", os.path.join(pwd, "hdf5", hdf5_version, "install", subtree)
-        )
-        common.utils.export_variable(
-            "HDF5_DIR", os.path.join(pwd, "hdf5", hdf5_version, "install", subtree)
-        )
-        common.utils.export_variable(
-            "NETCDF_ROOT", os.path.join(pwd, "netcdf-c", netcdf_version, "install", subtree)
-        )
-        common.utils.export_variable(
-            "NETCDF4_DIR", os.path.join(pwd, "netcdf-c", netcdf_version, "install", subtree)
-        )
+        # configure HDF5 and NetCDF-C
+        make_build_hdf5.setup(env, stack, stack_version, hdf5_version)
+        make_build_netcdf.setup(env, stack, stack_version, hdf5_version, netcdf_version)
 
         # jump into project source directory
         with common.utils.chdir(pmap_dir, restore=False):

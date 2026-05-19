@@ -9,12 +9,43 @@ from typing import TYPE_CHECKING
 import common.utils
 import common.utils_module
 import defaults
+import make_build_hdf5
 import utils
 
 if TYPE_CHECKING:
     from typing import Optional
 
     import defs
+
+
+def _get_dir(root_dir: str, version: str) -> str:
+    return os.path.join(root_dir, f"netcdf-c/{version}")
+
+
+def _get_install_dir(netcdf_dir: str, subtree: str, hdf5_version) -> str:
+    return os.path.join(netcdf_dir, "install", subtree, f"hdf5-{hdf5_version}")
+
+
+def _setup(install_dir: str) -> None:
+    common.utils.export_variable("NETCDF_ROOT", install_dir)
+    common.utils.export_variable("NETCDF_DIR", install_dir)
+    common.utils.export_variable("NETCDF4_DIR", install_dir)
+
+
+def setup(
+    env: defs.ProgrammingEnvironment,
+    stack: defs.SoftwareStack,
+    stack_version: Optional[str],
+    hdf5_version: str,
+    version: str,
+) -> None:
+    _setup(
+        install_dir=_get_install_dir(
+            netcdf_dir=_get_dir(root_dir=make_build_hdf5.get_root_dir(), version=version),
+            subtree=utils.get_subtree(env, stack, stack_version),
+            hdf5_version=hdf5_version,
+        )
+    )
 
 
 def core(
@@ -29,7 +60,7 @@ def core(
         utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load("buildtools")
 
-        root_dir = os.path.abspath(os.curdir)
+        root_dir = make_build_hdf5.get_root_dir()
         subtree = utils.get_subtree(env, stack, stack_version)
 
         hdf5_root = os.path.join(root_dir, "hdf5", hdf5_version, "install", subtree)
@@ -46,14 +77,16 @@ def core(
             with common.utils.chdir(f"netcdf-c/{version}"):
                 common.utils.run("autoupdate")
                 common.utils.run("autoreconf -if")
-                install_dir = os.path.join(root_dir, "netcdf-c", version, "install", subtree)
+                install_dir = os.path.join(
+                    root_dir, "netcdf-c", version, "install", subtree, f"hdf5-{hdf5_version}"
+                )
                 common.utils.run(f"rm -rf {install_dir}")
                 hdf5_include_dir = os.path.join(hdf5_root, "include")
                 hdf5_lib_dir = os.path.join(hdf5_root, "lib")
                 common.utils.run(
                     f"CFLAGS='-fPIC -I{hdf5_include_dir}'",
                     f"CPPFLAGS='-fPIC -I{hdf5_include_dir}'",
-                    f"LDFLAGS='-fPIC -L{hdf5_lib_dir}'",
+                    f"LDFLAGS='-fPIC -L{hdf5_lib_dir} -lhdf5'",
                     "LIBS=-ldl",
                     "./configure",
                     f"--prefix={install_dir}",

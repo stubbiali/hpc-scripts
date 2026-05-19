@@ -17,6 +17,56 @@ if TYPE_CHECKING:
     import defs
 
 
+def _get_dir(root_dir: str, version: str) -> str:
+    return os.path.join(root_dir, f"hdf5/{version}")
+
+
+def _get_build_dir(hdf5_dir: str, subtree: str) -> str:
+    return os.path.join(hdf5_dir, "build", subtree)
+
+
+def _get_install_dir(hdf5_dir: str, subtree: str) -> str:
+    return os.path.join(hdf5_dir, "install", subtree)
+
+
+def _setup(install_dir: str) -> None:
+    common.utils.export_variable("HDF5_ROOT", install_dir)
+    common.utils.export_variable("HDF5_DIR", install_dir)
+    common.utils.export_variable(
+        "LDFLAGS", f"'-L{os.path.join(install_dir, 'lib')} -lcurl -lhdf5 -lhdf5_hl'"
+    )
+
+
+def get_root_dir() -> str:
+    return os.path.abspath(os.curdir)
+
+
+def get_install_dir(
+    env: defs.ProgrammingEnvironment,
+    stack: defs.SoftwareStack,
+    stack_version: Optional[str],
+    version: str,
+) -> str:
+    return _get_install_dir(
+        hdf5_dir=_get_dir(root_dir=get_root_dir(), version=version),
+        subtree=utils.get_subtree(env, stack, stack_version),
+    )
+
+
+def setup(
+    env: defs.ProgrammingEnvironment,
+    stack: defs.SoftwareStack,
+    stack_version: Optional[str],
+    version: str,
+) -> None:
+    _setup(
+        install_dir=_get_install_dir(
+            hdf5_dir=_get_dir(root_dir=get_root_dir(), version=version),
+            subtree=utils.get_subtree(env, stack, stack_version),
+        )
+    )
+
+
 def core(
     env: defs.ProgrammingEnvironment,
     partition: defs.Partition,
@@ -28,8 +78,7 @@ def core(
         utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load("buildtools")
 
-        root_dir = os.path.abspath(os.curdir)
-        hdf5_dir = os.path.join(root_dir, f"hdf5/{version}")
+        hdf5_dir = _get_dir(root_dir := get_root_dir(), version)
         with common.utils.chdir(root_dir):
             common.utils.run("mkdir -p hdf5")
             if version < "1.14.4":
@@ -44,21 +93,22 @@ def core(
             )
 
             with common.utils.chdir(hdf5_dir):
-                build_dir = os.path.join(
-                    hdf5_dir, "build", subtree := utils.get_subtree(env, stack, stack_version)
+                build_dir = _get_build_dir(
+                    hdf5_dir, subtree := utils.get_subtree(env, stack, stack_version)
                 )
+                install_dir = _get_install_dir(hdf5_dir, subtree)
 
                 if version < "2.0.0":
                     common.utils.run("chmod +x autogen.sh")
                     common.utils.run("./autogen.sh")
-                    common.utils.run(f"rm -rf {build_dir}")
+                    common.utils.run(f"rm -rf {install_dir}")
                     common.utils.run(
                         "CFLAGS='-fPIC'",
                         "CXXFLAGS='-fPIC'",
                         "FC=ftn",
                         "FCFLAGS='-fPIC'",
                         "./configure",
-                        f"--prefix={build_dir}",
+                        f"--prefix={install_dir}",
                         "--enable-build-mode=production",
                         # "--enable-cxx",
                         "--enable-fortran",
@@ -69,7 +119,6 @@ def core(
                     )
                     common.utils.run("make -j 8 install")
                 else:
-                    install_dir = os.path.join(hdf5_dir, "install", subtree)
                     common.utils.run(f"mkdir -p {build_dir}")
                     with common.utils.chdir(build_dir):
                         common.utils.run(
@@ -87,8 +136,7 @@ def core(
                         )
                         common.utils.run("make -j 8 install")
 
-                common.utils.export_variable("HDF5_ROOT", install_dir)
-                common.utils.export_variable("HDF5_DIR", install_dir)
+                _setup(install_dir)
 
 
 if __name__ == "__main__":
