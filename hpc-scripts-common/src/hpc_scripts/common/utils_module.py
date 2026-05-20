@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-from . import utils
+from hpc_scripts.common import utils
 
 
 def module_purge(force: bool = False) -> None:
