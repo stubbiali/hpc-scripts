@@ -102,7 +102,7 @@ def core(
             _setup(install_dir)
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", type=str, default=defaults.ENV)
     parser.add_argument("--hdf5-version", type=str, default=defaults.HDF5_VERSION)
@@ -112,3 +112,7 @@ if __name__ == "__main__":
     parser.add_argument("--version", type=str, default=defaults.NETCDF_VERSION)
     args = parser.parse_args()
     core(**args.__dict__)
+
+
+if __name__ == "__main__":
+    main()

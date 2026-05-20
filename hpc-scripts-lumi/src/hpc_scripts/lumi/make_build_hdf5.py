@@ -122,7 +122,7 @@ def core(
             _setup(install_dir)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", type=str, default=defaults.ENV)
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)
@@ -131,3 +131,7 @@ if __name__ == "__main__":
     parser.add_argument("--version", type=str, default=defaults.HDF5_VERSION)
     args = parser.parse_args()
     core(**args.__dict__)
+
+
+if __name__ == "__main__":
+    main()

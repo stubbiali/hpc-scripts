@@ -28,7 +28,7 @@ def core(ghex_transport_backend: defs.GHEXTransportBackend, partition: defs.Part
     return fname
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(description="Configure MPICH.")
     parser.add_argument(
         "--ghex-transport-backend", type=str, default=defaults.GHEX_TRANSPORT_BACKEND
@@ -36,3 +36,7 @@ if __name__ == "__main__":
     parser.add_argument("--partition", type=str, default=defaults.PARTITION)
     args = parser.parse_args()
     core(**args.__dict__)
+
+
+if __name__ == "__main__":
+    main()

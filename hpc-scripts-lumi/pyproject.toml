@@ -15,7 +15,16 @@ version = '0.0'
 
 [project.scripts]
 make_build_hdf5 = 'hpc_scripts.lumi.make_build_hdf5:main'
+make_build_nco = 'hpc_scripts.lumi.make_build_nco:main'
+make_build_netcdf = 'hpc_scripts.lumi.make_build_netcdf:main'
+make_prepare_cloudsc = 'hpc_scripts.lumi.make_prepare_cloudsc:main'
+make_prepare_cloudsc2 = 'hpc_scripts.lumi.make_prepare_cloudsc2:main'
+make_prepare_ecrad = 'hpc_scripts.lumi.make_prepare_ecrad:main'
+make_prepare_ecrad_porting = 'hpc_scripts.lumi.make_prepare_ecrad_porting:main'
+make_prepare_mpi = 'hpc_scripts.lumi.make_prepare_mpi:main'
+make_prepare_pmap = 'hpc_scripts.lumi.make_prepare_pmap:main'
 make_select_gpu = 'hpc_scripts.lumi.make_select_gpu:main'
+mysalloc = 'hpc_scripts.lumi.salloc:main'
 
 [tool.setuptools.packages.find]
 where = ["src/"]

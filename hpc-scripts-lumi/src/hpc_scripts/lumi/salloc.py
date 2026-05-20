@@ -31,7 +31,7 @@ def core(
     common.utils.run(*command, verbose=True)
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(description="Get an allocation on the compute nodes.")
     parser.add_argument("--account", type=int, default=defaults.ACCOUNT)
     parser.add_argument("--num-nodes", type=int, default=NUM_NODES)
@@ -40,3 +40,7 @@ if __name__ == "__main__":
     parser.add_argument("--time", type=str, default=TIME)
     args = parser.parse_args()
     core(**args.__dict__)
+
+
+if __name__ == "__main__":
+    main()

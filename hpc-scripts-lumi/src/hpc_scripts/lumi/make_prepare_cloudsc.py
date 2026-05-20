@@ -81,7 +81,7 @@ def core(
     return fname
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--branch", type=str, default=BRANCH)
     parser.add_argument("--env", type=str, default=defaults.ENV)
@@ -91,3 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
     args = parser.parse_args()
     core(**args.__dict__, project="cloudsc")
+
+
+if __name__ == "__main__":
+    main()
