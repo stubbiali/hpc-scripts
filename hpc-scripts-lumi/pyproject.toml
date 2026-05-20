@@ -1,0 +1,23 @@
+[build-system]
+build-backend = 'setuptools.build_meta'
+requires = ['setuptools>=65.5.0', 'wheel']
+
+[project]
+authors = [
+    {name = 'Stefano Ubbiali', email = 'subbiali@phys.ethz.ch'},
+]
+dependencies = [
+    'hpc_scripts_common @ git+https://github.com/stubbiali/hpc-scripts.git@namespaces#subdirectory=hpc-scripts-common'
+]
+description = 'Scripts for LUMI @ CSC'
+name = 'hpc_scripts_lumi'
+version = '0.0'
+
+[project.scripts]
+make_build_hdf5 = 'hpc_scripts.lumi.make_build_hdf5:main'
+make_select_gpu = 'hpc_scripts.lumi.make_select_gpu:main'
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+include = ["hpc_scripts.lumi"]
+namespaces = true
