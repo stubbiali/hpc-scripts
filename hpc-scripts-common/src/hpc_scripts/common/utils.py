@@ -9,6 +9,8 @@ import subprocess
 import tempfile
 from typing import TYPE_CHECKING
 
+from hpc_scripts.common import config
+
 if TYPE_CHECKING:
     from typing import Any, Optional
 
@@ -27,7 +29,8 @@ def batch_directory(path: Optional[str] = None):
         else:
             final_cleanup = True
             if path is not None:
-                path = os.path.abspath(path)
+                if not os.path.isabs(path):
+                    path = os.path.join(config.ROOT_DIR, path)
                 if os.path.exists(path):
                     shutil.rmtree(path)
                     print(f"py-hpc-scripts: overwrite {path}")
@@ -35,8 +38,8 @@ def batch_directory(path: Optional[str] = None):
                     print(f"py-hpc-scripts: create {path}")
                 os.makedirs(path)
             else:
-                os.makedirs("_tmp", exist_ok=True)
-                path = os.path.abspath(tempfile.mkdtemp(dir="_tmp"))
+                os.makedirs(parent_dir := os.path.join(config.ROOT_DIR, "_tmp"), exist_ok=True)
+                path = os.path.abspath(tempfile.mkdtemp(dir=parent_dir))
                 os.makedirs(path, exist_ok=True)
                 print(f"py-hpc-scripts: create {path}")
             BATCH_DIRECTORY_REGISTRY.append(path)
@@ -52,7 +55,7 @@ def batch_file(filename: Optional[str] = None):
         if len(BATCH_DIRECTORY_REGISTRY) > 0:
             fname = os.path.abspath(os.path.join(BATCH_DIRECTORY_REGISTRY[-1], filename + ".sh"))
         else:
-            fname = os.path.abspath(filename + ".sh")
+            fname = os.path.join(config.ROOT_DIR, filename + ".sh")
 
         try:
             with open(fname, "w") as f:
