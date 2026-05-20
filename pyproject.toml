@@ -58,10 +58,12 @@ ignore = [
 case-sensitive = true
 combine-as-imports = true
 force-sort-within-sections = true
+known-first-party = ['hpc_scripts']
 section-order = [
     'future',
     'standard-library',
     'third-party',
+    'first-party',
     'local-folder'
 ]
 split-on-trailing-comma = false
