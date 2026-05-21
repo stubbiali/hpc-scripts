@@ -1,35 +1,19 @@
 # hpc-scripts: Utility scripts tailored to HPC systems
 
-This repository collects Bash scripts to build, install and execute (at scale)
-selected applications on a limited set of HPC systems. Each folder in the project root
-directory contains the scripts for a specific machine, except for the folder
-`common` gathering additional configuration files aimed to ameliorate
-the user experience and productivity on modern supercomputers.
+`hpc-scrips` aims to ease the configuration, build and deployment of selected applications on a
+limited set of HPC systems. `hpc-scripts` comes as a Python distribution consisting of multiple *namespace
+packages*, each targeting a specific machine, except for `hpc-scripts-common` that gathers common
+functionalities consumed by other packages. Packages expose *console scripts* (i.e., executable commands)
+that generate the Bash scripts to configure, build and deploy software.
 
-The following applications are targeted:
-* [FVM](https://github.com/ckuehnlein/FVM_GT4Py)
-* [CLOUDSC](https://github.com/ecmwf-ifs/dwarf-p-cloudsc)
-* [CLOUDSC2](https://github.com/ecmwf-ifs/dwarf-p-cloudsc2-tl-ad)
+The following packages are available:
 
-The following supercomputers are supported (the corresponding top-level
-directory is reported before the colon):
-* `daint`: [Piz Daint](https://www.cscs.ch/computers/piz-daint/) @ CSCS (Lugano, Switzerland)
-* `hpc2020`: [HPC2020](https://www.ecmwf.int/en/elibrary/81163-hpc2020-ecmwfs-new-high-performance-computing-facility)
-@ ECMWF (Bologna, Italy)
-* `meluxina`: [MeluXina](https://docs.lxp.lu/) @ LuxConnect (Bissen, Luxembourg)
+* `hpc-scripts-lumi` targets the LUMI supercomputer at CSC.
 
-**Disclaimer #1:** For any machine, the support is in principle *partial*, meaning
-that we might providing the scripts only for a subset of targeted applications.
-
-**Disclaimer #2:** The scripts are not guaranteed to work out-of-the-box. A few tweaks
-and tunings are likely needed. However, most scripts are parametrized through Bash variables
-(defined at the beginning of the file), so required changes should mainly be restricted to
-these variables.
-
-
-## Getting started
-
-We suggest cloning the repository in the `$HOME` directory of the HPC system at hand.
-
-We refer the reader to the instructions provided within each folder to get more information
-about the (suggested) usage of the scripts.
+Since different packages might expose executable commands with the same name, we recommend to only
+install on the remote host the package targeting that machine, so to avoid any name collision.
+A quick-start guide is provided for each package, with installation instructions, the list of
+supported applications, and the available console scripts. Note that the `hpc-scripts` distribution
+is *self-contained*: each package only depends on the Python standard library and (optionally)
+`hpc-scripts-common`. Therefore, it is safe to pip-install packages outside
+a virtual environment, so to have the provided console scripts always available in the path.
