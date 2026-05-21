@@ -50,9 +50,13 @@ def core(
         if partition_type == "gpu":
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
-        # set path to PMAP code
+        # set path to PMAP code, cloning the repo if the directory does not exist
         pmap_dir = os.path.join(common.config.ROOT_DIR, project, branch)
-        assert os.path.exists(pmap_dir)
+        if not os.path.exists(pmap_dir):
+            common.utils.run(
+                f"git clone -b {branch} git@github.com:PMAP-Project/"
+                f"{'PMAP-LES-shared' if project == 'pmap-les-shared' else 'pmap'}.git {pmap_dir}"
+            )
         common.utils.export_variable(project_with_underscores.upper(), pmap_dir)
         pmap_subtree = utils.get_subtree(
             env,
