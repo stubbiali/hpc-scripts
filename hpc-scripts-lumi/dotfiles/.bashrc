@@ -103,3 +103,6 @@ eval "$(uv generate-shell-completion bash)"
 
 # spack
 export SPACK_USER_PREFIX=/project/project_465000527/nasu/spack
+
+# hpc-scripts
+export HPC_SCRIPTS_ROOT_DIR=$PROJECT
