@@ -1,9 +1,20 @@
-# Dot files
+# hpc-scripts-common
 
-This folder contains configuration ("dot") files for some tools which are commonly
-used by programmers on a remote system (e.g. the Bash shell, Vim). If you want to use one of the
-provided dot file, we suggest creating a symlink to the file in your `$HOME`.
+The namespace package `hpc-scripts-common` contains host-agnostic functionalities and utilities
+used by other packages, and some template dotfiles, to be symlinked in your `$HOME` folder.
 
-**Remark:** Should a file with the same name of the chosen dot file already exist in `$HOME`,
-we highly recommend creating a backup copy of that file before proceeding, so to avoid any
-irreversible damage.
+### Quick start guide
+
+```bash
+# clone the repository into home
+~$ git clone -b namespaces git@github.com:stubbiali/hpc-scripts.git
+```
+
+### Example
+
+```bash
+# create a symlink to dotfiles/.vimrc in home
+# if .vimrc already exists in home, we suggest creating a backup copy for enhanced safety
+~$ mv .vimrc .vimrc.bck
+~$ ln -s hpc-scrips/hpc-scripts-common/dotfiles/.vimrc
+```
