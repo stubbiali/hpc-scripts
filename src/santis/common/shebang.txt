@@ -1,1 +1,0 @@
-#!/capstor/scratch/cscs/ciextc28/software_stack/spack/opt/spack/linux-neoverse_v2/python-3.11.11-clh6pnl5g6kzoqbbovybsj76ggd7y3zg/bin/python3
