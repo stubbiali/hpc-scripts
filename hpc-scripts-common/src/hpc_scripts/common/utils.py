@@ -33,15 +33,15 @@ def batch_directory(path: Optional[str] = None):
                     path = os.path.join(config.ROOT_DIR, path)
                 if os.path.exists(path):
                     shutil.rmtree(path)
-                    print(f"py-hpc-scripts: overwrite {path}")
+                    print(f"hpc-scripts: overwrite {path}")
                 else:
-                    print(f"py-hpc-scripts: create {path}")
+                    print(f"hpc-scripts: create {path}")
                 os.makedirs(path)
             else:
                 os.makedirs(parent_dir := os.path.join(config.ROOT_DIR, "_tmp"), exist_ok=True)
                 path = os.path.abspath(tempfile.mkdtemp(dir=parent_dir))
                 os.makedirs(path, exist_ok=True)
-                print(f"py-hpc-scripts: create {path}")
+                print(f"hpc-scripts: create {path}")
             BATCH_DIRECTORY_REGISTRY.append(path)
             yield path
     finally:
@@ -63,7 +63,7 @@ def batch_file(filename: Optional[str] = None):
                 f.write("#!/bin/bash -l\n\n")
                 yield f, fname
         finally:
-            print(f"py-hpc-scripts: write {fname}")
+            print(f"hpc-scripts: write {fname}")
             BATCH_FILE_REGISTRY.pop()
 
 
