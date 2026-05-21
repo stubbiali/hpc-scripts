@@ -71,7 +71,7 @@ def core(
         )
 
         with common.utils.chdir(netcdf_dir):
-            make_build_hdf5.setup(env, stack, stack_version)
+            make_build_hdf5.setup(env, stack, stack_version, hdf5_version)
 
             common.utils.run("autoupdate")
             common.utils.run("autoreconf -if")
