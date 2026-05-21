@@ -56,7 +56,7 @@ USE_CASE: dict[str, list[common.utils.ThreadsLayout]] = {
 # >>> config: end
 
 
-def core():
+def main():
     for gt_backend, pmap_precision, use_case in itertools.product(
         GT_BACKEND, PMAP_PRECISION, USE_CASE
     ):
@@ -113,4 +113,4 @@ def core():
 
 
 if __name__ == "__main__":
-    core()
+    main()

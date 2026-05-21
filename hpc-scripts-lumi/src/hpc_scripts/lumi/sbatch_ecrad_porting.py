@@ -33,7 +33,7 @@ TIME: str = "05:00:00"
 # >>> config: end
 
 
-def core():
+def main():
     for ecrad_precision, ecrad_stencil_name, ecrad_stencil_version, gt_backend in itertools.product(
         ECRAD_PRECISION, ECRAD_STENCIL_NAME, ECRAD_STENCIL_VERSION, GT_BACKEND
     ):
@@ -87,4 +87,4 @@ def core():
 
 
 if __name__ == "__main__":
-    core()
+    main()
