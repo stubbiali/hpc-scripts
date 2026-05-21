@@ -84,5 +84,5 @@ Installing PMAP-LES-shared using the software stack LUMI/25.03, and run a benchm
 (...) <HPC_SCRIPTS_ROOT_DIR>/pmap-les-shared/lumi$ make_select_gpu
 
 # run the moist baroclinic wave benchmark
-(...) <HPC_SCRIPTS_ROOT_DIR>/pmap-les-shared/lumi$ GT_BACKEND=dace:gpu srun --ntasks=1 --cpus-per-task=7 ./../../select_gpu.sh pmap config/baroclinic_wave_sphere_moist.yml
+(...) <HPC_SCRIPTS_ROOT_DIR>/pmap-les-shared/lumi$ GT_BACKEND=dace:gpu srun --ntasks=1 --cpus-per-task=7 ./../../select_gpu.sh pmap-les config/baroclinic_wave_sphere_moist.yml
 ```
