@@ -99,7 +99,7 @@ def core(
                 partition,
                 gt_backend=gt_backend,
             )
-            select_gpu_fname = make_select_gpu.main()
+            select_gpu_fname = make_select_gpu.core()
             if output_dir is not None:
                 output_dir = os.path.abspath(output_dir)
             else:
