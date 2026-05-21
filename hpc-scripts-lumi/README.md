@@ -1,12 +1,14 @@
 # hpc-scripts-lumi
 
 The namespace package `hpc-scripts-lumi` is meant to ease the configuration, build and run of
-selected software on the LUMI supercomputer. Some template dotfiles are also provided in `dotfiles/`.
+selected software on the LUMI supercomputer.
+
+Some template dotfiles are also provided in `dotfiles/`, to be symlinked in your `$HOME` folder.
 
 ### Quick start guide
 
 ```bash
-# clone the repository into your home
+# clone the repository into home
 ~$ git clone -b namespaces git@github.com:stubbiali/hpc-scripts.git
 
 # install the package in editable mode
