@@ -54,16 +54,13 @@ def output_directory(path: Optional[str] = None):
 @contextlib.contextmanager
 def output_file(filename: Optional[str] = None):
     if filename is not None:
-        dirname = (
-            OUTPUT_DIRECTORY_REGISTRY[-1]
-            if len(OUTPUT_DIRECTORY_REGISTRY) > 0
-            else config.SCRIPTS_ROOT_DIR
-        )
-        os.makedirs(dirname, exist_ok=True)
-
         basename, ext = os.path.splitext(filename)
         ext = ext or ".sh"
-        fname = os.path.join(dirname, basename + ext)
+        if len(OUTPUT_DIRECTORY_REGISTRY) > 0:
+            fname = os.path.abspath(os.path.join(OUTPUT_DIRECTORY_REGISTRY[-1], basename + ext))
+        else:
+            fname = os.path.join(config.SCRIPTS_ROOT_DIR, basename + ext)
+        os.makedirs(os.path.dirname(fname), exist_ok=True)
 
         try:
             with open(fname, "w") as f:
