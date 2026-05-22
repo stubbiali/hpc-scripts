@@ -1,0 +1,29 @@
+[build-system]
+build-backend = 'setuptools.build_meta'
+requires = ['setuptools>=65.5.0', 'wheel']
+
+[project]
+authors = [
+    {name = 'Stefano Ubbiali', email = 'subbiali@phys.ethz.ch'},
+]
+dependencies = [
+    'hpc_scripts_common @ git+https://github.com/stubbiali/hpc-scripts.git@namespaces#subdirectory=hpc-scripts-common'
+]
+description = 'Scripts for Alps.Santis @ CSCS'
+name = 'hpc_scripts_santis'
+version = '0.0'
+
+[project.scripts]
+make_build_spack_env_ecrad = 'hpc_scripts.santis.make_build_spack_env_ecrad:main'
+make_build_spack_env_pmap = 'hpc_scripts.santis.make_build_spack_env_pmap:main'
+make_prepare_ecrad = 'hpc_scripts.santis.make_prepare_ecrad:main'
+make_prepare_ecrad_porting = 'hpc_scripts.santis.make_prepare_ecrad_porting:main'
+make_prepare_pmap = 'hpc_scripts.santis.make_prepare_pmap:main'
+pysalloc = 'hpc_scripts.santis.salloc:main'
+sbatch_ecrad_porting = 'hpc_scripts.santis.sbatch_ecrad_porting:main'
+sbatch_pmap = 'hpc_scripts.santis.sbatch_pmap:main'
+
+[tool.setuptools.packages.find]
+where = ["src/"]
+include = ["hpc_scripts.santis"]
+namespaces = true
