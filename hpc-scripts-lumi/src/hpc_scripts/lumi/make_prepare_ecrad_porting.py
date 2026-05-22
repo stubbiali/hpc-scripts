@@ -46,7 +46,7 @@ def core(
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
         # set path to ecrad-porting code
-        ecrad_dir = os.path.join(common.config.ROOT_DIR, "ecrad-porting", branch)
+        ecrad_dir = os.path.join(common.config.APPS_ROOT_DIR, "ecrad-porting", branch)
         assert os.path.exists(ecrad_dir)
         common.utils.export_variable("ECRAD", ecrad_dir)
         subtree = utils.get_subtree(env, stack, stack_version)

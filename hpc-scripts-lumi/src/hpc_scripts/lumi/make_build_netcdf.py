@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def _get_dir(version: str) -> str:
-    return os.path.join(common.config.ROOT_DIR, f"netcdf-c/{version}")
+    return os.path.join(common.config.APPS_ROOT_DIR, f"netcdf-c/{version}")
 
 
 def _get_install_dir(netcdf_dir: str, subtree: str, hdf5_version) -> str:

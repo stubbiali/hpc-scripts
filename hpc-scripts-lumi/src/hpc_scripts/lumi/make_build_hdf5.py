@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def _get_dir(version: str) -> str:
-    return os.path.join(common.config.ROOT_DIR, f"hdf5/{version}")
+    return os.path.join(common.config.APPS_ROOT_DIR, f"hdf5/{version}")
 
 
 def _get_build_dir(hdf5_dir: str, subtree: str) -> str:

@@ -34,7 +34,7 @@ def core(
         utils.load_boost(cpe, stack_version)
 
         # set path to ecrad code
-        ecrad_dir = os.path.join(common.config.ROOT_DIR, "ecrad", branch)
+        ecrad_dir = os.path.join(common.config.APPS_ROOT_DIR, "ecrad", branch)
         assert os.path.exists(ecrad_dir)
         common.utils.export_variable("ECRAD", ecrad_dir)
 

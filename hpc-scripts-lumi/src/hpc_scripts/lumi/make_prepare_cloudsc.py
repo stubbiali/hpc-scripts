@@ -40,7 +40,7 @@ def core(
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
         # set path to the source code of the project
-        project_dir = os.path.join(common.config.ROOT_DIR, project, branch)
+        project_dir = os.path.join(common.config.APPS_ROOT_DIR, project, branch)
         assert os.path.exists(project_dir), f"Branch `{branch}` of `{project} not found."
         common.utils.export_variable(
             project.upper(), os.path.join(project_dir, "src", project + "_gt4py")

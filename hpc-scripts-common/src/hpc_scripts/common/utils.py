@@ -30,7 +30,7 @@ def output_directory(path: Optional[str] = None):
             final_cleanup = True
             if path is not None:
                 if not os.path.isabs(path):
-                    path = os.path.join(config.ROOT_DIR, path)
+                    path = os.path.join(config.SCRIPTS_ROOT_DIR, path)
                 if os.path.exists(path):
                     shutil.rmtree(path)
                     print(f"hpc-scripts: overwrite {path}")
@@ -38,7 +38,9 @@ def output_directory(path: Optional[str] = None):
                     print(f"hpc-scripts: create {path}")
                 os.makedirs(path)
             else:
-                os.makedirs(parent_dir := os.path.join(config.ROOT_DIR, "_tmp"), exist_ok=True)
+                os.makedirs(
+                    parent_dir := os.path.join(config.SCRIPTS_ROOT_DIR, "_tmp"), exist_ok=True
+                )
                 path = os.path.abspath(tempfile.mkdtemp(dir=parent_dir))
                 os.makedirs(path, exist_ok=True)
                 print(f"hpc-scripts: create {path}")
@@ -52,12 +54,16 @@ def output_directory(path: Optional[str] = None):
 @contextlib.contextmanager
 def output_file(filename: Optional[str] = None):
     if filename is not None:
+        dirname = (
+            OUTPUT_DIRECTORY_REGISTRY[-1]
+            if len(OUTPUT_DIRECTORY_REGISTRY) > 0
+            else config.SCRIPTS_ROOT_DIR
+        )
+        os.makedirs(dirname, exist_ok=True)
+
         basename, ext = os.path.splitext(filename)
         ext = ext or ".sh"
-        if len(OUTPUT_DIRECTORY_REGISTRY) > 0:
-            fname = os.path.abspath(os.path.join(OUTPUT_DIRECTORY_REGISTRY[-1], basename + ext))
-        else:
-            fname = os.path.join(config.ROOT_DIR, basename + ext)
+        fname = os.path.join(dirname, basename + ext)
 
         try:
             with open(fname, "w") as f:

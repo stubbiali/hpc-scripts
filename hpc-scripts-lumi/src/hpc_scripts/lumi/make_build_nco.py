@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def _get_dir(version: str) -> str:
-    return os.path.join(common.config.ROOT_DIR, "nco", version)
+    return os.path.join(common.config.APPS_ROOT_DIR, "nco", version)
 
 
 def _get_build_dir(nco_dir: str, subtree: str, hdf5_version: str, netcdf_version: str) -> str:
@@ -60,7 +60,7 @@ def core(
         utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load("buildtools")
 
-        with common.utils.chdir(common.config.ROOT_DIR):
+        with common.utils.chdir(common.config.APPS_ROOT_DIR):
             nco_dir = _get_dir(version)
             if not os.path.exists(nco_dir):
                 common.utils.run("mkdir -p nco")

@@ -51,7 +51,7 @@ def core(
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
         # set path to PMAP code, cloning the repo if the directory does not exist
-        pmap_dir = os.path.join(common.config.ROOT_DIR, project, branch)
+        pmap_dir = os.path.join(common.config.APPS_ROOT_DIR, project, branch)
         if not os.path.exists(pmap_dir):
             common.utils.run(
                 f"git clone -b {branch} git@github.com:PMAP-Project/"
@@ -70,7 +70,7 @@ def core(
         common.utils.export_variable(f"{project_with_underscores.upper()}_VENV", pmap_venv_dir)
 
         # low-level GT4Py, DaCe and GHEX config
-        gt_cache_root = os.path.join(common.config.ROOT_DIR, project, "_gtcache", pmap_subtree)
+        gt_cache_root = os.path.join(common.config.APPS_ROOT_DIR, project, "_gtcache", pmap_subtree)
         common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
         common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
         common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
