@@ -11,9 +11,8 @@ Some template dotfiles are also provided in `dotfiles/`, to be symlinked in your
 # clone the repository into home
 ~$ git clone -b namespaces git@github.com:stubbiali/hpc-scripts.git
 
-# install the package in editable mode
-~$ module load cray-python
-~$ pip install -e hpc-scripts/hpc-scripts-lumi
+# install the package in editable mode using `uv tool`
+~$ uv tool install -e hpc-scripts/hpc-scripts-lumi
 
 # set the directory containing the source code of the target software
 # all generated bash scripts will be placed in this directory
