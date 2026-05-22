@@ -56,7 +56,7 @@ def core(
     stack_version: Optional[str],
     version: str,
 ) -> None:
-    with common.utils.batch_file(filename="build_nco"):
+    with common.utils.output_file(filename="build_nco"):
         utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load("buildtools")
 

@@ -9,7 +9,7 @@ from hpc_scripts.lumi import defaults, defs, utils
 
 
 def core(ghex_transport_backend: defs.GHEXTransportBackend, partition: defs.Partition) -> str:
-    with common.utils.batch_file(filename="prepare_mpi") as (_, fname):
+    with common.utils.output_file(filename="prepare_mpi") as (_, fname):
         # common.utils.export_variable("MPICH_CRAY_OPT_THREAD_SYNC", 1)
         # common.utils.export_variable("MPICH_GNI_USE_UNASSIGNED_CPUS", "enabled")
         # common.utils.export_variable("MPICH_NEMESIS_ASYNC_PROGRESS", "MC")

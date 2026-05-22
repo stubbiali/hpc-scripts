@@ -69,7 +69,7 @@ def main():
                 GHEX_TRANSPORT_BACKEND,
                 gt_backend.replace(":", ""),
             )
-            with common.utils.batch_directory(path=job_dir) as output_dir:
+            with common.utils.output_directory(path=job_dir) as output_dir:
                 job_name = (
                     f"{use_case.replace('/', '-')}-{threads_layout.num_tasks}-{pmap_precision[0]}"
                 )

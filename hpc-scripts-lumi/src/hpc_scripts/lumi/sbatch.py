@@ -42,10 +42,10 @@ def core(
         assert cb is not None, f"Module `{callback_module}` must define `callback()`."
         job_script = cb()
 
-    with common.utils.batch_directory() as job_dir:
+    with common.utils.output_directory() as job_dir:
         error = os.path.join(job_dir, "error.txt")
         output = os.path.join(job_dir, "output.txt")
-        with common.utils.batch_file(filename="batch") as (_, batch_file):
+        with common.utils.output_file(filename="batch") as (_, batch_file):
             command = [
                 "sbatch",
                 f"--account=project_{account}",

@@ -15,17 +15,17 @@ if TYPE_CHECKING:
     from typing import Any, Optional
 
 
-BATCH_DIRECTORY_REGISTRY = []
-BATCH_FILE_REGISTRY = []
+OUTPUT_DIRECTORY_REGISTRY = []
+OUTPUT_FILE_REGISTRY = []
 
 
 @contextlib.contextmanager
-def batch_directory(path: Optional[str] = None):
-    assert len(BATCH_DIRECTORY_REGISTRY) <= 1
+def output_directory(path: Optional[str] = None):
+    assert len(OUTPUT_DIRECTORY_REGISTRY) <= 1
     try:
-        if len(BATCH_DIRECTORY_REGISTRY) > 0:
+        if len(OUTPUT_DIRECTORY_REGISTRY) > 0:
             final_cleanup = False
-            yield BATCH_DIRECTORY_REGISTRY[-1]
+            yield OUTPUT_DIRECTORY_REGISTRY[-1]
         else:
             final_cleanup = True
             if path is not None:
@@ -42,29 +42,32 @@ def batch_directory(path: Optional[str] = None):
                 path = os.path.abspath(tempfile.mkdtemp(dir=parent_dir))
                 os.makedirs(path, exist_ok=True)
                 print(f"hpc-scripts: create {path}")
-            BATCH_DIRECTORY_REGISTRY.append(path)
+            OUTPUT_DIRECTORY_REGISTRY.append(path)
             yield path
     finally:
         if final_cleanup:
-            BATCH_DIRECTORY_REGISTRY.pop()
+            OUTPUT_DIRECTORY_REGISTRY.pop()
 
 
 @contextlib.contextmanager
-def batch_file(filename: Optional[str] = None):
+def output_file(filename: Optional[str] = None):
     if filename is not None:
-        if len(BATCH_DIRECTORY_REGISTRY) > 0:
-            fname = os.path.abspath(os.path.join(BATCH_DIRECTORY_REGISTRY[-1], filename + ".sh"))
+        basename, ext = os.path.splitext(filename)
+        ext = ext or ".sh"
+        if len(OUTPUT_DIRECTORY_REGISTRY) > 0:
+            fname = os.path.abspath(os.path.join(OUTPUT_DIRECTORY_REGISTRY[-1], basename + ext))
         else:
-            fname = os.path.join(config.ROOT_DIR, filename + ".sh")
+            fname = os.path.join(config.ROOT_DIR, basename + ext)
 
         try:
             with open(fname, "w") as f:
-                BATCH_FILE_REGISTRY.append(f)
-                f.write("#!/bin/bash -l\n\n")
+                OUTPUT_FILE_REGISTRY.append(f)
+                if ext == ".sh":
+                    f.write("#!/bin/bash -l\n\n")
                 yield f, fname
         finally:
             print(f"hpc-scripts: write {fname}")
-            BATCH_FILE_REGISTRY.pop()
+            OUTPUT_FILE_REGISTRY.pop()
 
 
 def run(*args: str, split: bool = False, verbose: bool = False) -> None:
@@ -77,8 +80,8 @@ def run(*args: str, split: bool = False, verbose: bool = False) -> None:
         command = " ".join(split_args)
     if verbose:
         print(command)
-    if len(BATCH_FILE_REGISTRY) > 0:
-        BATCH_FILE_REGISTRY[-1].write(command + "\n")
+    if len(OUTPUT_FILE_REGISTRY) > 0:
+        OUTPUT_FILE_REGISTRY[-1].write(command + "\n")
     else:
         subprocess.run(command, capture_output=False, check=True, shell=True)
 

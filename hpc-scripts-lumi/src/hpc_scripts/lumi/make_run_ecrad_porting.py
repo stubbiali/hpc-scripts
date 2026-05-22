@@ -53,7 +53,7 @@ def core(
         branch, env, hdf5_version, netcdf_version, partition, rocm_version, stack, stack_version
     )
 
-    with common.utils.batch_file(filename="run_ecrad_porting") as (_, fname):
+    with common.utils.output_file(filename="run_ecrad_porting") as (_, fname):
         common.utils.run(f"source {prepare_ecrad_fname}")
 
         with common.utils.chdir("$ECRAD"):
@@ -115,5 +115,5 @@ if __name__ == "__main__":
     parser.add_argument("--stack", type=str, default=defaults.STACK)
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
     args = parser.parse_args()
-    with common.utils.batch_directory():
+    with common.utils.output_directory():
         core(**args.__dict__)

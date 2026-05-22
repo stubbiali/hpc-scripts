@@ -36,7 +36,7 @@ def core(
     stack: defs.SoftwareStack,
     stack_version: Optional[str],
 ) -> str:
-    with common.utils.batch_file(filename="prepare_ecrad_porting") as (_, fname):
+    with common.utils.output_file(filename="prepare_ecrad_porting") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version, load_cdo=True)
         common.utils_module.module_load("buildtools", "cray-python")

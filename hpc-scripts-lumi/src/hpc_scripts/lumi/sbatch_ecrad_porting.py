@@ -46,7 +46,7 @@ def main():
             if ECRAD_MODE == "fortran"
             else f"{gt_backend.replace(':', '')}/{ecrad_precision}"
         )
-        with common.utils.batch_directory(path=job_dir):
+        with common.utils.output_directory(path=job_dir):
             job_name = (
                 f"ecrad_{ECRAD_MODE}-{ecrad_stencil_name}-{ecrad_stencil_version}-"
                 f"{gt_backend}-{ecrad_precision[0]}"

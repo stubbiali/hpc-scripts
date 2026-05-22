@@ -40,7 +40,7 @@ def core(
     stack_version: Optional[str],
 ) -> tuple[str, str]:
     project_with_underscores = project.replace("-", "_")
-    with common.utils.batch_file(filename=f"prepare_{project_with_underscores}") as (_, fname):
+    with common.utils.output_file(filename=f"prepare_{project_with_underscores}") as (_, fname):
         # clear environment and load relevant modules
         cpe = utils.setup_env(env, partition, stack, stack_version)
         common.utils_module.module_load("buildtools")

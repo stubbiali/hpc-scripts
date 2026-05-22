@@ -70,7 +70,7 @@ def core(
     )
 
     project_with_underscores = project.replace("-", "_")
-    with common.utils.batch_file(filename=f"run_{project_with_underscores}") as (_, fname):
+    with common.utils.output_file(filename=f"run_{project_with_underscores}") as (_, fname):
         common.utils.run(f". {prepare_pmap_fname}")
 
         with common.utils.chdir(f"${project_with_underscores.upper()}"):
@@ -150,5 +150,5 @@ if __name__ == "__main__":
     parser.add_argument("--stack-version", type=str, default=defaults.STACK_VERSION)
     parser.add_argument("--use-case", type=str, default=USE_CASE)
     args = parser.parse_args()
-    with common.utils.batch_directory():
+    with common.utils.output_directory():
         core(**args.__dict__)

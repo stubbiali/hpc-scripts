@@ -27,7 +27,7 @@ def core(
     stack_version: Optional[str],
     project: str = "cloudsc",
 ) -> str:
-    with common.utils.batch_file(filename="prepare_" + project) as (_, fname):
+    with common.utils.output_file(filename="prepare_" + project) as (_, fname):
         # clear environment
         common.utils_module.module_reset()
 
