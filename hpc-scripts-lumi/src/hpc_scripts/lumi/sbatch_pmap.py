@@ -34,6 +34,7 @@ PMAP_ENABLE_OVERCOMPUTING: bool = True
 PMAP_EXTENDED_TIMERS: bool = False
 PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
 PROJECT: Literal["pmap", "pmap-les-real-cases-shared"] = "pmap"
+PYTHON_VERSION: defs.PythonVersion = defaults.PYTHON_VERSION
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
@@ -95,6 +96,7 @@ def main():
                     pmap_extended_timers=PMAP_EXTENDED_TIMERS,
                     pmap_precision=pmap_precision,
                     project=PROJECT,
+                    python_version=PYTHON_VERSION,
                     rocm_version=ROCM_VERSION,
                     stack=STACK,
                     stack_version=STACK_VERSION,
