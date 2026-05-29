@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 # >>> config: start
 ACCOUNT: int = defaults.ACCOUNT
-BRANCH: str = "main"
+BRANCH: str = "lumi"
 DACE_DEFAULT_BLOCK_SIZE: str = "'256,1,1'"
 DRY_RUN: bool = False
 ENV: defs.ProgrammingEnvironment = "cray"
@@ -23,7 +23,7 @@ GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
 GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 GT_BACKEND: list[str] = ["gt:gpu"]
-JOB_ROOT_DIR: str = "jobs/pmap-les/"
+JOB_ROOT_DIR: str = "jobs/pmap-les-shared/"
 HDF5_VERSION: str = defaults.HDF5_VERSION
 NETCDF_VERSION: str = defaults.NETCDF_VERSION
 NUM_RUNS: int = 15
@@ -33,7 +33,7 @@ PMAP_ENABLE_BENCHMARKING: bool = True
 PMAP_ENABLE_OVERCOMPUTING: bool = True
 PMAP_EXTENDED_TIMERS: bool = False
 PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
-PROJECT: Literal["pmap", "pmap-les-real-cases-shared"] = "pmap"
+PROJECT: Literal["pmap", "pmap-les-shared"] = "pmap-les-shared"
 PYTHON_VERSION: defs.PythonVersion = defaults.PYTHON_VERSION
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
