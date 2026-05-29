@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "main"
+BRANCH: str = "lumi"
 PROJECT: Literal["pmap", "pmap-les-shared"] = "pmap"
 # >>> config: end
 
