@@ -110,7 +110,7 @@ def core(
                 )
             common.utils.run(f"mkdir -p {output_dir}")
             command = (
-                f"srun {' '.join(srun_options)} {select_gpu_fname} pmap-les "
+                f"srun {' '.join(srun_options)} {select_gpu_fname} pmap "
                 f"{os.path.join('config', use_case + '.yml')} "
                 f"--output-directory={output_dir}"
             )
