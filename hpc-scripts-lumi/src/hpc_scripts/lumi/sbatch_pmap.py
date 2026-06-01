@@ -23,7 +23,7 @@ GHEX_AGGREGATE_FIELDS: bool = False
 GHEX_COLLECT_STATISTICS: bool = False
 GHEX_TRANSPORT_BACKEND: defs.GHEXTransportBackend = "mpi"
 GT_BACKEND: list[str] = ["gt:gpu"]
-JOB_ROOT_DIR: str = "jobs/pmap-les-shared/"
+JOB_ROOT_DIR: str = "jobs"
 HDF5_VERSION: str = defaults.HDF5_VERSION
 NETCDF_VERSION: str = defaults.NETCDF_VERSION
 NUM_RUNS: int = 15
@@ -64,6 +64,7 @@ def main():
         for threads_layout in USE_CASE[use_case]:
             job_dir = os.path.join(
                 JOB_ROOT_DIR,
+                PROJECT,
                 BRANCH,
                 use_case,
                 pmap_precision,
