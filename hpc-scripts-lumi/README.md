@@ -30,6 +30,7 @@ Some template dotfiles are also provided in `dotfiles/`, to be symlinked in your
 * [dwarf-p-cloudsc2-tl-ad](https://github.com/ecmwf-ifs/dwarf-p-cloudsc2-tl-ad)
 * [PMAP](https://github.com/PMAP-Project/PMAP)
 * [PMAP-LES-shared](https://github.com/PMAP-Project/PMAP-LES-shared)
+* [PMAP-real_cases-shared](https://github.com/PMAP-Project/PMAP-real_cases-shared)
 * [ecRad](https://github.com/ecmwf-ifs/ecrad)
 * [ecRad-versions](https://github.com/PMAP-Project/ecRad-versions)
 
@@ -57,7 +58,7 @@ Pass the `-h` flag to any command to get its synopsis.
 
 ### Example
 
-Installing PMAP-LES-shared using the software stack LUMI/25.03, and run a benchmark on one GPU.
+Installing PMAP-real_cases-shared using the software stack LUMI/25.03, and run a benchmark on one GPU.
 
 ```bash
 # build hdf5 with parallel support
