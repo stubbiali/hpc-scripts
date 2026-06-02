@@ -29,7 +29,6 @@ Some template dotfiles are also provided in `dotfiles/`, to be symlinked in your
 * [dwarf-p-cloudsc](https://github.com/ecmwf-ifs/dwarf-p-cloudsc)
 * [dwarf-p-cloudsc2-tl-ad](https://github.com/ecmwf-ifs/dwarf-p-cloudsc2-tl-ad)
 * [PMAP](https://github.com/PMAP-Project/PMAP)
-* [PMAP-LES-shared](https://github.com/PMAP-Project/PMAP-LES-shared)
 * [PMAP-real_cases-shared](https://github.com/PMAP-Project/PMAP-real_cases-shared)
 * [ecRad](https://github.com/ecmwf-ifs/ecrad)
 * [ecRad-versions](https://github.com/PMAP-Project/ecRad-versions)
