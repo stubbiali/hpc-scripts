@@ -1,0 +1,73 @@
+#!/leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-8.5.0/python-3.11.7-ziwh63aulhhzxksf42k5u3gnim2rbpmp/bin/python
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+
+import argparse
+import os
+
+from hpc_scripts import common
+from hpc_scripts.leonardo import defaults, defs, utils
+
+# >>> config: start
+BRANCH: str = "main"
+# >>> config: end
+
+
+def core(
+    branch: str,
+    software_stack: defs.SoftwareStack,
+    python_version: defs.PythonVersion,
+    refresh_python_venv: bool,
+) -> tuple[str, str]:
+    with common.utils.output_file(filename="prepare_pmap") as (_, fname):
+        common.utils_module.module_purge()
+        utils.load_pmap_stack(python_version, software_stack)
+        utils.setup_ghex()
+
+        pmap_root = os.path.join(common.config.APPS_ROOT_DIR, "pmap")
+        if not os.path.exists(pmap_dir := os.path.join(pmap_root, branch)):
+            common.utils.run(
+                f"git clone -b {branch} git@github.com:PMAP-Project/PMAP.git {pmap_dir}"
+            )
+        common.utils.export_variable("PMAP", pmap_dir)
+
+        common.utils.export_variable(
+            "GT_CACHE_ROOT", (gt_cache_root := os.path.join(pmap_root, "_gtcache", software_stack))
+        )
+        # common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=4096'")
+        common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+
+        with common.utils.chdir(pmap_dir, restore=False):
+            venv_dir = os.path.join(
+                pmap_dir, "_venv", software_stack, f"py{python_version.replace('.', '')}"
+            )
+            common.utils.export_variable("PMAP_VENV", venv_dir)
+
+            if not os.path.exists(venv_dir):
+                refresh_python_venv = True
+                utils.setup_uv(software_stack)
+                common.utils.run(f"uv venv --python=$(which python{python_version}) {venv_dir}")
+
+            common.utils.run(f". {venv_dir}/bin/activate")
+
+            if refresh_python_venv:
+                common.utils.run(
+                    f"uv pip install --prerelease=allow -e "
+                    f".[dev,gpu{'-cuda12x' if python_version < '3.14' else ''},mpi-test]"
+                )
+
+    return fname
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--branch", type=str, default=BRANCH)
+    parser.add_argument("--python-version", type=str, default=defaults.PYTHON_VERSION)
+    parser.add_argument("--refresh-python-venv", action="store_true")
+    parser.add_argument("--software-stack", type=str, default=defaults.SOFTWARE_STACK)
+    args = parser.parse_args()
+    core(**args.__dict__)
+
+
+if __name__ == "__main__":
+    main()
