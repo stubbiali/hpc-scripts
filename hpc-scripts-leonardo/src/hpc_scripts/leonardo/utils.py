@@ -114,6 +114,7 @@ def load_mpi(
         elif mpi == "hpcx-mpi":
             common.utils_module.module_load(f"{mpi}/{mpi_version}")
             common.utils.export_variable("CFLAGS", "'$CFLAGS -noswitcherror'")
+            common.utils.export_variable("CXXFLAGS", "'$CXXFLAGS -noswitcherror'")
 
         common.utils.export_variable("CC", "$(which mpicc)")
         common.utils.export_variable("CXX", "$(which mpic++)")
