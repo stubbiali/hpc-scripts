@@ -9,7 +9,7 @@ user_fast_dir: str = os.path.join(fast_dir, user)
 # see https://docs.hpc.cineca.it/hpc/leonardo.html
 Partition = Literal["boost_usr_prod"]
 QOS: dict[Partition, tuple[str, ...]] = {
-    "boost_usr_prod": ("normal", "boost_qos_dbg", "boost_qos_bprod", "boost_qos_lprod"),
+    "boost_usr_prod": ("normal", "boost_qos_dbg", "boost_qos_bprod", "boost_qos_lprod")
 }
 valid_partitions = get_args(Partition)
 

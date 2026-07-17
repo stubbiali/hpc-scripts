@@ -98,4 +98,3 @@ eval "$(uv generate-shell-completion bash)"
 # hpc-scripts
 export HPCS_APPS_ROOT_DIR=$USER_FAST
 export HPCS_SCRIPTS_ROOT_DIR=$USER_FAST/_scripts
-
