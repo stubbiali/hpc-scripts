@@ -20,7 +20,7 @@ COMPILER_VERSION: str = "11.2.0"
 HDF5_VERSION: str = "1.14.4.2"
 MPI: defs.MPI = "hpcx"
 NETCDF_VERSION: str = "4.9.2"
-PARTITION: defs.Partition = "gpu"
+PARTITION: defs.Partition = "par"
 ROOT_DIR: str = defs.root_dir
 # >>> config: end
 
@@ -67,11 +67,11 @@ def core(
 
         # set path to PMAP code
         pmapl_dir = os.path.join(defs.root_dir, "pmapl", branch)
+        print(pmapl_dir)
         assert os.path.exists(pmapl_dir)
         utils.export_variable("PMAPL", pmapl_dir)
         pmapl_venv_dir = os.path.join(pmapl_dir, "venv", partition, env_id, mpi_id)
         utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
-
         # low-level GT4Py, DaCe and GHEX config
         gt_cache_root = os.path.join(defs.root_dir, "pmapl", "gt_cache", env_id)
         utils.export_variable("GT_CACHE_ROOT", gt_cache_root)

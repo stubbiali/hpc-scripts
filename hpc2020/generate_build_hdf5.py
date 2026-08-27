@@ -15,7 +15,7 @@ AUTOCONF_VERSION: str = "2.72"
 ENV: defs.ProgrammingEnvironment = "gnu"
 COMPILER_VERSION: str = "11.2.0"
 MPI: defs.MPI = "hpcx"
-PARTITION: defs.Partition = "gpu"
+PARTITION: defs.Partition = "par"
 ROOT_DIR: str = defs.root_dir
 VERSION: str = "1.14.4.2"
 # >>> config: end

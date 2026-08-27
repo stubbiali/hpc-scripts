@@ -133,7 +133,7 @@ def load_mpi(mpi: str, env: str, compiler_version: str, partition: str) -> str:
                     else:
                         cc, cxx, fc = "mpigcc", "mpigxx", "mpif90"
                 else:
-                    module_name = "openmpi/4.1.5.4" if partition == "gpu" else "openmpi/4.1.1.1"
+                    module_name = "openmpi/4.1.1.1" if partition == "gpu" else "openmpi/4.1.1.1"
     module_load(module_name)
     export_variable("CC", cc)
     export_variable("MPICC", cc)
