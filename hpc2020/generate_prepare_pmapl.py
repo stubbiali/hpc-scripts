@@ -73,10 +73,15 @@ def core(
         pmapl_venv_dir = os.path.join(pmapl_dir, "venv", partition, env_id, mpi_id)
         utils.export_variable("PMAPL_VENV", pmapl_venv_dir)
         # low-level GT4Py, DaCe and GHEX config
-        gt_cache_root = os.path.join(defs.root_dir, "pmapl", "gt_cache", env_id)
-        utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
-        utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
-        utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+        pmap_dir = os.path.join(pmapl_dir, "PMAP")
+        gt_cache_dir_name = "gt_cache"
+        gt_cache_dir = os.path.join(pmap_dir, gt_cache_dir_name)
+        utils.export_variable("GT_CACHE_ROOT", pmap_dir)
+        utils.export_variable("GT_CACHE_DIR_NAME", gt_cache_dir_name)
+        utils.export_variable("GT_CACHE_LOAD_RETRIES", 50)
+        utils.export_variable("GT_CACHE_LOAD_RETRY_DELAY", 1000)
+        utils.run(f"mkdir -p {gt_cache_dir}")
+        utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_dir, ".dace.conf"))
 
         # jump into project source directory and activate virtual environment (if it already exists)
         with utils.chdir(pmapl_dir, restore=False):
