@@ -36,7 +36,6 @@ PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["double", "single"]
 PROJECT: Literal["pmap", "pmap-real_cases-shared"] = "pmap-real_cases-shared"
 PROJECT: Literal["pmap", "pmap-real_cases-shared", "pmap-snapshots"] = "pmap-real_cases-shared"
 PYTHON_VERSION: defs.PythonVersion = defaults.PYTHON_VERSION
-REFRESH_PYTHON_VERSION: bool = False
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
 STACK_VERSION: str = defaults.STACK_VERSION
@@ -101,7 +100,6 @@ def main():
                     pmap_precision=pmap_precision,
                     project=PROJECT,
                     python_version=PYTHON_VERSION,
-                    refresh_python_venv=REFRESH_PYTHON_VERSION,
                     rocm_version=ROCM_VERSION,
                     stack=STACK,
                     stack_version=STACK_VERSION,
