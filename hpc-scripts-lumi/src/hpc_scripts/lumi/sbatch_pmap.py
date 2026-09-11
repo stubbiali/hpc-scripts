@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 # >>> config: start
 ACCOUNT: int = defaults.ACCOUNT
-BRANCH: str = "lumi"
+BRANCH: str = "lumi/real_cases_stable"
 DACE_DEFAULT_BLOCK_SIZE: str | None = None
 DRY_RUN: bool = False
 ENV: defs.ProgrammingEnvironment = "cray"
@@ -32,9 +32,8 @@ PMAP_DISABLE_LOG: bool = False
 PMAP_ENABLE_BENCHMARKING: bool = False
 PMAP_ENABLE_OVERCOMPUTING: bool = True
 PMAP_EXTENDED_TIMERS: bool = False
-PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["double", "single"]
-PROJECT: Literal["pmap", "pmap-real_cases-shared"] = "pmap-real_cases-shared"
-PROJECT: Literal["pmap", "pmap-real_cases-shared", "pmap-snapshots"] = "pmap-real_cases-shared"
+PMAP_PRECISION: list[defs.FloatingPointPrecision] = ["single"]
+PROJECT: Literal["pmap", "pmap-real_cases-shared", "pmap-snapshots"] = "pmap-snapshots"
 PYTHON_VERSION: defs.PythonVersion = defaults.PYTHON_VERSION
 ROCM_VERSION: str = defaults.ROCM_VERSION
 STACK: defs.SoftwareStack = defaults.STACK
@@ -72,6 +71,7 @@ def main():
                 pmap_precision,
                 GHEX_TRANSPORT_BACKEND,
                 gt_backend.replace(":", ""),
+                str(threads_layout.num_tasks),
             )
             with common.utils.output_directory(path=job_dir) as output_dir:
                 job_name = (
