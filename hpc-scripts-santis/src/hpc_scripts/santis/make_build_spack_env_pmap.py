@@ -22,7 +22,7 @@ def main() -> None:
             "gcc@14",
             "hdf5",
             "libffi",
-            "netcdf-c",
+            "netcdf-c" + " ~blosc" if uenv == "prgenv-gnu/25.11:v1" else "",
             "python@3.11",
             "python@3.12",
             "python@3.13",
