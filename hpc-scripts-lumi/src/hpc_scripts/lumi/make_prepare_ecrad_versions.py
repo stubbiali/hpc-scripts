@@ -53,11 +53,8 @@ def core(
         venv_dir = os.path.join(ecrad_dir, "_venv", subtree)
         common.utils.export_variable("ECRAD_VENV", venv_dir)
 
-        # low-level GT4Py, DaCe and GHEX config
-        # gt_cache_root = os.path.join(pwd, "ecrad-porting", "_gtcache", subtree)
-        # common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
-        # common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
-        # common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+        # low-level GT4Py & DaCe config
+        utils.setup_gt4py("ecrad-versions", subtree)
 
         # set/fix HIP-related variables
         if partition_type == "gpu":

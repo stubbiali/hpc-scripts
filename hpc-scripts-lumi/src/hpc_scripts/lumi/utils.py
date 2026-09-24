@@ -145,6 +145,17 @@ def setup_hip(rocm_version: str) -> None:
     common.utils.export_variable("ROCM_HOME", f"/opt/rocm-{rocm_version}")
 
 
+def setup_gt4py(project: str, subtree: str) -> None:
+    gt_cache_root = os.path.join(common.config.APPS_ROOT_DIR, project, "_gtcache", subtree)
+    common.utils.export_variable("GT_CACHE_ROOT", gt_cache_root)
+    common.utils.export_variable("GT_CACHE_DIR_NAME", ".gt_cache")
+    common.utils.export_variable("GT4PY_EXTRA_COMPILE_ARGS", "'-fbracket-depth=32768'")
+    common.utils.export_variable(
+        "GT4PY_CARTESIAN_EXTRA_CUDA_COMPILE_ARGS", "'-fbracket-depth=32768'"
+    )
+    common.utils.export_variable("DACE_CONFIG", os.path.join(gt_cache_root, ".dace.conf"))
+
+
 def get_srun_options(
     num_nodes: int,
     num_tasks_per_node: int,
