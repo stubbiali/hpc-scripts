@@ -61,14 +61,10 @@ def setup_env(
     partition: lumi.defs.Partition,
     stack: lumi.defs.SoftwareStack,
     stack_version: Optional[str],
-    load_cdo: bool = False,
 ) -> str:
     common.utils_module.module_reset()
     load_stack(stack, stack_version)
     load_partition(partition)
-    if load_cdo:
-        # note(stubbiali): the CDO module could only be built using easybuild for cpeGNU
-        common.utils_module.module_load("CDO/2.4.3-cpeGNU-24.03")
     cpe = load_cpe(env, stack_version)
     common.utils.export_variable("CC", "cc")
     common.utils.export_variable("CXX", "CC")
