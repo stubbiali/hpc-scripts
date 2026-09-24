@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 # >>> config: start
-BRANCH: str = "cy49r1s-pmap"
+BRANCH: str = "main"
 # >>> config: end
 
 
