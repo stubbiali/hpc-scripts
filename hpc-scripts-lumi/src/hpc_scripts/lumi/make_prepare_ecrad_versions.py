@@ -46,7 +46,7 @@ def core(
         if partition_type == "gpu":
             common.utils_module.module_load(f"rocm/{rocm_version}")
 
-        # set path to ecrad-versions code, cloning the code if does not exist yet
+        # set path to ecrad-versions code, cloning the repo if the directory does not exist yet
         ecrad_dir = os.path.join(common.config.APPS_ROOT_DIR, "ecrad-versions", branch)
         if not os.path.exists(ecrad_dir):
             common.utils.run(
