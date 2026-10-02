@@ -103,8 +103,8 @@ def core(
 
             if install_pmap:
                 # install the model with all its frozen python dependencies
-                common.utils.run("uv pip install --prerelease=allow -r requirements-dev-mpi.txt")
                 common.utils.run("uv pip install -e .[gpu]")
+                common.utils.run("uv pip install --prerelease=allow -r requirements-dev-mpi.txt")
 
     return fname
 
